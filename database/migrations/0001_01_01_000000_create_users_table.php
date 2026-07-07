@@ -16,6 +16,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('phone', 15)->nullable();
+            $table->string('ktp_number', 16)->unique()->nullable();
+            $table->text('address')->nullable();
+            $table->enum('role', ['owner', 'admin', 'customer'])->default('customer')->index();
+            $table->enum('status', ['pending', 'active', 'inactive'])->default('pending')->index();
+            $table->string('line_id', 100)->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
