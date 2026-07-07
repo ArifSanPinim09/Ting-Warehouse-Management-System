@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -11,6 +12,8 @@ new #[Layout('layouts.guest')] class extends Component
 
     /**
      * Handle an incoming authentication request.
+     *
+     * PRD §7.5: Redirect berdasarkan role setelah login.
      */
     public function login(): void
     {
@@ -20,7 +23,15 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        // PRD §7.5: Role-based redirect
+        $user = Auth::user();
+        $redirect = match ($user->role) {
+            'owner' => '/owner/dashboard',
+            'admin' => '/admin/dashboard',
+            default => '/dashboard',
+        };
+
+        $this->redirectIntended(default: $redirect, navigate: true);
     }
 }; ?>
 

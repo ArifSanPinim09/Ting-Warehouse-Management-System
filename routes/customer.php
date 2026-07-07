@@ -13,18 +13,24 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Customer dashboard
-    // Route::get('/customer/dashboard', [App\Http\Controllers\Customer\DashboardController::class, 'index'])->name('customer.dashboard');
+    // Customer dashboard (PRD §4.2)
+    Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-    // My Boxes
-    // Route::get('/customer/my-boxes', [App\Http\Controllers\Customer\BoxController::class, 'index'])->name('customer.my-boxes');
+    // My Boxes (PRD §4.3)
+    // Route::get('/my-boxes', [App\Http\Controllers\Customer\BoxController::class, 'index'])->name('customer.my-boxes');
 
-    // My Invoices
-    // Route::get('/customer/my-invoices', [App\Http\Controllers\Customer\InvoiceController::class, 'index'])->name('customer.my-invoices');
+    // Setor Resi (PRD §4.4)
+    // Route::get('/setor-resi', [App\Http\Controllers\Customer\ItemController::class, 'create'])->name('customer.setor-resi');
 
-    // Checkout
-    // Route::get('/customer/checkout', [App\Http\Controllers\Customer\CheckoutController::class, 'index'])->name('customer.checkout');
+    // My Invoices (PRD §4.5)
+    // Route::get('/my-invoices', [App\Http\Controllers\Customer\InvoiceController::class, 'index'])->name('customer.my-invoices');
 
-    // Komplain
-    // Route::get('/customer/komplain', [App\Http\Controllers\Customer\KomplainController::class, 'index'])->name('customer.komplain');
+    // Checkout (PRD §4.6)
+    // Route::get('/checkout', [App\Http\Controllers\Customer\CheckoutController::class, 'index'])->name('customer.checkout');
+
+    // Komplain (PRD §4.7)
+    // Route::get('/komplain', [App\Http\Controllers\Customer\KomplainController::class, 'index'])->name('customer.komplain');
+
+    // Profile
+    Route::view('/profile', 'profile')->name('profile');
 });

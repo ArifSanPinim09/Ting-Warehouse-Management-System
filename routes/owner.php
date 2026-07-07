@@ -8,20 +8,20 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | Routes for owner role: Dashboard, Finance, Data, User Management.
-| All routes here are protected by auth middleware and owner role.
+| All routes here are protected by auth middleware and owner role only.
 |
 */
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Owner dashboard
-    // Route::get('/owner/dashboard', [App\Http\Controllers\Owner\DashboardController::class, 'index'])->name('owner.dashboard');
+Route::middleware(['auth', 'verified', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
+    // Owner dashboard (PRD §4.13)
+    Route::view('/dashboard', 'owner.dashboard')->name('dashboard');
 
-    // Finance reports
-    // Route::get('/owner/finance', [App\Http\Controllers\Owner\FinanceController::class, 'index'])->name('owner.finance');
+    // Finance reports (PRD §4.13)
+    // Route::get('/finance', [App\Http\Controllers\Owner\FinanceController::class, 'index'])->name('finance');
 
     // Data management
-    // Route::get('/owner/data', [App\Http\Controllers\Owner\DataController::class, 'index'])->name('owner.data');
+    // Route::get('/data', [App\Http\Controllers\Owner\DataController::class, 'index'])->name('data');
 
     // User management
-    // Route::get('/owner/users', [App\Http\Controllers\Owner\UserController::class, 'index'])->name('owner.users');
+    // Route::get('/users', [App\Http\Controllers\Owner\UserController::class, 'index'])->name('users');
 });

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -24,6 +25,9 @@ class LoginForm extends Form
     /**
      * Attempt to authenticate the request's credentials.
      *
+     * PRD §4.1: User harus aktif, session 120 menit, 5x gagal kunci 15 menit
+     * PRD §13.1: Error messages PERSIS sesuai teks
+     *
      * @throws ValidationException
      */
     public function authenticate(): void
@@ -34,7 +38,27 @@ class LoginForm extends Form
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'form.email' => trans('auth.failed'),
+                'form.email' => 'Email atau password salah',
+            ]);
+        }
+
+        $user = Auth::user();
+
+        // PRD §13.1: "Akun belum aktif. Hubungi admin."
+        if ($user->status === User::STATUS_PENDING) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'form.email' => 'Akun belum aktif. Hubungi admin.',
+            ]);
+        }
+
+        // PRD §13.1: "Akun telah dinonaktifkan."
+        if ($user->status === User::STATUS_INACTIVE) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'form.email' => 'Akun telah dinonaktifkan.',
             ]);
         }
 
@@ -43,6 +67,9 @@ class LoginForm extends Form
 
     /**
      * Ensure the authentication request is not rate limited.
+     *
+     * PRD §4.1: 5x gagal kunci 15 menit
+     * PRD §13.1: "Akun terkunci. Coba lagi dalam X menit."
      */
     protected function ensureIsNotRateLimited(): void
     {
@@ -55,10 +82,7 @@ class LoginForm extends Form
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'form.email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'form.email' => 'Akun terkunci. Coba lagi dalam '.ceil($seconds / 60).' menit.',
         ]);
     }
 
