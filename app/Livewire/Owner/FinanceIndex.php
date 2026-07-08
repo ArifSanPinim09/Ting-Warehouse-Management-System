@@ -136,17 +136,19 @@ class FinanceIndex extends Component
     {
         $query = $this->buildQuery();
 
-        // Summary stats from filtered data
-        $summaryQuery = clone $query;
-        $this->totalRevenue = (float) (clone $summaryQuery)->where('status', Invoice::STATUS_VERIFIED)->sum('grand_total');
-        $this->totalOutstanding = (float) (clone $summaryQuery)->whereIn('status', [
-            Invoice::STATUS_WAITING_PAYMENT,
-            Invoice::STATUS_WAITING_VERIFICATION,
-        ])->sum('grand_total');
+        // Summary stats — 1 query with conditional aggregation instead of 3
+        $summary = (clone $query)->selectRaw("
+            SUM(CASE WHEN status = 'verified' THEN grand_total ELSE 0 END) as total_revenue,
+            SUM(CASE WHEN status IN ('waiting_payment', 'waiting_verification') THEN grand_total ELSE 0 END) as total_outstanding,
+            COUNT(*) as total_count
+        ")->first();
+
+        $this->totalRevenue = (float) ($summary->total_revenue ?? 0);
+        $this->totalOutstanding = (float) ($summary->total_outstanding ?? 0);
         $this->cashIn = $this->totalRevenue;
-        $this->cashOut = 0; // No expense model in V1
+        $this->cashOut = 0;
         $this->totalProfit = $this->cashIn - $this->cashOut;
-        $this->totalInvoiceCount = (clone $summaryQuery)->count();
+        $this->totalInvoiceCount = (int) ($summary->total_count ?? 0);
 
         $invoices = $query->latest()->paginate($this->perPage);
 
@@ -154,8 +156,11 @@ class FinanceIndex extends Component
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        $years = Invoice::all('created_at')
-            ->map(fn ($inv) => $inv->created_at->format('Y'))
+        // Get distinct years (DB-agnostic — extract year in PHP)
+        $years = Invoice::select('created_at')
+            ->distinct()
+            ->pluck('created_at')
+            ->map(fn ($d) => $d->format('Y'))
             ->unique()
             ->sortDesc()
             ->values();

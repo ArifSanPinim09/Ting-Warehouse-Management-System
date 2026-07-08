@@ -121,20 +121,23 @@ class AuditLogIndex extends Component
 
         $logs = $query->paginate($this->perPage);
 
-        // Get distinct subject types for filter dropdown
-        $subjectTypes = ActivityLog::distinct()
+        // Get distinct subject types for filter dropdown (cached via query)
+        $subjectTypes = ActivityLog::select('subject_type')
+            ->distinct()
             ->pluck('subject_type')
             ->sort()
             ->values();
 
         // Get distinct event types for filter dropdown
-        $eventTypes = ActivityLog::distinct()
+        $eventTypes = ActivityLog::select('event')
+            ->distinct()
             ->pluck('event')
             ->sort()
             ->values();
 
-        // Get users who have made changes (for filter dropdown)
-        $users = \App\Models\User::whereIn('id', ActivityLog::distinct()->pluck('user_id'))
+        // Get users who have made changes (single query with IN)
+        $userIds = ActivityLog::select('user_id')->distinct()->pluck('user_id');
+        $users = \App\Models\User::whereIn('id', $userIds)
             ->orderBy('name')
             ->get(['id', 'name', 'role']);
 

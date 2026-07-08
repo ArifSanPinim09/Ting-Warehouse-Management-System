@@ -20,35 +20,42 @@ class Dashboard extends Component
     public function render()
     {
         $user = auth()->user();
+        $now = now();
+        $startOfMonth = $now->copy()->startOfMonth();
 
-        // Stat cards data
+        // Single query for all invoice stats
+        $invoiceStats = Invoice::where('customer_id', $user->id)
+            ->selectRaw("
+                SUM(CASE WHEN status = 'waiting_payment' THEN grand_total ELSE 0 END) as unpaid_total,
+                SUM(CASE WHEN status = 'waiting_payment' THEN 1 ELSE 0 END) as unpaid_count
+            ")->first();
+
+        $unpaidInvoices = (float) ($invoiceStats->unpaid_total ?? 0);
+        $unpaidCount = (int) ($invoiceStats->unpaid_count ?? 0);
+
+        // Single query for box stats
         $activeBoxes = Box::where('customer_id', $user->id)
             ->whereIn('status', [Box::STATUS_OPEN, Box::STATUS_SENT_TO_CARGO, Box::STATUS_OTW_INA])
             ->count();
 
-        $unpaidInvoices = Invoice::where('customer_id', $user->id)
-            ->where('status', Invoice::STATUS_WAITING_PAYMENT)
-            ->sum('grand_total');
+        // Single query for item stats this month
+        $itemStats = Item::where('customer_id', $user->id)
+            ->where('created_at', '>=', $startOfMonth)
+            ->selectRaw("
+                COUNT(*) as goods,
+                SUM(CASE WHEN resi_number IS NOT NULL THEN 1 ELSE 0 END) as receipts
+            ")->first();
 
-        $unpaidCount = Invoice::where('customer_id', $user->id)
-            ->where('status', Invoice::STATUS_WAITING_PAYMENT)
-            ->count();
+        $goodsThisMonth = (int) ($itemStats->goods ?? 0);
+        $receiptsThisMonth = (int) ($itemStats->receipts ?? 0);
 
-        $goodsThisMonth = Item::where('customer_id', $user->id)
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
+        // Batch load settings (1 query instead of 3)
+        $settings = Setting::whereIn('key', ['kurs_yuan_idr', 'rate_sharing_air_berat', 'rate_sharing_sea_berat'])
+            ->pluck('value', 'key');
 
-        $receiptsThisMonth = Item::where('customer_id', $user->id)
-            ->whereNotNull('resi_number')
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
-
-        // Rates from settings
-        $kursYuan = (float) Setting::getValue('kurs_yuan_idr', '2460');
-        $rateAir = (float) Setting::getValue('rate_sharing_air_berat', '255');
-        $rateSea = (float) Setting::getValue('rate_sharing_sea_berat', '70');
+        $kursYuan = (float) ($settings['kurs_yuan_idr'] ?? 2460);
+        $rateAir = (float) ($settings['rate_sharing_air_berat'] ?? 255);
+        $rateSea = (float) ($settings['rate_sharing_sea_berat'] ?? 70);
 
         // Box list with status
         $boxes = Box::where('customer_id', $user->id)

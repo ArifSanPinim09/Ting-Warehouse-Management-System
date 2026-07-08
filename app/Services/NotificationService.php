@@ -56,9 +56,9 @@ class NotificationService
      * PRD §4.4: "Isi form -> Upload -> Submit -> Validasi -> Simpan -> Notif admin"
      *
      * @param  User  $customer  The newly registered customer
-     * @return Notification
+     * @return Notification|null  Null when no active admins exist
      */
-    public function customerRegister(User $customer): Notification
+    public function customerRegister(User $customer): ?Notification
     {
         return $this->notifyAdmins(
             type: self::TYPE_CUSTOMER_REGISTER,
@@ -142,9 +142,9 @@ class NotificationService
      * Payment received (customer uploads proof) — notify admin/owner users.
      *
      * @param  \App\Models\Invoice  $invoice  The invoice with payment
-     * @return Notification
+     * @return Notification|null  Null when no active admins exist
      */
-    public function paymentReceived($invoice): Notification
+    public function paymentReceived($invoice): ?Notification
     {
         return $this->notifyAdmins(
             type: self::TYPE_PAYMENT_RECEIVED,
@@ -228,9 +228,9 @@ class NotificationService
      * New complaint created — notify admin/owner users.
      *
      * @param  \App\Models\Complain  $complaint  The new complaint
-     * @return Notification
+     * @return Notification|null  Null when no active admins exist
      */
-    public function newComplaint($complaint): Notification
+    public function newComplaint($complaint): ?Notification
     {
         return $this->notifyAdmins(
             type: self::TYPE_NEW_COMPLAINT,
@@ -295,9 +295,9 @@ class NotificationService
      *
      * @param  string               $type  Notification type
      * @param  array<string, mixed> $data  Notification payload
-     * @return Notification  The last created notification (for testing)
+     * @return Notification|null  Null when no active admins exist
      */
-    private function notifyAdmins(string $type, array $data): Notification
+    private function notifyAdmins(string $type, array $data): ?Notification
     {
         $admins = User::whereIn('role', ['admin', 'owner'])
             ->where('status', User::STATUS_ACTIVE)

@@ -369,4 +369,86 @@ class NotificationServiceTest extends TestCase
         $this->assertNull($notif->read_at);
         $this->assertFalse($notif->isRead());
     }
+
+    /**
+     * Test customerRegister creates one notification per active admin/owner.
+     */
+    public function test_customer_register_creates_one_per_admin(): void
+    {
+        $admin1 = User::factory()->create(['role' => 'admin', 'status' => User::STATUS_ACTIVE]);
+        $admin2 = User::factory()->create(['role' => 'admin', 'status' => User::STATUS_ACTIVE]);
+        $owner = User::factory()->create(['role' => 'owner', 'status' => User::STATUS_ACTIVE]);
+
+        $customer = User::factory()->create(['role' => 'customer']);
+
+        $this->service->customerRegister($customer);
+
+        $this->assertEquals(3, Notification::where('type', NotificationService::TYPE_CUSTOMER_REGISTER)->count());
+
+        $this->assertNotNull(Notification::where('notifiable_id', $admin1->id)->first());
+        $this->assertNotNull(Notification::where('notifiable_id', $admin2->id)->first());
+        $this->assertNotNull(Notification::where('notifiable_id', $owner->id)->first());
+    }
+
+    /**
+     * Test customerRegister handles zero active admins gracefully.
+     */
+    public function test_customer_register_with_no_active_admins(): void
+    {
+        // Only inactive admins exist
+        User::factory()->create(['role' => 'admin', 'status' => User::STATUS_INACTIVE]);
+
+        $customer = User::factory()->create(['role' => 'customer']);
+
+        // Should not throw — notifyAdmins returns null when no admins
+        $result = $this->service->customerRegister($customer);
+
+        $this->assertEquals(0, Notification::where('type', NotificationService::TYPE_CUSTOMER_REGISTER)->count());
+        $this->assertNull($result);
+    }
+
+    /**
+     * Test paymentReceived also notifies owner (superset of admin).
+     */
+    public function test_payment_received_notifies_owner_too(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => User::STATUS_ACTIVE]);
+        $owner = User::factory()->create(['role' => 'owner', 'status' => User::STATUS_ACTIVE]);
+        $customer = User::factory()->create(['role' => 'customer']);
+        $box = Box::factory()->create(['customer_id' => $customer->id]);
+        $invoice = Invoice::factory()->create([
+            'customer_id' => $customer->id,
+            'box_id' => $box->id,
+            'invoice_number' => 'INV-2024-001',
+            'status' => Invoice::STATUS_WAITING_VERIFICATION,
+        ]);
+
+        $this->service->paymentReceived($invoice);
+
+        $this->assertEquals(2, Notification::where('type', NotificationService::TYPE_PAYMENT_RECEIVED)->count());
+        $this->assertNotNull(Notification::where('notifiable_id', $admin->id)->first());
+        $this->assertNotNull(Notification::where('notifiable_id', $owner->id)->first());
+    }
+
+    /**
+     * Test newComplaint notifies both admin and owner.
+     */
+    public function test_new_complaint_notifies_all_admins_and_owners(): void
+    {
+        User::factory()->create(['role' => 'admin', 'status' => User::STATUS_ACTIVE]);
+        User::factory()->create(['role' => 'admin', 'status' => User::STATUS_ACTIVE]);
+        User::factory()->create(['role' => 'owner', 'status' => User::STATUS_ACTIVE]);
+        $customer = User::factory()->create(['role' => 'customer']);
+        $box = Box::factory()->create(['customer_id' => $customer->id]);
+        $complaint = Complain::factory()->create([
+            'customer_id' => $customer->id,
+            'box_id' => $box->id,
+            'type' => 'Barang Hilang',
+            'status' => Complain::STATUS_OPEN,
+        ]);
+
+        $this->service->newComplaint($complaint);
+
+        $this->assertEquals(3, Notification::where('type', NotificationService::TYPE_NEW_COMPLAINT)->count());
+    }
 }

@@ -48,41 +48,51 @@ class RecapIndex extends Component
 
     public function loadStats(): void
     {
+        // Box stats — 1 query with conditional aggregation
         $boxQuery = Box::query();
-        $invoiceQuery = Invoice::query();
-
-        if ($this->filterType) {
-            $boxQuery->where('type', $this->filterType);
-        }
-        if ($this->filterMethod) {
-            $boxQuery->where('method', $this->filterMethod);
-        }
-        if ($this->filterDateFrom) {
-            $boxQuery->whereDate('created_at', '>=', $this->filterDateFrom);
-            $invoiceQuery->whereDate('created_at', '>=', $this->filterDateFrom);
-        }
-        if ($this->filterDateTo) {
-            $boxQuery->whereDate('created_at', '<=', $this->filterDateTo);
-            $invoiceQuery->whereDate('created_at', '<=', $this->filterDateTo);
-        }
+        if ($this->filterType) $boxQuery->where('type', $this->filterType);
+        if ($this->filterMethod) $boxQuery->where('method', $this->filterMethod);
+        if ($this->filterDateFrom) $boxQuery->whereDate('created_at', '>=', $this->filterDateFrom);
+        if ($this->filterDateTo) $boxQuery->whereDate('created_at', '<=', $this->filterDateTo);
 
         $this->totalBoxes = $boxQuery->count();
-        $this->totalItems = Item::whereHas('box', function ($q) {
-            if ($this->filterType) $q->where('type', $this->filterType);
-            if ($this->filterMethod) $q->where('method', $this->filterMethod);
-            if ($this->filterDateFrom) $q->whereDate('created_at', '>=', $this->filterDateFrom);
-            if ($this->filterDateTo) $q->whereDate('created_at', '<=', $this->filterDateTo);
-        })->count();
 
-        $this->totalInvoices = $invoiceQuery->count();
-        $this->totalRevenue = (float) $invoiceQuery->sum('grand_total');
-        $this->totalCheckouts = Checkout::whereHas('invoice', function ($q) {
-            if ($this->filterDateFrom) $q->whereDate('created_at', '>=', $this->filterDateFrom);
-            if ($this->filterDateTo) $q->whereDate('created_at', '<=', $this->filterDateTo);
-        })->count();
-        $this->totalComplaints = Complain::when($this->filterDateFrom, fn($q) => $q->whereDate('created_at', '>=', $this->filterDateFrom))
-            ->when($this->filterDateTo, fn($q) => $q->whereDate('created_at', '<=', $this->filterDateTo))
-            ->count();
+        // Items count — use box filters via subquery
+        $itemQuery = Item::query();
+        if ($this->filterType || $this->filterMethod || $this->filterDateFrom || $this->filterDateTo) {
+            $itemQuery->whereHas('box', function ($q) {
+                if ($this->filterType) $q->where('type', $this->filterType);
+                if ($this->filterMethod) $q->where('method', $this->filterMethod);
+                if ($this->filterDateFrom) $q->whereDate('created_at', '>=', $this->filterDateFrom);
+                if ($this->filterDateTo) $q->whereDate('created_at', '<=', $this->filterDateTo);
+            });
+        }
+        $this->totalItems = $itemQuery->count();
+
+        // Invoice stats — 1 query with conditional aggregation
+        $invoiceQuery = Invoice::query();
+        if ($this->filterDateFrom) $invoiceQuery->whereDate('created_at', '>=', $this->filterDateFrom);
+        if ($this->filterDateTo) $invoiceQuery->whereDate('created_at', '<=', $this->filterDateTo);
+
+        $invoiceStats = $invoiceQuery->selectRaw('COUNT(*) as total, COALESCE(SUM(grand_total), 0) as revenue')->first();
+        $this->totalInvoices = (int) $invoiceStats->total;
+        $this->totalRevenue = (float) $invoiceStats->revenue;
+
+        // Checkouts + Complaints — 1 query each
+        $checkoutQuery = Checkout::query();
+        $complaintQuery = Complain::query();
+
+        if ($this->filterDateFrom) {
+            $checkoutQuery->whereDate('created_at', '>=', $this->filterDateFrom);
+            $complaintQuery->whereDate('created_at', '>=', $this->filterDateFrom);
+        }
+        if ($this->filterDateTo) {
+            $checkoutQuery->whereDate('created_at', '<=', $this->filterDateTo);
+            $complaintQuery->whereDate('created_at', '<=', $this->filterDateTo);
+        }
+
+        $this->totalCheckouts = $checkoutQuery->count();
+        $this->totalComplaints = $complaintQuery->count();
     }
 
     public function render()

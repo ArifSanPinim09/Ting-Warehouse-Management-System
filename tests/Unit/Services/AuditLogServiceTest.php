@@ -265,4 +265,138 @@ class AuditLogServiceTest extends TestCase
         $this->assertNotNull($setting);
         $this->assertNotNull($setting->key);
     }
+
+    /**
+     * Test log for "deleted" event.
+     */
+    public function test_log_for_deleted_event(): void
+    {
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $box = Box::factory()->create();
+
+        // Clear observer-created logs
+        ActivityLog::truncate();
+
+        $this->service->log(
+            event: 'deleted',
+            subject: $box,
+            old: ['status' => Box::STATUS_OPEN, 'tracking_number' => 'TRK-001'],
+        );
+
+        $log = ActivityLog::first();
+
+        $this->assertNotNull($log);
+        $this->assertEquals('deleted', $log->event);
+        $this->assertEquals(Box::class, $log->subject_type);
+        $this->assertEquals(['status' => Box::STATUS_OPEN, 'tracking_number' => 'TRK-001'], $log->old_values);
+        $this->assertNull($log->new_values);
+    }
+
+    /**
+     * Test logCustom without description (empty description).
+     */
+    public function test_log_custom_without_description(): void
+    {
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $box = Box::factory()->create();
+        ActivityLog::truncate();
+
+        $this->service->logCustom(
+            subject: $box,
+            event: 'exported',
+            description: '',
+            new: ['format' => 'csv'],
+        );
+
+        $log = ActivityLog::first();
+
+        $this->assertNotNull($log);
+        $this->assertEquals('exported', $log->event);
+        $this->assertArrayNotHasKey('_description', $log->new_values);
+        $this->assertEquals('csv', $log->new_values['format']);
+    }
+
+    /**
+     * Test log with both old and new as empty arrays (created event).
+     */
+    public function test_log_created_with_empty_new(): void
+    {
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $box = Box::factory()->create();
+        ActivityLog::truncate();
+
+        $this->service->log(
+            event: 'created',
+            subject: $box,
+            old: [],
+            new: [],
+        );
+
+        $log = ActivityLog::first();
+
+        $this->assertNotNull($log);
+        $this->assertEquals('created', $log->event);
+        $this->assertNull($log->old_values);
+        $this->assertNull($log->new_values);
+    }
+
+    /**
+     * Test computeDiff with multiple changed fields.
+     */
+    public function test_log_multiple_changed_fields(): void
+    {
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $box = Box::factory()->create();
+        ActivityLog::truncate();
+
+        $this->service->log(
+            event: 'updated',
+            subject: $box,
+            old: ['status' => Box::STATUS_OPEN, 'tracking_number' => 'TRK-OLD', 'notes' => 'lama'],
+            new: ['status' => Box::STATUS_SENT_TO_CARGO, 'tracking_number' => 'TRK-NEW', 'notes' => 'lama'],
+        );
+
+        $log = ActivityLog::first();
+
+        $this->assertNotNull($log);
+        // status and tracking_number changed
+        $this->assertEquals(Box::STATUS_OPEN, $log->old_values['status']);
+        $this->assertEquals(Box::STATUS_SENT_TO_CARGO, $log->new_values['status']);
+        $this->assertEquals('TRK-OLD', $log->old_values['tracking_number']);
+        $this->assertEquals('TRK-NEW', $log->new_values['tracking_number']);
+        // notes didn't change, should NOT appear
+        $this->assertArrayNotHasKey('notes', $log->old_values);
+        $this->assertArrayNotHasKey('notes', $log->new_values);
+    }
+
+    /**
+     * Test ActivityLog model has correct relationship.
+     */
+    public function test_activity_log_subject_morph(): void
+    {
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $box = Box::factory()->create();
+        ActivityLog::truncate();
+
+        $this->service->log(
+            event: 'created',
+            subject: $box,
+            new: ['status' => Box::STATUS_OPEN],
+        );
+
+        $log = ActivityLog::first();
+
+        $this->assertEquals(Box::class, $log->subject_type);
+        $this->assertEquals($box->id, $log->subject_id);
+    }
 }

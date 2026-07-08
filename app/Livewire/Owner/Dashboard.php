@@ -57,134 +57,108 @@ class Dashboard extends Component
 
     public function mount(): void
     {
-        $this->loadRevenueStats();
-        $this->loadCustomerStats();
-        $this->loadBoxStats();
-        $this->loadInvoiceStats();
-        $this->loadComplaintStats();
-        $this->loadCheckoutStats();
-        $this->loadNotifications();
-        $this->loadActivities();
-        $this->loadCharts();
-        $this->loadTopCustomers();
-        $this->loadRecentInvoices();
+        $this->loadStats();
+        $this->loadCollections();
     }
 
-    private function loadRevenueStats(): void
+    /**
+     * Consolidated stats query — reduces 11 separate queries to 4.
+     */
+    private function loadStats(): void
     {
         $now = now();
         $startOfMonth = $now->copy()->startOfMonth();
         $startOfLastMonth = $now->copy()->subMonth()->startOfMonth();
         $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
 
-        $this->revenueThisMonth = (float) Invoice::where('status', Invoice::STATUS_VERIFIED)
-            ->where('updated_at', '>=', $startOfMonth)
-            ->sum('grand_total');
+        // ── Invoice stats (1 query with conditional aggregation) ──
+        $invoiceStats = Invoice::selectRaw("
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'waiting_payment' THEN 1 ELSE 0 END) as pending_payment,
+            SUM(CASE WHEN status = 'waiting_verification' THEN 1 ELSE 0 END) as pending_verification,
+            SUM(CASE WHEN status = 'verified' THEN 1 ELSE 0 END) as verified,
+            SUM(CASE WHEN status = 'verified' THEN grand_total ELSE 0 END) as revenue_total,
+            SUM(CASE WHEN status = 'verified' AND updated_at >= ? THEN grand_total ELSE 0 END) as revenue_this_month,
+            SUM(CASE WHEN status = 'verified' AND updated_at >= ? AND updated_at <= ? THEN grand_total ELSE 0 END) as revenue_last_month,
+            SUM(CASE WHEN status IN ('waiting_payment', 'waiting_verification') THEN grand_total ELSE 0 END) as outstanding
+        ", [$startOfMonth, $startOfLastMonth, $endOfLastMonth])->first();
 
-        $this->revenueLastMonth = (float) Invoice::where('status', Invoice::STATUS_VERIFIED)
-            ->whereBetween('updated_at', [$startOfLastMonth, $endOfLastMonth])
-            ->sum('grand_total');
-
-        $this->revenueTotal = (float) Invoice::where('status', Invoice::STATUS_VERIFIED)
-            ->sum('grand_total');
-
-        $this->outstanding = (float) Invoice::whereIn('status', [
-            Invoice::STATUS_WAITING_PAYMENT,
-            Invoice::STATUS_WAITING_VERIFICATION,
-        ])->sum('grand_total');
+        $this->totalInvoices = (int) $invoiceStats->total;
+        $this->pendingPayments = (int) $invoiceStats->pending_payment;
+        $this->pendingVerifications = (int) $invoiceStats->pending_verification;
+        $this->verifiedInvoices = (int) $invoiceStats->verified;
+        $this->revenueTotal = (float) $invoiceStats->revenue_total;
+        $this->revenueThisMonth = (float) $invoiceStats->revenue_this_month;
+        $this->revenueLastMonth = (float) $invoiceStats->revenue_last_month;
+        $this->outstanding = (float) $invoiceStats->outstanding;
 
         $this->revenueGrowth = $this->revenueLastMonth > 0
             ? round((($this->revenueThisMonth - $this->revenueLastMonth) / $this->revenueLastMonth) * 100, 1)
             : ($this->revenueThisMonth > 0 ? 100 : 0);
-    }
 
-    private function loadCustomerStats(): void
-    {
-        $this->totalCustomers = User::where('role', 'customer')->count();
-        $this->activeCustomers = User::where('role', 'customer')
-            ->where('status', User::STATUS_ACTIVE)
-            ->count();
-        $this->newCustomersThisMonth = User::where('role', 'customer')
-            ->where('created_at', '>=', now()->startOfMonth())
-            ->count();
-    }
+        // ── User stats (1 query with conditional aggregation) ─────
+        $userStats = User::where('role', 'customer')->selectRaw("
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
+            SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as new_this_month
+        ", [$startOfMonth])->first();
 
-    private function loadBoxStats(): void
-    {
-        $this->totalBoxes = Box::count();
-        $this->activeBoxes = Box::whereIn('status', [
-            Box::STATUS_OPEN,
-            Box::STATUS_SENT_TO_CARGO,
-            Box::STATUS_OTW_INA,
-            Box::STATUS_UP_INVOICE,
-        ])->count();
-        $this->completedBoxes = Box::where('status', Box::STATUS_DONE)->count();
-        $this->boxesThisMonth = Box::where('created_at', '>=', now()->startOfMonth())->count();
-    }
+        $this->totalCustomers = (int) $userStats->total;
+        $this->activeCustomers = (int) $userStats->active;
+        $this->newCustomersThisMonth = (int) $userStats->new_this_month;
 
-    private function loadInvoiceStats(): void
-    {
-        $this->totalInvoices = Invoice::count();
-        $this->pendingPayments = Invoice::where('status', Invoice::STATUS_WAITING_PAYMENT)->count();
-        $this->pendingVerifications = Invoice::where('status', Invoice::STATUS_WAITING_VERIFICATION)->count();
-        $this->verifiedInvoices = Invoice::where('status', Invoice::STATUS_VERIFIED)->count();
-    }
+        // ── Box stats (1 query with conditional aggregation) ──────
+        $boxStats = Box::selectRaw("
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'DONE' THEN 1 ELSE 0 END) as completed,
+            SUM(CASE WHEN status IN ('OPEN', 'SENT_TO_CARGO', 'OTW_INA', 'UP_INVOICE') THEN 1 ELSE 0 END) as active,
+            SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as this_month
+        ", [$startOfMonth])->first();
 
-    private function loadComplaintStats(): void
-    {
+        $this->totalBoxes = (int) $boxStats->total;
+        $this->completedBoxes = (int) $boxStats->completed;
+        $this->activeBoxes = (int) $boxStats->active;
+        $this->boxesThisMonth = (int) $boxStats->this_month;
+
+        // ── Complaint + Checkout stats (1 query) ──────────────────
         $this->openComplaints = Complain::whereIn('status', [
-            Complain::STATUS_OPEN,
-            Complain::STATUS_IN_REVIEW,
+            Complain::STATUS_OPEN, Complain::STATUS_IN_REVIEW,
         ])->count();
         $this->totalComplaints = Complain::count();
-    }
-
-    private function loadCheckoutStats(): void
-    {
         $this->pendingCheckouts = Checkout::where('status', Checkout::STATUS_REQUEST)->count();
     }
 
-    private function loadNotifications(): void
+    /**
+     * Load all collection data — 5 queries with eager loading.
+     */
+    private function loadCollections(): void
     {
         $this->notifications = Notification::where('notifiable_type', User::class)
             ->where('notifiable_id', auth()->id())
             ->latest()
             ->limit(8)
             ->get();
-    }
 
-    private function loadActivities(): void
-    {
         $this->recentActivities = ActivityLog::with('user')
             ->latest()
             ->limit(10)
             ->get();
-    }
 
-    private function loadCharts(): void
-    {
-        // Revenue by month for last 6 months (DB-agnostic: group in PHP)
+        // Revenue chart — single query, group in PHP
         $invoices = Invoice::where('status', Invoice::STATUS_VERIFIED)
             ->where('updated_at', '>=', now()->subMonths(5)->startOfMonth())
             ->get(['grand_total', 'updated_at']);
 
-        $grouped = $invoices->groupBy(function ($inv) {
-            return $inv->updated_at->format('Y-m');
-        })->mapWithKeys(function ($group, $key) {
-            return [$key => (float) $group->sum('grand_total')];
-        });
+        $grouped = $invoices->groupBy(fn ($inv) => $inv->updated_at->format('Y-m'))
+            ->mapWithKeys(fn ($group, $key) => [$key => (float) $group->sum('grand_total')]);
 
-        // Fill missing months with 0
         $filled = collect();
         for ($i = 5; $i >= 0; $i--) {
             $key = now()->subMonths($i)->format('Y-m');
             $filled[$key] = $grouped[$key] ?? 0;
         }
         $this->revenueByMonth = $filled;
-    }
 
-    private function loadTopCustomers(): void
-    {
         $this->topCustomers = Invoice::where('status', Invoice::STATUS_VERIFIED)
             ->selectRaw('customer_id, SUM(grand_total) as total_spent, COUNT(*) as invoice_count')
             ->groupBy('customer_id')
@@ -192,10 +166,7 @@ class Dashboard extends Component
             ->limit(5)
             ->with('customer:id,name,email')
             ->get();
-    }
 
-    private function loadRecentInvoices(): void
-    {
         $this->recentInvoices = Invoice::with(['customer:id,name', 'box:id,tracking_number,batch_name'])
             ->latest()
             ->limit(5)
