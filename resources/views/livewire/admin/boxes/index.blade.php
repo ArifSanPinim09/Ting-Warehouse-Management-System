@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-[#f8fafc]">
     {{-- Page Header --}}
     <div class="bg-white border-b border-gray-100">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="mx-auto w-full max-w-[1500px] px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6">
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-[22px] font-bold text-gray-900 tracking-tight">Manage Box</h1>
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
+    <div class="mx-auto w-full max-w-[1500px] px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6 space-y-4">
 
         {{-- Filters --}}
         <div class="bg-white rounded-[12px] border border-gray-100 p-4">

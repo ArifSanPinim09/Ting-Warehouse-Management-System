@@ -15,7 +15,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-[#f8fafc]">
-        <div x-data="{ sidebarOpen: false }" class="min-h-screen flex">
+        <div x-data="{ sidebarOpen: false }" class="h-screen flex overflow-hidden">
 
             {{-- Mobile Overlay --}}
             <div
@@ -143,7 +143,7 @@
             </aside>
 
             {{-- Main Content --}}
-            <div class="flex-1 flex flex-col min-w-0 lg:ml-0">
+            <div class="flex-1 flex flex-col min-w-0 lg:ml-0 overflow-y-auto">
 
                 {{-- Top Bar --}}
                 <header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 flex-shrink-0 sticky top-0 z-30">

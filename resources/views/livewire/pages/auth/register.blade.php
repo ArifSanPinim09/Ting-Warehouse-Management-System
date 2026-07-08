@@ -5,6 +5,9 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -22,10 +25,17 @@ new #[Layout('layouts.guest')] class extends Component
      * Handle an incoming registration request.
      *
      * PRD §4.1: Validasi -> Simpan(PENDING) -> Notif admin -> Aktivasi -> Login
+     * PRD §20.5: Register rate limit 3x per hour
      * User TIDAK langsung login setelah register, harus tunggu aktivasi admin.
      */
     public function register(): void
     {
+        // PRD §20.5: Rate limiting for registration
+        $this->ensureIsNotRateLimited();
+
+        // Hit rate limiter BEFORE processing (counts all attempts, successful or not)
+        RateLimiter::hit($this->throttleKey(), 3600); // 1 hour window
+
         $validated = $this->validate((new RegisterRequest())->rules(), (new RegisterRequest())->messages());
 
         $validated['password'] = Hash::make($validated['password']);
@@ -36,6 +46,32 @@ new #[Layout('layouts.guest')] class extends Component
 
         // Tidak login otomatis — customer harus tunggu aktivasi admin (PRD §4.1)
         $this->redirect(route('login', absolute: false), navigate: true);
+    }
+
+    /**
+     * Ensure the registration request is not rate limited.
+     *
+     * PRD §20.5: 3 registrations per hour per IP.
+     */
+    protected function ensureIsNotRateLimited(): void
+    {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 3)) {
+            return;
+        }
+
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'email' => 'Terlalu banyak percobaan registrasi. Coba lagi dalam ' . ceil($seconds / 60) . ' menit.',
+        ]);
+    }
+
+    /**
+     * Get the registration rate limiting throttle key.
+     */
+    protected function throttleKey(): string
+    {
+        return Str::transliterate('register|' . request()->ip());
     }
 }; ?>
 

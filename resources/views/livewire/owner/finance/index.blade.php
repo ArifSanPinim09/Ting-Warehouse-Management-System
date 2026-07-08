@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-[#f8fafc]">
     {{-- Page Header --}}
     <div class="bg-white border-b border-gray-100">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="mx-auto w-full max-w-[1500px] px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h1 class="text-[22px] font-bold text-gray-900 tracking-tight">Laporan Keuangan</h1>
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div class="mx-auto w-full max-w-[1500px] px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6 space-y-6">
 
         {{-- Summary Cards --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">

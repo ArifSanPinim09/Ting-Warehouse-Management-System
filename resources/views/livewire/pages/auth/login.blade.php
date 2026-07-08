@@ -23,7 +23,9 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        // PRD §7.5: Role-based redirect
+        // PRD §7.5: Role-based redirect — always redirect by role, never use
+        // redirectIntended() which may have a stale /dashboard URL from a
+        // previous session and override the role-based logic.
         $user = Auth::user();
         $redirect = match ($user->role) {
             'owner' => '/owner/dashboard',
@@ -31,7 +33,7 @@ new #[Layout('layouts.guest')] class extends Component
             default => '/dashboard',
         };
 
-        $this->redirectIntended(default: $redirect, navigate: true);
+        $this->redirect($redirect, navigate: true);
     }
 }; ?>
 

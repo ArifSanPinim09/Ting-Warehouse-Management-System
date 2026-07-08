@@ -51,14 +51,14 @@ class Dashboard extends Component
             type,
             SUM(CASE WHEN status != 'DONE' THEN 1 ELSE 0 END) as open_count,
             SUM(CASE WHEN status = 'DONE' THEN 1 ELSE 0 END) as closed_count
-        ")->groupBy('type')->pluck(null, 'type');
+        ")->groupBy('type')->get()->keyBy('type');
 
-        $this->sharingOpen = (int) ($boxStats['sharing']['open_count'] ?? 0);
-        $this->sharingClosed = (int) ($boxStats['sharing']['closed_count'] ?? 0);
-        $this->directOpen = (int) ($boxStats['direct']['open_count'] ?? 0);
-        $this->directClosed = (int) ($boxStats['direct']['closed_count'] ?? 0);
-        $this->handcarryOpen = (int) ($boxStats['handcarry']['open_count'] ?? 0);
-        $this->handcarryClosed = (int) ($boxStats['handcarry']['closed_count'] ?? 0);
+        $this->sharingOpen = (int) ($boxStats['sharing']?->open_count ?? 0);
+        $this->sharingClosed = (int) ($boxStats['sharing']?->closed_count ?? 0);
+        $this->directOpen = (int) ($boxStats['direct']?->open_count ?? 0);
+        $this->directClosed = (int) ($boxStats['direct']?->closed_count ?? 0);
+        $this->handcarryOpen = (int) ($boxStats['handcarry']?->open_count ?? 0);
+        $this->handcarryClosed = (int) ($boxStats['handcarry']?->closed_count ?? 0);
 
         // Customer stats
         $this->customerActive = User::where('role', 'customer')->where('status', User::STATUS_ACTIVE)->count();
