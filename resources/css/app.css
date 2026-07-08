@@ -1,3 +1,223 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─── Design System Base ─────────────────────────────────────────── */
+
+@layer base {
+    html {
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        @apply bg-[#f8fafc] text-[#1e293b] font-sans text-body;
+    }
+
+    ::selection {
+        @apply bg-accent/15 text-accent;
+    }
+
+    /* Focus ring — consistent across all interactive elements */
+    *:focus-visible {
+        @apply outline-none ring-2 ring-accent/40 ring-offset-2;
+    }
+}
+
+/* ─── Design System Components ───────────────────────────────────── */
+
+@layer components {
+    /* Card — consistent elevation and radius */
+    .ds-card {
+        @apply bg-white rounded-card shadow-card;
+    }
+
+    .ds-card-hover {
+        @apply ds-card transition-all duration-150 ease-out hover:shadow-card-hover hover:-translate-y-0.5;
+    }
+
+    /* Badge — pill shape per PRD §9.1 */
+    .ds-badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-badge text-caption font-medium;
+    }
+
+    .ds-badge-success {
+        @apply ds-badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20;
+    }
+
+    .ds-badge-warning {
+        @apply ds-badge bg-amber-50 text-amber-700 ring-1 ring-amber-600/20;
+    }
+
+    .ds-badge-info {
+        @apply ds-badge bg-blue-50 text-blue-700 ring-1 ring-blue-600/20;
+    }
+
+    .ds-badge-danger {
+        @apply ds-badge bg-red-50 text-red-700 ring-1 ring-red-600/20;
+    }
+
+    .ds-badge-neutral {
+        @apply ds-badge bg-gray-100 text-gray-600 ring-1 ring-gray-500/20;
+    }
+
+    /* Input — consistent styling */
+    .ds-input {
+        @apply block w-full rounded-input border-border bg-white text-body
+               shadow-sm transition-colors duration-150
+               placeholder:text-gray-400
+               focus:border-accent focus:ring-2 focus:ring-accent/20
+               disabled:bg-muted disabled:text-gray-400 disabled:cursor-not-allowed;
+    }
+
+    .ds-input-error {
+        @apply ds-input border-red-300 focus:border-red-500 focus:ring-red-500/20;
+    }
+
+    .ds-label {
+        @apply block text-body font-medium text-[#1e293b] mb-1.5;
+    }
+
+    .ds-hint {
+        @apply text-caption text-gray-500 mt-1;
+    }
+
+    .ds-error {
+        @apply text-caption text-red-600 mt-1;
+    }
+
+    /* Button — primary per design system */
+    .ds-btn {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
+               rounded-button text-body font-semibold
+               transition-all duration-150 ease-out
+               focus:outline-none focus:ring-2 focus:ring-offset-2
+               disabled:opacity-50 disabled:cursor-not-allowed
+               active:scale-[0.98];
+    }
+
+    .ds-btn-primary {
+        @apply ds-btn bg-primary text-white
+               hover:bg-primary-light
+               focus:ring-primary/40;
+    }
+
+    .ds-btn-secondary {
+        @apply ds-btn bg-white text-gray-700 border border-border
+               hover:bg-gray-50 hover:border-gray-300
+               focus:ring-gray-400/40;
+    }
+
+    .ds-btn-danger {
+        @apply ds-btn bg-red-600 text-white
+               hover:bg-red-500
+               focus:ring-red-500/40;
+    }
+
+    .ds-btn-ghost {
+        @apply ds-btn bg-transparent text-gray-600
+               hover:bg-gray-100 hover:text-gray-900
+               focus:ring-gray-400/40;
+    }
+
+    .ds-btn-sm {
+        @apply px-3 py-1.5 text-caption;
+    }
+
+    .ds-btn-lg {
+        @apply px-6 py-3 text-subtitle;
+    }
+
+    /* Skeleton — loading state per PRD §17 */
+    .ds-skeleton {
+        @apply bg-gray-200 rounded animate-skeleton;
+    }
+
+    /* Toast notification */
+    .ds-toast {
+        @apply fixed top-4 right-4 z-[60] max-w-sm w-full
+               bg-white rounded-card shadow-modal border border-border
+               animate-toast-in;
+    }
+
+    /* Stat card for dashboard */
+    .ds-stat {
+        @apply ds-card p-5;
+    }
+
+    .ds-stat-value {
+        @apply text-display font-bold text-primary tracking-tight;
+    }
+
+    .ds-stat-label {
+        @apply text-caption text-gray-500 mt-1;
+    }
+
+    .ds-stat-icon {
+        @apply w-10 h-10 rounded-button flex items-center justify-center;
+    }
+
+    /* Section header */
+    .ds-section-title {
+        @apply text-title font-semibold text-[#1e293b];
+    }
+
+    .ds-section-subtitle {
+        @apply text-body text-gray-500 mt-0.5;
+    }
+
+    /* Table */
+    .ds-table {
+        @apply w-full text-left text-body;
+    }
+
+    .ds-table thead {
+        @apply border-b border-border;
+    }
+
+    .ds-table th {
+        @apply py-3 px-4 text-caption font-semibold text-gray-500 uppercase tracking-wider;
+    }
+
+    .ds-table td {
+        @apply py-3.5 px-4 text-body text-[#1e293b];
+    }
+
+    .ds-table tbody tr {
+        @apply border-b border-gray-50 transition-colors hover:bg-gray-50/50;
+    }
+
+    /* Empty state */
+    .ds-empty {
+        @apply flex flex-col items-center justify-center py-16 px-6 text-center;
+    }
+
+    .ds-empty-icon {
+        @apply w-16 h-16 text-gray-300 mb-4;
+    }
+
+    .ds-empty-title {
+        @apply text-subtitle font-semibold text-[#1e293b] mb-1;
+    }
+
+    .ds-empty-text {
+        @apply text-body text-gray-500 mb-6 max-w-sm;
+    }
+}
+
+/* ─── Utilities ──────────────────────────────────────────────────── */
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}

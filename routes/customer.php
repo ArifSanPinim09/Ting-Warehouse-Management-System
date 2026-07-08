@@ -1,5 +1,13 @@
 <?php
 
+use App\Livewire\Customer\BoxDirect;
+use App\Livewire\Customer\BoxSharing;
+use App\Livewire\Customer\CheckoutIndex;
+use App\Livewire\Customer\Dashboard;
+use App\Livewire\Customer\InvoiceIndex;
+use App\Livewire\Customer\Kalkulator;
+use App\Livewire\Customer\KomplainIndex;
+use App\Livewire\Customer\SetorResi;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,22 +22,26 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Customer dashboard (PRD §4.2)
-    Route::view('/dashboard', 'dashboard')->name('dashboard');
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
     // My Boxes (PRD §4.3)
-    // Route::get('/my-boxes', [App\Http\Controllers\Customer\BoxController::class, 'index'])->name('customer.my-boxes');
+    Route::get('/box/sharing', BoxSharing::class)->name('customer.box.sharing');
+    Route::get('/box/direct', BoxDirect::class)->name('customer.box.direct');
 
     // Setor Resi (PRD §4.4)
-    // Route::get('/setor-resi', [App\Http\Controllers\Customer\ItemController::class, 'create'])->name('customer.setor-resi');
+    Route::get('/setor-resi', SetorResi::class)->name('customer.setor-resi');
 
     // My Invoices (PRD §4.5)
-    // Route::get('/my-invoices', [App\Http\Controllers\Customer\InvoiceController::class, 'index'])->name('customer.my-invoices');
+    Route::get('/invoice', InvoiceIndex::class)->name('customer.invoice');
 
     // Checkout (PRD §4.6)
-    // Route::get('/checkout', [App\Http\Controllers\Customer\CheckoutController::class, 'index'])->name('customer.checkout');
+    Route::get('/checkout', CheckoutIndex::class)->name('customer.checkout');
 
     // Komplain (PRD §4.7)
-    // Route::get('/komplain', [App\Http\Controllers\Customer\KomplainController::class, 'index'])->name('customer.komplain');
+    Route::get('/komplain', KomplainIndex::class)->name('customer.komplain');
+
+    // Kalkulator (PRD §4.8)
+    Route::get('/kalkulator', Kalkulator::class)->name('customer.kalkulator');
 
     // Profile
     Route::view('/profile', 'profile')->name('profile');
