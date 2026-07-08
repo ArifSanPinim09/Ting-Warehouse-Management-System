@@ -24,6 +24,8 @@ class Box extends Model
         'method',
         'customer_id',
         'notes',
+        'etd',
+        'eta',
     ];
 
     /**
@@ -33,7 +35,10 @@ class Box extends Model
      */
     protected function casts(): array
     {
-        return [];
+        return [
+            'etd' => 'date',
+            'eta' => 'date',
+        ];
     }
 
     // ─── Status Constants ──────────────────────────────────────────

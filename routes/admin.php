@@ -1,5 +1,13 @@
 <?php
 
+use App\Livewire\Admin\CustomerIndex;
+use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\EstUpdate;
+use App\Livewire\Admin\GenerateInvoice;
+use App\Livewire\Admin\ManageBox;
+use App\Livewire\Admin\RecapIndex;
+use App\Livewire\Admin\SettingsIndex;
+use App\Livewire\Admin\VerificationIndex;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,27 +22,27 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['auth', 'verified', 'role:admin,owner'])->prefix('admin')->name('admin.')->group(function () {
-    // Admin dashboard (PRD §4.9)
-    Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
+    // Admin dashboard (PRD §8.11)
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
-    // Manage Boxes (PRD §4.9)
-    // Route::get('/manage-boxes', [App\Http\Controllers\Admin\BoxController::class, 'index'])->name('manage-boxes');
+    // Manage Boxes (PRD §4.9, §8.12)
+    Route::get('/manage-boxes', ManageBox::class)->name('boxes');
 
-    // Generate Invoice (PRD §4.10)
-    // Route::get('/invoices', [App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices');
+    // Generate Invoice (PRD §4.10, §11.7)
+    Route::get('/invoices', GenerateInvoice::class)->name('invoices');
 
-    // Verification (PRD §4.11)
-    // Route::get('/verification', [App\Http\Controllers\Admin\VerificationController::class, 'index'])->name('verification');
+    // Verification (PRD §4.11, §8.13)
+    Route::get('/verification', VerificationIndex::class)->name('verification');
 
-    // Settings (PRD §4.12)
-    // Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings');
+    // Settings / Rate (PRD §4.12, §8.14)
+    Route::get('/settings', SettingsIndex::class)->name('settings');
 
     // Info Customer (PRD §4.14)
-    // Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('customers');
+    Route::get('/customers', CustomerIndex::class)->name('customers');
 
     // Est Update (PRD §4.15)
-    // Route::get('/est-update', [App\Http\Controllers\Admin\EstUpdateController::class, 'index'])->name('est-update');
+    Route::get('/est-update', EstUpdate::class)->name('est-update');
 
     // Recap (PRD §4.16)
-    // Route::get('/recap', [App\Http\Controllers\Admin\RecapController::class, 'index'])->name('recap');
+    Route::get('/recap', RecapIndex::class)->name('recap');
 });

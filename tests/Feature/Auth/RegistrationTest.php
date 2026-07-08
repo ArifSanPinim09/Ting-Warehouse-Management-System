@@ -24,13 +24,24 @@ class RegistrationTest extends TestCase
         $component = Volt::test('pages.auth.register')
             ->set('name', 'Test User')
             ->set('email', 'test@example.com')
+            ->set('phone', '081234567890')
+            ->set('ktp_number', '1234567890123456')
+            ->set('address', 'Jl. Test No. 123, Jakarta')
             ->set('password', 'password')
             ->set('password_confirmation', 'password');
 
         $component->call('register');
 
-        $component->assertRedirect(route('dashboard', absolute: false));
+        $component->assertRedirect(route('login', absolute: false));
 
-        $this->assertAuthenticated();
+        // User is NOT authenticated after registration — must wait for admin activation (PRD §4.1)
+        $this->assertGuest();
+
+        // But the user record exists with PENDING status
+        $this->assertDatabaseHas('users', [
+            'email' => 'test@example.com',
+            'status' => 'pending',
+            'role' => 'customer',
+        ]);
     }
 }
