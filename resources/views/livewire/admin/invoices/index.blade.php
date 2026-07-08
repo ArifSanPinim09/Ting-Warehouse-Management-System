@@ -5,11 +5,11 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-[22px] font-bold text-gray-900 tracking-tight">Generate Invoice</h1>
-                    <p class="text-[13px] text-gray-500 mt-0.5">Buat invoice untuk box yang sudah tiba di Indonesia</p>
+                    <p class="text-body text-gray-500 mt-0.5">Buat invoice untuk box yang sudah tiba di Indonesia</p>
                 </div>
                 <button
                     wire:click="openGenerateModal"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-[13px] font-medium rounded-[8px] hover:bg-primary-light transition-colors shadow-sm"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-body font-medium rounded-[8px] hover:bg-primary-light transition-colors shadow-sm"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     <span class="hidden sm:inline">Buat Invoice</span>
@@ -25,9 +25,9 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div class="sm:col-span-2 relative">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari invoice number, customer, atau tracking..." class="w-full pl-10 pr-4 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors placeholder:text-gray-400">
+                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari invoice number, customer, atau tracking..." class="w-full pl-10 pr-4 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors placeholder:text-gray-400">
                 </div>
-                <select wire:model.live="filterStatus" class="py-2.5 px-3 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors text-gray-600">
+                <select wire:model.live="filterStatus" class="py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600">
                     <option value="">Semua Status</option>
                     <option value="waiting_payment">Menunggu Pembayaran</option>
                     <option value="waiting_verification">Menunggu Verifikasi</option>
@@ -54,47 +54,47 @@
                             <table class="w-full">
                                 <thead>
                                     <tr class="border-b border-gray-100">
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Invoice</th>
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Customer</th>
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Box</th>
-                                        <th class="text-right px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Fee TAX</th>
-                                        <th class="text-right px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Fee WH</th>
-                                        <th class="text-right px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Fee Packing</th>
-                                        <th class="text-right px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Grand Total</th>
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                                        <th class="text-right px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Aksi</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Invoice</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Customer</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Box</th>
+                                        <th class="text-right px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Fee TAX</th>
+                                        <th class="text-right px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Fee WH</th>
+                                        <th class="text-right px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Fee Packing</th>
+                                        <th class="text-right px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Grand Total</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                                        <th class="text-right px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-50">
                                     @foreach($invoices as $inv)
                                         <tr class="hover:bg-gray-50/50 transition-colors cursor-pointer" wire:click="selectInvoice({{ $inv->id }})">
                                             <td class="px-5 py-3.5">
-                                                <span class="text-[13px] font-semibold text-gray-900">{{ $inv->invoice_number }}</span>
-                                                <p class="text-[11px] text-gray-400 mt-0.5">{{ $inv->created_at->format('d M Y') }}</p>
+                                                <span class="text-body font-semibold text-gray-900">{{ $inv->invoice_number }}</span>
+                                                <p class="text-caption text-gray-400 mt-0.5">{{ $inv->created_at->format('d M Y') }}</p>
                                             </td>
                                             <td class="px-5 py-3.5">
-                                                <span class="text-[13px] text-gray-700">{{ $inv->customer->name ?? '-' }}</span>
+                                                <span class="text-body text-gray-700">{{ $inv->customer->name ?? '-' }}</span>
                                             </td>
                                             <td class="px-5 py-3.5">
-                                                <span class="text-[13px] text-gray-600">{{ $inv->box->tracking_number ?? $inv->box->batch_name ?? 'Box #' . $inv->box_id }}</span>
+                                                <span class="text-body text-gray-600">{{ $inv->box->tracking_number ?? $inv->box->batch_name ?? 'Box #' . $inv->box_id }}</span>
                                             </td>
                                             <td class="px-5 py-3.5 text-right">
-                                                <span class="text-[13px] text-gray-600">Rp {{ number_format($inv->fee_tax, 0, ',', '.') }}</span>
+                                                <span class="text-body text-gray-600">Rp {{ number_format($inv->fee_tax, 0, ',', '.') }}</span>
                                             </td>
                                             <td class="px-5 py-3.5 text-right">
-                                                <span class="text-[13px] text-gray-600">Rp {{ number_format($inv->fee_wh, 0, ',', '.') }}</span>
+                                                <span class="text-body text-gray-600">Rp {{ number_format($inv->fee_wh, 0, ',', '.') }}</span>
                                             </td>
                                             <td class="px-5 py-3.5 text-right">
-                                                <span class="text-[13px] text-gray-600">Rp {{ number_format($inv->fee_packing, 0, ',', '.') }}</span>
+                                                <span class="text-body text-gray-600">Rp {{ number_format($inv->fee_packing, 0, ',', '.') }}</span>
                                             </td>
                                             <td class="px-5 py-3.5 text-right">
-                                                <span class="text-[14px] font-bold text-gray-900">Rp {{ number_format($inv->grand_total, 0, ',', '.') }}</span>
+                                                <span class="text-body font-bold text-gray-900">Rp {{ number_format($inv->grand_total, 0, ',', '.') }}</span>
                                             </td>
                                             <td class="px-5 py-3.5">
                                                 <x-status-badge :status="$inv->status" />
                                             </td>
                                             <td class="px-5 py-3.5 text-right">
-                                                <button wire:click.stop="selectInvoice({{ $inv->id }})" class="text-[12px] font-medium text-accent hover:text-primary transition-colors">
+                                                <button wire:click.stop="selectInvoice({{ $inv->id }})" class="text-caption font-medium text-accent hover:text-primary transition-colors">
                                                     Detail
                                                 </button>
                                             </td>
@@ -116,13 +116,13 @@
                             <div wire:click="selectInvoice({{ $inv->id }})" class="bg-white rounded-[12px] border border-gray-100 p-4 hover:shadow-card-hover transition-shadow cursor-pointer">
                                 <div class="flex items-start justify-between mb-3">
                                     <div>
-                                        <p class="text-[14px] font-semibold text-gray-900">{{ $inv->invoice_number }}</p>
-                                        <p class="text-[12px] text-gray-500 mt-0.5">{{ $inv->customer->name ?? '-' }}</p>
+                                        <p class="text-body font-semibold text-gray-900">{{ $inv->invoice_number }}</p>
+                                        <p class="text-caption text-gray-500 mt-0.5">{{ $inv->customer->name ?? '-' }}</p>
                                     </div>
                                     <x-status-badge :status="$inv->status" />
                                 </div>
                                 <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                                    <span class="text-[12px] text-gray-500">{{ $inv->box->tracking_number ?? 'Box #' . $inv->box_id }}</span>
+                                    <span class="text-caption text-gray-500">{{ $inv->box->tracking_number ?? 'Box #' . $inv->box_id }}</span>
                                     <span class="text-[15px] font-bold text-gray-900">Rp {{ number_format($inv->grand_total, 0, ',', '.') }}</span>
                                 </div>
                             </div>
@@ -136,52 +136,52 @@
                 <div class="w-full lg:w-[380px] flex-shrink-0">
                     <div class="bg-white rounded-[12px] border border-gray-100 sticky top-[88px]">
                         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 class="text-[14px] font-semibold text-gray-900">Detail Invoice</h3>
-                            <button wire:click="closeDetail" class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                            <h3 class="text-body font-semibold text-gray-900">Detail Invoice</h3>
+                            <button wire:click="closeDetail" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
                         <div class="p-5 space-y-4">
                             <div class="text-center pb-4 border-b border-gray-100">
-                                <p class="text-[11px] text-gray-400 uppercase tracking-wide mb-1">Invoice Number</p>
+                                <p class="text-caption text-gray-400 uppercase tracking-wide mb-1">Invoice Number</p>
                                 <p class="text-[18px] font-bold text-gray-900">{{ $selectedInvoice->invoice_number }}</p>
                                 <x-status-badge :status="$selectedInvoice->status" size="lg" class="mt-2" />
                             </div>
 
                             <div class="space-y-2.5">
-                                <div class="flex justify-between text-[13px]">
+                                <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Customer</span>
                                     <span class="font-medium text-gray-800">{{ $selectedInvoice->customer->name ?? '-' }}</span>
                                 </div>
-                                <div class="flex justify-between text-[13px]">
+                                <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Box</span>
                                     <span class="font-medium text-gray-800">{{ $selectedInvoice->box->tracking_number ?? 'Box #' . $selectedInvoice->box_id }}</span>
                                 </div>
-                                <div class="flex justify-between text-[13px]">
+                                <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Berat</span>
                                     <span class="font-medium text-gray-800">{{ $selectedInvoice->weight }} kg</span>
                                 </div>
-                                <div class="flex justify-between text-[13px]">
+                                <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Volume</span>
                                     <span class="font-medium text-gray-800">{{ $selectedInvoice->volume }} m³</span>
                                 </div>
                             </div>
 
                             <div class="border-t border-gray-100 pt-4 space-y-2">
-                                <div class="flex justify-between text-[13px]">
+                                <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Fee TAX</span>
                                     <span class="font-medium text-gray-800">Rp {{ number_format($selectedInvoice->fee_tax, 0, ',', '.') }}</span>
                                 </div>
-                                <div class="flex justify-between text-[13px]">
+                                <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Fee WH</span>
                                     <span class="font-medium text-gray-800">Rp {{ number_format($selectedInvoice->fee_wh, 0, ',', '.') }}</span>
                                 </div>
-                                <div class="flex justify-between text-[13px]">
+                                <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Fee Packing</span>
                                     <span class="font-medium text-gray-800">Rp {{ number_format($selectedInvoice->fee_packing, 0, ',', '.') }}</span>
                                 </div>
                                 @if($selectedInvoice->add_on > 0)
-                                    <div class="flex justify-between text-[13px]">
+                                    <div class="flex justify-between text-body">
                                         <span class="text-gray-500">Add On</span>
                                         <span class="font-medium text-gray-800">Rp {{ number_format($selectedInvoice->add_on, 0, ',', '.') }}</span>
                                     </div>
@@ -195,12 +195,12 @@
                             {{-- Payment Proof --}}
                             @if($selectedInvoice->payment_proof)
                                 <div class="border-t border-gray-100 pt-4">
-                                    <p class="text-[12px] font-semibold text-gray-700 mb-2 uppercase tracking-wide">Bukti Transfer</p>
+                                    <p class="text-caption font-semibold text-gray-700 mb-2 uppercase tracking-wide">Bukti Transfer</p>
                                     <div class="rounded-[8px] overflow-hidden border border-gray-200">
                                         <img src="{{ Storage::url($selectedInvoice->payment_proof) }}" alt="Bukti Transfer" class="w-full h-auto" loading="lazy">
                                     </div>
                                     @if($selectedInvoice->payment_method)
-                                        <p class="text-[12px] text-gray-500 mt-2">Metode: <span class="font-medium capitalize">{{ $selectedInvoice->payment_method }}</span></p>
+                                        <p class="text-caption text-gray-500 mt-2">Metode: <span class="font-medium capitalize">{{ $selectedInvoice->payment_method }}</span></p>
                                     @endif
                                 </div>
                             @endif
@@ -219,7 +219,7 @@
                 <div class="relative bg-white rounded-[16px] shadow-modal w-full max-w-lg p-6 transform transition-all" @click.stop>
                     <div class="flex items-center justify-between mb-5">
                         <h3 class="text-[16px] font-semibold text-gray-900">Generate Invoice</h3>
-                        <button wire:click="closeGenerateModal" class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                        <button wire:click="closeGenerateModal" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
@@ -227,83 +227,83 @@
                     <div class="space-y-4">
                         {{-- Box Select --}}
                         <div>
-                            <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Pilih Box (OTW Indonesia) <span class="text-red-500">*</span></label>
-                            <select wire:model.live="selectedBoxId" class="w-full py-2.5 px-3 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
+                            <label class="block text-caption font-medium text-gray-700 mb-1.5">Pilih Box (OTW Indonesia) <span class="text-red-500">*</span></label>
+                            <select wire:model.live="selectedBoxId" class="w-full py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                                 <option value="">Pilih box</option>
                                 @foreach($availableBoxes as $box)
                                     <option value="{{ $box->id }}">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }} — {{ $box->customer->name ?? '-' }} ({{ ucfirst($box->type) }}/{{ strtoupper($box->method) }})</option>
                                 @endforeach
                             </select>
-                            @error('selectedBoxId') <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            @error('selectedBoxId') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             @if($availableBoxes->isEmpty())
-                                <p class="text-[12px] text-amber-600 mt-1">Tidak ada box dengan status OTW Indonesia.</p>
+                                <p class="text-caption text-amber-600 mt-1">Tidak ada box dengan status OTW Indonesia.</p>
                             @endif
                         </div>
 
                         {{-- Weight & Dimensions --}}
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Berat (kg) <span class="text-red-500">*</span></label>
-                                <input type="number" wire:model.live="weight" step="0.1" min="0.1" max="99999" placeholder="Berat (kg)" class="w-full px-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
-                                @error('weight') <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Berat (kg) <span class="text-red-500">*</span></label>
+                                <input type="number" wire:model.live="weight" step="0.1" min="0.1" max="99999" placeholder="Berat (kg)" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('weight') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Add On (Rp)</label>
-                                <input type="number" wire:model.live="addOn" min="0" max="999999" placeholder="0" class="w-full px-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
-                                @error('addOn') <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Add On (Rp)</label>
+                                <input type="number" wire:model.live="addOn" min="0" max="999999" placeholder="0" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('addOn') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-3">
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Panjang (cm) <span class="text-red-500">*</span></label>
-                                <input type="number" wire:model.live="length" min="1" max="999" placeholder="P" class="w-full px-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
-                                @error('length') <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Panjang (cm) <span class="text-red-500">*</span></label>
+                                <input type="number" wire:model.live="length" min="1" max="999" placeholder="P" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('length') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Lebar (cm) <span class="text-red-500">*</span></label>
-                                <input type="number" wire:model.live="width" min="1" max="999" placeholder="L" class="w-full px-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
-                                @error('width') <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Lebar (cm) <span class="text-red-500">*</span></label>
+                                <input type="number" wire:model.live="width" min="1" max="999" placeholder="L" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('width') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Tinggi (cm) <span class="text-red-500">*</span></label>
-                                <input type="number" wire:model.live="height" min="1" max="999" placeholder="T" class="w-full px-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
-                                @error('height') <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Tinggi (cm) <span class="text-red-500">*</span></label>
+                                <input type="number" wire:model.live="height" min="1" max="999" placeholder="T" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('height') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
 
                         {{-- Live Preview --}}
                         @if($preview)
                             <div class="bg-gray-50 rounded-[10px] p-4 border border-gray-100">
-                                <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-3">Preview Perhitungan</p>
+                                <p class="text-caption font-semibold text-gray-500 uppercase tracking-wide mb-3">Preview Perhitungan</p>
                                 <div class="space-y-2">
-                                    <div class="flex justify-between text-[13px]">
+                                    <div class="flex justify-between text-body">
                                         <span class="text-gray-500">Volume</span>
                                         <span class="font-medium text-gray-800">{{ number_format($preview['volume'], 2, ',', '.') }} m³</span>
                                     </div>
-                                    <div class="flex justify-between text-[13px]">
+                                    <div class="flex justify-between text-body">
                                         <span class="text-gray-500">Dasar (max berat/volume)</span>
                                         <span class="font-medium text-gray-800">{{ number_format($preview['basis'], 2, ',', '.') }}</span>
                                     </div>
-                                    <div class="flex justify-between text-[13px]">
+                                    <div class="flex justify-between text-body">
                                         <span class="text-gray-500">Rate Key</span>
-                                        <span class="font-medium text-gray-600 text-[12px]">{{ $preview['rate_key'] }}</span>
+                                        <span class="font-medium text-gray-600 text-caption">{{ $preview['rate_key'] }}</span>
                                     </div>
                                     <div class="border-t border-gray-200 pt-2 mt-2 space-y-1.5">
-                                        <div class="flex justify-between text-[13px]">
+                                        <div class="flex justify-between text-body">
                                             <span class="text-gray-500">Fee TAX</span>
                                             <span class="font-medium text-gray-800">Rp {{ number_format($preview['fee_tax'], 0, ',', '.') }}</span>
                                         </div>
-                                        <div class="flex justify-between text-[13px]">
+                                        <div class="flex justify-between text-body">
                                             <span class="text-gray-500">Fee WH</span>
                                             <span class="font-medium text-gray-800">Rp {{ number_format($preview['fee_wh'], 0, ',', '.') }}</span>
                                         </div>
-                                        <div class="flex justify-between text-[13px]">
+                                        <div class="flex justify-between text-body">
                                             <span class="text-gray-500">Fee Packing</span>
                                             <span class="font-medium text-gray-800">Rp {{ number_format($preview['fee_packing'], 0, ',', '.') }}</span>
                                         </div>
                                         @if($preview['add_on'] > 0)
-                                            <div class="flex justify-between text-[13px]">
+                                            <div class="flex justify-between text-body">
                                                 <span class="text-gray-500">Add On</span>
                                                 <span class="font-medium text-gray-800">Rp {{ number_format($preview['add_on'], 0, ',', '.') }}</span>
                                             </div>
@@ -319,13 +319,13 @@
                     </div>
 
                     <div class="flex items-center gap-3 justify-end mt-6">
-                        <button wire:click="closeGenerateModal" class="px-4 py-2.5 text-[13px] font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
+                        <button wire:click="closeGenerateModal" class="px-4 py-2.5 text-body font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
                             Batal
                         </button>
                         <button
                             wire:click="generateInvoice"
                             @if(!$preview) disabled @endif
-                            class="px-4 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="px-4 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Generate Invoice
                         </button>

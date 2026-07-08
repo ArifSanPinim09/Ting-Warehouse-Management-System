@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\Owner\ExportFinanceController;
 use App\Livewire\AuditLogIndex;
+use App\Livewire\Owner\Dashboard;
+use App\Livewire\Owner\FinanceIndex;
+use App\Livewire\Owner\ManageAdminIndex;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -8,24 +12,25 @@ use Illuminate\Support\Facades\Route;
 | Owner Routes
 |--------------------------------------------------------------------------
 |
-| Routes for owner role: Dashboard, Finance, Data, User Management.
+| Routes for owner role: Dashboard, Finance, Manage Admin, Audit Log.
 | All routes here are protected by auth middleware and owner role only.
+| Owner also has full access to all admin routes (via role:admin,owner).
 |
 */
 
 Route::middleware(['auth', 'verified', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
-    // Owner dashboard (PRD §4.13)
-    Route::view('/dashboard', 'owner.dashboard')->name('dashboard');
+    // Owner Dashboard (PRD §8.15)
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
-    // Audit Log (PRD §3.3, CLAUDE.md §3.3)
+    // Laporan Keuangan (PRD §4.13, §8.16)
+    Route::get('/finance', FinanceIndex::class)->name('finance');
+
+    // Manage Admin
+    Route::get('/manage-admin', ManageAdminIndex::class)->name('manage-admin');
+
+    // Audit Log (PRD §3.3)
     Route::get('/audit-log', AuditLogIndex::class)->name('audit-log');
 
-    // Finance reports (PRD §4.13)
-    // Route::get('/finance', [App\Http\Controllers\Owner\FinanceController::class, 'index'])->name('finance');
-
-    // Data management
-    // Route::get('/data', [App\Http\Controllers\Owner\DataController::class, 'index'])->name('data');
-
-    // User management
-    // Route::get('/users', [App\Http\Controllers\Owner\UserController::class, 'index'])->name('users');
+    // Export Finance (PRD §8.16)
+    Route::get('/finance/export', ExportFinanceController::class)->name('export-finance');
 });

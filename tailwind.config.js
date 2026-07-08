@@ -31,8 +31,7 @@ export default {
                 'title': ['1.25rem', { lineHeight: '1.4', fontWeight: '600' }],
                 'subtitle': ['1rem', { lineHeight: '1.5', fontWeight: '600' }],
                 'body': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],
-                'caption': ['0.75rem', { lineHeight: '1.5', fontWeight: '400' }],
-                'micro': ['0.6875rem', { lineHeight: '1.5', fontWeight: '400' }],
+                'caption': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],
             },
             borderRadius: {
                 'card': '12px',

@@ -70,7 +70,7 @@ new class extends Component
                     <button
                         @click="dropdownOpen = !dropdownOpen"
                         @click.outside="dropdownOpen = false"
-                        class="flex items-center gap-2 px-2 py-1.5 rounded-button transition-colors hover:bg-gray-50"
+                        class="flex items-center gap-2 px-3 py-2 rounded-button transition-colors hover:bg-gray-50 min-h-[44px]"
                     >
                         <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
                             <span class="text-caption font-semibold text-accent">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
@@ -111,7 +111,7 @@ new class extends Component
                 {{-- Mobile: Notification + Hamburger --}}
                 <div class="flex items-center gap-1 sm:hidden">
                     <livewire:notifications.notification-bell />
-                    <button @click="open = !open" class="p-2 rounded-button text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                    <button @click="open = !open" class="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-button text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                         <svg x-show="!open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
@@ -133,16 +133,16 @@ new class extends Component
                     href="{{ route($item['route']) }}"
                     wire:navigate
                     @click="open = false"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-button text-body font-medium transition-colors {{ $isActive ? 'bg-primary/5 text-primary' : 'text-gray-600 hover:bg-gray-50' }}"
+                    class="flex items-center gap-3 px-3 py-3 min-h-[44px] rounded-button text-body font-medium transition-colors {{ $isActive ? 'bg-primary/5 text-primary' : 'text-gray-600 hover:bg-gray-50' }}"
                 >
                     {{ $item['label'] }}
                 </a>
             @endforeach
             <hr class="my-2 border-gray-100">
-            <a href="{{ route('profile') }}" wire:navigate @click="open = false" class="flex items-center gap-3 px-3 py-2.5 rounded-button text-body text-gray-600 hover:bg-gray-50">
+            <a href="{{ route('profile') }}" wire:navigate @click="open = false" class="flex items-center gap-3 px-3 py-3 min-h-[44px] rounded-button text-body text-gray-600 hover:bg-gray-50">
                 Profil Saya
             </a>
-            <button wire:click="logout" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-button text-body text-red-600 hover:bg-red-50">
+            <button wire:click="logout" class="w-full flex items-center gap-3 px-3 py-3 min-h-[44px] rounded-button text-body text-red-600 hover:bg-red-50">
                 Keluar
             </button>
         </div>

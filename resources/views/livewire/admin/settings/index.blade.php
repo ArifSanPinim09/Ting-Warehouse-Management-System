@@ -5,10 +5,10 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-[22px] font-bold text-gray-900 tracking-tight">Pengaturan Rate</h1>
-                    <p class="text-[13px] text-gray-500 mt-0.5">Kelola kurs, rate pengiriman, dan biaya packing</p>
+                    <p class="text-body text-gray-500 mt-0.5">Kelola kurs, rate pengiriman, dan biaya packing</p>
                 </div>
                 @if($lastUpdatedAt)
-                    <span class="hidden sm:flex items-center gap-1.5 text-[12px] text-gray-400">
+                    <span class="hidden sm:flex items-center gap-1.5 text-caption text-gray-400">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Terakhir diupdate: {{ $lastUpdatedAt }}
                     </span>
@@ -32,7 +32,7 @@
             @foreach($tabs as $tab)
                 <button
                     wire:click="setTab('{{ $tab['key'] }}')"
-                    class="flex items-center gap-2 px-4 py-2 rounded-[8px] text-[13px] font-medium transition-all duration-150 {{ $activeTab === $tab['key'] ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}"
+                    class="flex items-center gap-2 px-4 py-2 rounded-[8px] text-body font-medium transition-all duration-150 {{ $activeTab === $tab['key'] ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}"
                 >
                     <svg class="w-4 h-4 {{ $activeTab === $tab['key'] ? 'text-white' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">{!! $tab['icon'] !!}</svg>
                     {{ $tab['label'] }}
@@ -45,27 +45,27 @@
             <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-[15px] font-semibold text-gray-900">Kurs Mata Uang</h3>
-                    <p class="text-[13px] text-gray-500 mt-0.5">Kurs Yuan ke Rupiah yang digunakan untuk perhitungan</p>
+                    <p class="text-body text-gray-500 mt-0.5">Kurs Yuan ke Rupiah yang digunakan untuk perhitungan</p>
                 </div>
                 <div class="p-6">
                     <div class="max-w-md">
-                        <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Kurs Yuan → IDR <span class="text-red-500">*</span></label>
+                        <label class="block text-caption font-medium text-gray-700 mb-1.5">Kurs Yuan → IDR <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-gray-400">Rp</span>
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-gray-400">Rp</span>
                             <input
                                 type="number"
                                 wire:model="kurs_yuan_idr"
                                 min="1"
                                 max="99999"
-                                class="w-full pl-10 pr-4 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors"
+                                class="w-full pl-10 pr-4 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors"
                             >
                         </div>
-                        @error('kurs_yuan_idr') <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        @error('kurs_yuan_idr') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end">
                         <button
                             wire:click="saveCurrency"
-                            class="px-5 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"
+                            class="px-5 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"
                         >
                             Simpan Kurs
                         </button>
@@ -79,12 +79,12 @@
             <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-[15px] font-semibold text-gray-900">Rate Sharing</h3>
-                    <p class="text-[13px] text-gray-500 mt-0.5">Rate per kg untuk pengiriman sharing (normal & sensitive)</p>
+                    <p class="text-body text-gray-500 mt-0.5">Rate per kg untuk pengiriman sharing (normal & sensitive)</p>
                 </div>
                 <div class="p-6 space-y-8">
                     {{-- Normal Sharing --}}
                     <div>
-                        <h4 class="text-[13px] font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                        <h4 class="text-body font-semibold text-gray-700 mb-4 flex items-center gap-2">
                             <div class="w-2 h-2 rounded-full bg-blue-500"></div>
                             Sharing Normal
                         </h4>
@@ -99,13 +99,13 @@
                             @endphp
                             @foreach($fields as $field)
                                 <div>
-                                    <label class="block text-[12px] font-medium text-gray-600 mb-1.5">{{ $field['label'] }}</label>
+                                    <label class="block text-caption font-medium text-gray-600 mb-1.5">{{ $field['label'] }}</label>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400">Rp</span>
-                                        <input type="number" wire:model="{{ $field['key'] }}" min="1" max="99999" class="w-full pl-10 pr-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors">
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400">/kg</span>
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">Rp</span>
+                                        <input type="number" wire:model="{{ $field['key'] }}" min="1" max="99999" class="w-full pl-10 pr-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">/kg</span>
                                     </div>
-                                    @error($field['key']) <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                    @error($field['key']) <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                                 </div>
                             @endforeach
                         </div>
@@ -113,7 +113,7 @@
 
                     {{-- Sensitive Sharing --}}
                     <div>
-                        <h4 class="text-[13px] font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                        <h4 class="text-body font-semibold text-gray-700 mb-4 flex items-center gap-2">
                             <div class="w-2 h-2 rounded-full bg-amber-500"></div>
                             Sharing Sensitive
                         </h4>
@@ -128,13 +128,13 @@
                             @endphp
                             @foreach($sensitiveFields as $field)
                                 <div>
-                                    <label class="block text-[12px] font-medium text-gray-600 mb-1.5">{{ $field['label'] }}</label>
+                                    <label class="block text-caption font-medium text-gray-600 mb-1.5">{{ $field['label'] }}</label>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400">Rp</span>
-                                        <input type="number" wire:model="{{ $field['key'] }}" min="1" max="99999" class="w-full pl-10 pr-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors">
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400">/kg</span>
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">Rp</span>
+                                        <input type="number" wire:model="{{ $field['key'] }}" min="1" max="99999" class="w-full pl-10 pr-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">/kg</span>
                                     </div>
-                                    @error($field['key']) <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                    @error($field['key']) <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                                 </div>
                             @endforeach
                         </div>
@@ -143,7 +143,7 @@
                 <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-end">
                     <button
                         wire:click="confirmSave('sharing')"
-                        class="px-5 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"
+                        class="px-5 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"
                     >
                         Simpan Rate Sharing
                     </button>
@@ -156,7 +156,7 @@
             <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-[15px] font-semibold text-gray-900">Rate Direct</h3>
-                    <p class="text-[13px] text-gray-500 mt-0.5">Rate per kg untuk pengiriman direct (tanpa sensitive)</p>
+                    <p class="text-body text-gray-500 mt-0.5">Rate per kg untuk pengiriman direct (tanpa sensitive)</p>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -170,13 +170,13 @@
                         @endphp
                         @foreach($directFields as $field)
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-600 mb-1.5">{{ $field['label'] }}</label>
+                                <label class="block text-caption font-medium text-gray-600 mb-1.5">{{ $field['label'] }}</label>
                                 <div class="relative">
-                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400">Rp</span>
-                                    <input type="number" wire:model="{{ $field['key'] }}" min="1" max="99999" class="w-full pl-10 pr-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400">/kg</span>
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">Rp</span>
+                                    <input type="number" wire:model="{{ $field['key'] }}" min="1" max="99999" class="w-full pl-10 pr-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">/kg</span>
                                 </div>
-                                @error($field['key']) <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                @error($field['key']) <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                         @endforeach
                     </div>
@@ -184,7 +184,7 @@
                 <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-end">
                     <button
                         wire:click="confirmSave('direct')"
-                        class="px-5 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"
+                        class="px-5 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"
                     >
                         Simpan Rate Direct
                     </button>
@@ -197,32 +197,32 @@
             <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-[15px] font-semibold text-gray-900">Fee Packing</h3>
-                    <p class="text-[13px] text-gray-500 mt-0.5">Tiered pricing berdasarkan berat barang</p>
+                    <p class="text-body text-gray-500 mt-0.5">Tiered pricing berdasarkan berat barang</p>
                 </div>
                 <div class="p-6 space-y-6">
                     {{-- Tier Visual --}}
                     <div class="bg-gray-50 rounded-[10px] p-5">
-                        <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-4">Struktur Tier</p>
+                        <p class="text-caption font-semibold text-gray-500 uppercase tracking-wide mb-4">Struktur Tier</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div class="text-center">
                                 <div class="w-full h-2 bg-emerald-200 rounded-full mb-2"></div>
-                                <p class="text-[12px] font-semibold text-gray-700">0 — 150 kg</p>
-                                <p class="text-[11px] text-gray-500">Flat rate</p>
+                                <p class="text-caption font-semibold text-gray-700">0 — 150 kg</p>
+                                <p class="text-caption text-gray-500">Flat rate</p>
                             </div>
                             <div class="text-center">
                                 <div class="w-full h-2 bg-blue-200 rounded-full mb-2"></div>
-                                <p class="text-[12px] font-semibold text-gray-700">151 — 1.000 kg</p>
-                                <p class="text-[11px] text-gray-500">Flat rate</p>
+                                <p class="text-caption font-semibold text-gray-700">151 — 1.000 kg</p>
+                                <p class="text-caption text-gray-500">Flat rate</p>
                             </div>
                             <div class="text-center">
                                 <div class="w-full h-2 bg-amber-200 rounded-full mb-2"></div>
-                                <p class="text-[12px] font-semibold text-gray-700">1.001 — 2.000 kg</p>
-                                <p class="text-[11px] text-gray-500">Flat rate</p>
+                                <p class="text-caption font-semibold text-gray-700">1.001 — 2.000 kg</p>
+                                <p class="text-caption text-gray-500">Flat rate</p>
                             </div>
                             <div class="text-center">
                                 <div class="w-full h-2 bg-red-200 rounded-full mb-2"></div>
-                                <p class="text-[12px] font-semibold text-gray-700">&gt; 2.000 kg</p>
-                                <p class="text-[11px] text-gray-500">+ Extra per kg</p>
+                                <p class="text-caption font-semibold text-gray-700">&gt; 2.000 kg</p>
+                                <p class="text-caption text-gray-500">+ Extra per kg</p>
                             </div>
                         </div>
                     </div>
@@ -239,13 +239,13 @@
                         @endphp
                         @foreach($packingFields as $field)
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">{{ $field['label'] }}</label>
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">{{ $field['label'] }}</label>
                                 <div class="relative">
-                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400">Rp</span>
-                                    <input type="number" wire:model="{{ $field['key'] }}" min="0" max="999999" class="w-full pl-10 pr-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">Rp</span>
+                                    <input type="number" wire:model="{{ $field['key'] }}" min="0" max="999999" class="w-full pl-10 pr-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
                                 </div>
-                                <p class="text-[11px] text-gray-400 mt-1">{{ $field['desc'] }}</p>
-                                @error($field['key']) <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                <p class="text-caption text-gray-400 mt-1">{{ $field['desc'] }}</p>
+                                @error($field['key']) <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                         @endforeach
                     </div>
@@ -253,7 +253,7 @@
                 <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-end">
                     <button
                         wire:click="confirmSave('packing')"
-                        class="px-5 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"
+                        class="px-5 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"
                     >
                         Simpan Fee Packing
                     </button>
@@ -274,19 +274,19 @@
                         </div>
                         <div>
                             <h3 class="text-[16px] font-semibold text-gray-900">Konfirmasi Perubahan Rate</h3>
-                            <p class="text-[13px] text-gray-500 mt-1">Perubahan rate akan langsung berlaku untuk invoice baru. Invoice yang sudah dibuat tidak akan terpengaruh.</p>
+                            <p class="text-body text-gray-500 mt-1">Perubahan rate akan langsung berlaku untuk invoice baru. Invoice yang sudah dibuat tidak akan terpengaruh.</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3 justify-end">
-                        <button wire:click="$set('showConfirmModal', false)" class="px-4 py-2.5 text-[13px] font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
+                        <button wire:click="$set('showConfirmModal', false)" class="px-4 py-2.5 text-body font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
                             Batal
                         </button>
                         @if($confirmSection === 'sharing')
-                            <button wire:click="saveSharingRates" class="px-4 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">Konfirmasi</button>
+                            <button wire:click="saveSharingRates" class="px-4 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">Konfirmasi</button>
                         @elseif($confirmSection === 'direct')
-                            <button wire:click="saveDirectRates" class="px-4 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">Konfirmasi</button>
+                            <button wire:click="saveDirectRates" class="px-4 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">Konfirmasi</button>
                         @elseif($confirmSection === 'packing')
-                            <button wire:click="saveFeePacking" class="px-4 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">Konfirmasi</button>
+                            <button wire:click="saveFeePacking" class="px-4 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">Konfirmasi</button>
                         @endif
                     </div>
                 </div>

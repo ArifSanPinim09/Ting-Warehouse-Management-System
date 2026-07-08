@@ -114,7 +114,7 @@
                 <div class="relative bg-white rounded-t-modal sm:rounded-modal shadow-modal w-full max-w-lg animate-slide-up" wire:click.stop>
                     <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                         <h3 class="text-title font-semibold text-primary">Request Checkout</h3>
-                        <button wire:click="closeForm" class="p-2 rounded-button text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                        <button wire:click="closeForm" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-button text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>

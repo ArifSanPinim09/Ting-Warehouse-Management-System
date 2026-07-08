@@ -72,7 +72,7 @@ new #[Layout('layouts.guest')] class extends Component
         <!-- Address -->
         <div class="mt-4">
             <x-input-label for="address" :value="__('Alamat')" />
-            <textarea wire:model="address" id="address" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" name="address" rows="3" required></textarea>
+            <textarea wire:model="address" id="address" class="block mt-1 w-full border-gray-300 focus:border-accent focus:ring-accent/40 rounded-md shadow-card" name="address" rows="3" required></textarea>
             <x-input-error :messages="$errors->get('address')" class="mt-2" />
         </div>
 
@@ -96,7 +96,7 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}" wire:navigate>
+            <a class="underline text-body text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/40" href="{{ route('login') }}" wire:navigate>
                 {{ __('Sudah punya akun?') }}
             </a>
 

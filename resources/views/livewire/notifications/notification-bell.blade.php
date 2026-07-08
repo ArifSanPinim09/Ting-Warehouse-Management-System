@@ -2,7 +2,7 @@
     <!-- Bell Button -->
     <button
         @click="open = !open; @this.toggleDropdown()"
-        class="relative p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition ease-in-out duration-150"
+        class="relative p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-accent/40 transition ease-in-out duration-150"
     >
         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -11,7 +11,7 @@
 
         <!-- Unread Badge -->
         @if ($unreadCount > 0)
-            <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+            <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-caption font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-badge">
                 {{ $unreadCount > 99 ? '99+' : $unreadCount }}
             </span>
         @endif
@@ -26,16 +26,16 @@
         x-transition:leave="transition ease-in duration-75"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"
-        class="absolute right-0 mt-2 w-80 sm:w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+        class="absolute right-0 mt-2 w-80 sm:w-96 rounded-card shadow-dropdown bg-white z-50"
         style="display: none;"
     >
         <!-- Header -->
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <h3 class="text-sm font-semibold text-gray-800">Notifikasi</h3>
+            <h3 class="text-body font-semibold text-gray-800">Notifikasi</h3>
             @if ($unreadCount > 0)
                 <button
                     wire:click="markAllAsRead"
-                    class="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                    class="text-caption text-accent hover:text-primary font-medium min-h-[44px] flex items-center"
                 >
                     Tandai semua dibaca
                 </button>
@@ -64,12 +64,12 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                               d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
-                    <p class="mt-2 text-sm text-gray-500">Tidak ada notifikasi</p>
+                    <p class="mt-2 text-body text-gray-500">Tidak ada notifikasi</p>
                 </div>
             @else
                 @foreach ($notifications as $notification)
                     <div
-                        class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition ease-in-out duration-150 cursor-pointer {{ $notification->isRead() ? 'bg-white' : 'bg-blue-50' }}"
+                        class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition ease-in-out duration-150 cursor-pointer min-h-[44px] {{ $notification->isRead() ? 'bg-white' : 'bg-blue-50' }}"
                         wire:click="markAsRead('{{ $notification->id }}')"
                     >
                         <div class="flex items-start gap-3">
@@ -84,13 +84,13 @@
 
                             <!-- Content -->
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-800">
+                                <p class="text-body font-medium text-gray-800">
                                     {{ $notification->data['title'] ?? 'Notifikasi' }}
                                 </p>
-                                <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                                <p class="text-caption text-gray-500 mt-0.5 line-clamp-2">
                                     {{ $notification->data['message'] ?? '' }}
                                 </p>
-                                <p class="text-xs text-gray-400 mt-1">
+                                <p class="text-caption text-gray-400 mt-1">
                                     {{ $notification->created_at->diffForHumans() }}
                                 </p>
                             </div>
@@ -119,7 +119,7 @@
         {{-- Footer link to full notification page (when implemented) --}}
         @if ($notifications->isNotEmpty())
             <div class="px-4 py-2 border-t border-gray-100 text-center">
-                <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                <a href="#" class="text-caption text-accent hover:text-primary font-medium min-h-[44px] inline-flex items-center">
                     Lihat semua notifikasi
                 </a>
             </div>

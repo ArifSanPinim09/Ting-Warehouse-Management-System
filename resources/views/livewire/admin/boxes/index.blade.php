@@ -5,11 +5,11 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-[22px] font-bold text-gray-900 tracking-tight">Manage Box</h1>
-                    <p class="text-[13px] text-gray-500 mt-0.5">Kelola box dan status pengiriman</p>
+                    <p class="text-body text-gray-500 mt-0.5">Kelola box dan status pengiriman</p>
                 </div>
                 <button
                     wire:click="openCreateModal"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-[13px] font-medium rounded-[8px] hover:bg-primary-light transition-colors shadow-sm"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-body font-medium rounded-[8px] hover:bg-primary-light transition-colors shadow-sm"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     <span class="hidden sm:inline">Buat Box</span>
@@ -30,12 +30,12 @@
                         type="text"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Cari tracking number, batch, atau customer..."
-                        class="w-full pl-10 pr-4 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors placeholder:text-gray-400"
+                        class="w-full pl-10 pr-4 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors placeholder:text-gray-400"
                     >
                 </div>
 
                 {{-- Type Filter --}}
-                <select wire:model.live="filterType" class="py-2.5 px-3 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors text-gray-600">
+                <select wire:model.live="filterType" class="py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600">
                     <option value="">Semua Tipe</option>
                     <option value="sharing">Sharing</option>
                     <option value="direct">Direct</option>
@@ -43,7 +43,7 @@
                 </select>
 
                 {{-- Status Filter --}}
-                <select wire:model.live="filterStatus" class="py-2.5 px-3 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors text-gray-600">
+                <select wire:model.live="filterStatus" class="py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600">
                     <option value="">Semua Status</option>
                     <option value="OPEN">Open</option>
                     <option value="SENT_TO_CARGO">Sent to Cargo</option>
@@ -53,7 +53,7 @@
                 </select>
 
                 {{-- Customer Filter --}}
-                <select wire:model.live="filterCustomer" class="py-2.5 px-3 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors text-gray-600">
+                <select wire:model.live="filterCustomer" class="py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600">
                     <option value="">Semua Customer</option>
                     @foreach($customers as $customer)
                         <option value="{{ $customer->id }}">{{ $customer->name }}</option>
@@ -75,7 +75,7 @@
                             action="Buat Box Baru"
                             actionUrl="#"
                         >
-                            <button wire:click="openCreateModal" class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-[13px] font-medium rounded-[8px] hover:bg-primary-light transition-colors mt-2">
+                            <button wire:click="openCreateModal" class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-body font-medium rounded-[8px] hover:bg-primary-light transition-colors mt-2">
                                 Buat Box Baru
                             </button>
                         </x-empty-state>
@@ -87,13 +87,13 @@
                             <table class="w-full">
                                 <thead>
                                     <tr class="border-b border-gray-100">
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Box</th>
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Customer</th>
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Tipe</th>
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Metode</th>
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Barang</th>
-                                        <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                                        <th class="text-right px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Aksi</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Box</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Customer</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Tipe</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Metode</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Barang</th>
+                                        <th class="text-left px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                                        <th class="text-right px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wide">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-50">
@@ -105,28 +105,28 @@
                                                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                                     </div>
                                                     <div>
-                                                        <p class="text-[13px] font-semibold text-gray-900">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}</p>
-                                                        <p class="text-[11px] text-gray-400">{{ $box->created_at->format('d M Y') }}</p>
+                                                        <p class="text-body font-semibold text-gray-900">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}</p>
+                                                        <p class="text-caption text-gray-400">{{ $box->created_at->format('d M Y') }}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-5 py-3.5">
-                                                <span class="text-[13px] text-gray-700">{{ $box->customer->name ?? '-' }}</span>
+                                                <span class="text-body text-gray-700">{{ $box->customer->name ?? '-' }}</span>
                                             </td>
                                             <td class="px-5 py-3.5">
-                                                <span class="text-[12px] font-medium text-gray-600 capitalize">{{ $box->type }}</span>
+                                                <span class="text-caption font-medium text-gray-600 capitalize">{{ $box->type }}</span>
                                             </td>
                                             <td class="px-5 py-3.5">
-                                                <span class="text-[12px] font-medium text-gray-600 uppercase">{{ $box->method }}</span>
+                                                <span class="text-caption font-medium text-gray-600 uppercase">{{ $box->method }}</span>
                                             </td>
                                             <td class="px-5 py-3.5">
-                                                <span class="text-[13px] text-gray-600">{{ $box->items_count }}</span>
+                                                <span class="text-body text-gray-600">{{ $box->items_count }}</span>
                                             </td>
                                             <td class="px-5 py-3.5">
                                                 <x-status-badge :status="$box->status" />
                                             </td>
                                             <td class="px-5 py-3.5 text-right">
-                                                <button wire:click.stop="selectBox({{ $box->id }})" class="text-[12px] font-medium text-accent hover:text-primary transition-colors">
+                                                <button wire:click.stop="selectBox({{ $box->id }})" class="text-caption font-medium text-accent hover:text-primary transition-colors">
                                                     Detail
                                                 </button>
                                             </td>
@@ -152,13 +152,13 @@
                                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                         </div>
                                         <div>
-                                            <p class="text-[14px] font-semibold text-gray-900">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}</p>
-                                            <p class="text-[12px] text-gray-500">{{ $box->customer->name ?? '-' }}</p>
+                                            <p class="text-body font-semibold text-gray-900">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}</p>
+                                            <p class="text-caption text-gray-500">{{ $box->customer->name ?? '-' }}</p>
                                         </div>
                                     </div>
                                     <x-status-badge :status="$box->status" />
                                 </div>
-                                <div class="flex items-center gap-4 text-[12px] text-gray-500">
+                                <div class="flex items-center gap-4 text-caption text-gray-500">
                                     <span class="capitalize">{{ $box->type }}</span>
                                     <span class="w-1 h-1 rounded-full bg-gray-300"></span>
                                     <span class="uppercase">{{ $box->method }}</span>
@@ -182,8 +182,8 @@
                     <div class="bg-white rounded-[12px] border border-gray-100 sticky top-[88px]">
                         {{-- Detail Header --}}
                         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 class="text-[14px] font-semibold text-gray-900">Detail Box</h3>
-                            <button wire:click="closeDetail" class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                            <h3 class="text-body font-semibold text-gray-900">Detail Box</h3>
+                            <button wire:click="closeDetail" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
@@ -192,39 +192,39 @@
                             {{-- Box Info --}}
                             <div class="space-y-3">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[12px] text-gray-500">Tracking Number</span>
-                                    <span class="text-[13px] font-semibold text-gray-900">{{ $selectedBox->tracking_number ?? '-' }}</span>
+                                    <span class="text-caption text-gray-500">Tracking Number</span>
+                                    <span class="text-body font-semibold text-gray-900">{{ $selectedBox->tracking_number ?? '-' }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[12px] text-gray-500">Batch</span>
-                                    <span class="text-[13px] text-gray-700">{{ $selectedBox->batch_name ?? '-' }}</span>
+                                    <span class="text-caption text-gray-500">Batch</span>
+                                    <span class="text-body text-gray-700">{{ $selectedBox->batch_name ?? '-' }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[12px] text-gray-500">Customer</span>
-                                    <span class="text-[13px] text-gray-700">{{ $selectedBox->customer->name ?? '-' }}</span>
+                                    <span class="text-caption text-gray-500">Customer</span>
+                                    <span class="text-body text-gray-700">{{ $selectedBox->customer->name ?? '-' }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[12px] text-gray-500">Tipe</span>
-                                    <span class="text-[13px] text-gray-700 capitalize">{{ $selectedBox->type }}</span>
+                                    <span class="text-caption text-gray-500">Tipe</span>
+                                    <span class="text-body text-gray-700 capitalize">{{ $selectedBox->type }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[12px] text-gray-500">Metode</span>
-                                    <span class="text-[13px] text-gray-700 uppercase">{{ $selectedBox->method }}</span>
+                                    <span class="text-caption text-gray-500">Metode</span>
+                                    <span class="text-body text-gray-700 uppercase">{{ $selectedBox->method }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[12px] text-gray-500">Status</span>
+                                    <span class="text-caption text-gray-500">Status</span>
                                     <x-status-badge :status="$selectedBox->status" size="lg" />
                                 </div>
                                 @if($selectedBox->etd)
                                     <div class="flex items-center justify-between">
-                                        <span class="text-[12px] text-gray-500">ETD</span>
-                                        <span class="text-[13px] text-gray-700">{{ $selectedBox->etd->format('d M Y') }}</span>
+                                        <span class="text-caption text-gray-500">ETD</span>
+                                        <span class="text-body text-gray-700">{{ $selectedBox->etd->format('d M Y') }}</span>
                                     </div>
                                 @endif
                                 @if($selectedBox->eta)
                                     <div class="flex items-center justify-between">
-                                        <span class="text-[12px] text-gray-500">ETA</span>
-                                        <span class="text-[13px] text-gray-700">{{ $selectedBox->eta->format('d M Y') }}</span>
+                                        <span class="text-caption text-gray-500">ETA</span>
+                                        <span class="text-body text-gray-700">{{ $selectedBox->eta->format('d M Y') }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -232,14 +232,14 @@
                             {{-- Notes --}}
                             @if($selectedBox->notes)
                                 <div class="p-3 bg-gray-50 rounded-[8px]">
-                                    <p class="text-[12px] text-gray-500 mb-1">Catatan</p>
-                                    <p class="text-[13px] text-gray-700">{{ $selectedBox->notes }}</p>
+                                    <p class="text-caption text-gray-500 mb-1">Catatan</p>
+                                    <p class="text-body text-gray-700">{{ $selectedBox->notes }}</p>
                                 </div>
                             @endif
 
                             {{-- Status Timeline --}}
                             <div>
-                                <p class="text-[12px] font-semibold text-gray-700 mb-3 uppercase tracking-wide">Timeline Status</p>
+                                <p class="text-caption font-semibold text-gray-700 mb-3 uppercase tracking-wide">Timeline Status</p>
                                 <div class="space-y-0">
                                     @php
                                         $steps = [
@@ -271,8 +271,8 @@
                                                 @endif
                                             </div>
                                             <div class="pb-4">
-                                                <p class="text-[13px] font-medium {{ $isCurrent ? 'text-blue-700' : ($isCompleted ? 'text-gray-700' : 'text-gray-400') }}">{{ $step['label'] }}</p>
-                                                <p class="text-[11px] text-gray-400">{{ $step['desc'] }}</p>
+                                                <p class="text-body font-medium {{ $isCurrent ? 'text-blue-700' : ($isCompleted ? 'text-gray-700' : 'text-gray-400') }}">{{ $step['label'] }}</p>
+                                                <p class="text-caption text-gray-400">{{ $step['desc'] }}</p>
                                             </div>
                                         </div>
                                     @endforeach
@@ -299,7 +299,7 @@
                             @if($nextStatus)
                                 <button
                                     wire:click="confirmStatusChange('{{ $nextStatus }}')"
-                                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-[13px] font-medium rounded-[8px] hover:bg-primary-light transition-colors"
+                                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-body font-medium rounded-[8px] hover:bg-primary-light transition-colors"
                                 >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                                     {{ $nextLabel }}
@@ -309,16 +309,16 @@
                             {{-- Items --}}
                             @if($selectedBox->items->count() > 0)
                                 <div>
-                                    <p class="text-[12px] font-semibold text-gray-700 mb-3 uppercase tracking-wide">Daftar Barang ({{ $selectedBox->items->count() }})</p>
+                                    <p class="text-caption font-semibold text-gray-700 mb-3 uppercase tracking-wide">Daftar Barang ({{ $selectedBox->items->count() }})</p>
                                     <div class="space-y-2 max-h-[200px] overflow-y-auto">
                                         @foreach($selectedBox->items as $item)
                                             <div class="flex items-center justify-between p-2.5 rounded-[8px] bg-gray-50">
                                                 <div class="min-w-0">
-                                                    <p class="text-[13px] font-medium text-gray-800 truncate">{{ $item->name }}</p>
-                                                    <p class="text-[11px] text-gray-500">{{ $item->resi_number }} · {{ $item->quantity }}x</p>
+                                                    <p class="text-body font-medium text-gray-800 truncate">{{ $item->name }}</p>
+                                                    <p class="text-caption text-gray-500">{{ $item->resi_number }} · {{ $item->quantity }}x</p>
                                                 </div>
                                                 @if($item->is_sensitive)
-                                                    <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full flex-shrink-0">Sensitive</span>
+                                                    <span class="text-caption font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full flex-shrink-0">Sensitive</span>
                                                 @endif
                                             </div>
                                         @endforeach
@@ -329,13 +329,13 @@
                             {{-- Invoices --}}
                             @if($selectedBox->invoices->count() > 0)
                                 <div>
-                                    <p class="text-[12px] font-semibold text-gray-700 mb-3 uppercase tracking-wide">Invoice</p>
+                                    <p class="text-caption font-semibold text-gray-700 mb-3 uppercase tracking-wide">Invoice</p>
                                     <div class="space-y-2">
                                         @foreach($selectedBox->invoices as $invoice)
                                             <div class="flex items-center justify-between p-2.5 rounded-[8px] bg-gray-50">
                                                 <div class="min-w-0">
-                                                    <p class="text-[13px] font-medium text-gray-800">{{ $invoice->invoice_number }}</p>
-                                                    <p class="text-[11px] text-gray-500">Rp {{ number_format($invoice->grand_total, 0, ',', '.') }}</p>
+                                                    <p class="text-body font-medium text-gray-800">{{ $invoice->invoice_number }}</p>
+                                                    <p class="text-caption text-gray-500">Rp {{ number_format($invoice->grand_total, 0, ',', '.') }}</p>
                                                 </div>
                                                 <x-status-badge :status="$invoice->status" />
                                             </div>
@@ -362,7 +362,7 @@
                         </div>
                         <div>
                             <h3 class="text-[16px] font-semibold text-gray-900">Konfirmasi Perubahan Status</h3>
-                            <p class="text-[13px] text-gray-500 mt-1">
+                            <p class="text-body text-gray-500 mt-1">
                                 Anda akan mengubah status box menjadi
                                 <span class="font-semibold text-gray-700">{{ $pendingStatus }}</span>.
                                 Pastikan box sudah siap untuk tahap ini.
@@ -371,20 +371,20 @@
                     </div>
 
                     <div class="mb-5">
-                        <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Catatan (opsional)</label>
+                        <label class="block text-caption font-medium text-gray-700 mb-1.5">Catatan (opsional)</label>
                         <textarea
                             wire:model="statusNote"
                             rows="2"
                             placeholder="Tambahkan catatan untuk perubahan ini..."
-                            class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors resize-none"
+                            class="w-full px-3 py-2 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors resize-none"
                         ></textarea>
                     </div>
 
                     <div class="flex items-center gap-3 justify-end">
-                        <button wire:click="cancelStatusChange" class="px-4 py-2 text-[13px] font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
+                        <button wire:click="cancelStatusChange" class="px-4 py-2 text-body font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
                             Batal
                         </button>
-                        <button wire:click="updateStatus" class="px-4 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
+                        <button wire:click="updateStatus" class="px-4 py-2 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
                             Konfirmasi
                         </button>
                     </div>
@@ -401,7 +401,7 @@
                 <div class="relative bg-white rounded-[16px] shadow-modal w-full max-w-lg p-6 transform transition-all" @click.stop>
                     <div class="flex items-center justify-between mb-5">
                         <h3 class="text-[16px] font-semibold text-gray-900">Buat Box Baru</h3>
-                        <button wire:click="closeCreateModal" class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                        <button wire:click="closeCreateModal" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
@@ -410,16 +410,16 @@
                         {{-- Type & Method --}}
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Tipe Box</label>
-                                <select wire:model="newType" class="w-full py-2.5 px-3 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Tipe Box</label>
+                                <select wire:model="newType" class="w-full py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                                     <option value="sharing">Sharing</option>
                                     <option value="direct">Direct</option>
                                     <option value="handcarry">Handcarry</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Metode</label>
-                                <select wire:model="newMethod" class="w-full py-2.5 px-3 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Metode</label>
+                                <select wire:model="newMethod" class="w-full py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                                     <option value="air">Air</option>
                                     <option value="sea">Sea</option>
                                 </select>
@@ -428,8 +428,8 @@
 
                         {{-- Customer --}}
                         <div>
-                            <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Customer</label>
-                            <select wire:model="newCustomerId" class="w-full py-2.5 px-3 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
+                            <label class="block text-caption font-medium text-gray-700 mb-1.5">Customer</label>
+                            <select wire:model="newCustomerId" class="w-full py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                                 <option value="">Tanpa Customer</option>
                                 @foreach($customers as $customer)
                                     <option value="{{ $customer->id }}">{{ $customer->name }}</option>
@@ -440,27 +440,27 @@
                         {{-- Tracking & Batch --}}
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Tracking Number</label>
-                                <input type="text" wire:model="newTrackingNumber" placeholder="Opsional" class="w-full px-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Tracking Number</label>
+                                <input type="text" wire:model="newTrackingNumber" placeholder="Opsional" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                             </div>
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Batch Name</label>
-                                <input type="text" wire:model="newBatchName" placeholder="Opsional" class="w-full px-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20">
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Batch Name</label>
+                                <input type="text" wire:model="newBatchName" placeholder="Opsional" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                             </div>
                         </div>
 
                         {{-- Notes --}}
                         <div>
-                            <label class="block text-[12px] font-medium text-gray-700 mb-1.5">Catatan</label>
-                            <textarea wire:model="newNotes" rows="2" placeholder="Catatan opsional..." class="w-full px-3 py-2.5 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-1 focus:ring-accent/20 resize-none"></textarea>
+                            <label class="block text-caption font-medium text-gray-700 mb-1.5">Catatan</label>
+                            <textarea wire:model="newNotes" rows="2" placeholder="Catatan opsional..." class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 resize-none"></textarea>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-3 justify-end mt-6">
-                        <button wire:click="closeCreateModal" class="px-4 py-2.5 text-[13px] font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
+                        <button wire:click="closeCreateModal" class="px-4 py-2.5 text-body font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
                             Batal
                         </button>
-                        <button wire:click="createBox" class="px-4 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
+                        <button wire:click="createBox" class="px-4 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
                             Buat Box
                         </button>
                     </div>

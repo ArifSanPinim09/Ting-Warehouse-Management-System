@@ -24,6 +24,6 @@
     };
 @endphp
 
-<span {{ $attributes->merge(['class' => $config['class'] . ($size === 'lg' ? ' text-sm px-3 py-1' : '')]) }}>
+<span {{ $attributes->merge(['class' => $config['class'] . ($size === 'lg' ? ' text-body px-3 py-1' : '')]) }}>
     {{ $config['label'] }}
 </span>

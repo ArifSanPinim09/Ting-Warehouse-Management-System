@@ -112,37 +112,37 @@
             <div class="ds-card p-5">
                 <h3 class="ds-section-title mb-4">Menu Cepat</h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <a href="{{ route('customer.setor-resi') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 transition-colors group">
+                    <a href="{{ route('customer.setor-resi') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent/40 transition-colors group">
                         <div class="w-10 h-10 rounded-button bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         </div>
                         <span class="text-caption font-medium text-gray-600">Setor Resi</span>
                     </a>
-                    <a href="{{ route('customer.box.sharing') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 transition-colors group">
+                    <a href="{{ route('customer.box.sharing') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent/40 transition-colors group">
                         <div class="w-10 h-10 rounded-button bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                         </div>
                         <span class="text-caption font-medium text-gray-600">My Box</span>
                     </a>
-                    <a href="{{ route('customer.invoice') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 transition-colors group">
+                    <a href="{{ route('customer.invoice') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent/40 transition-colors group">
                         <div class="w-10 h-10 rounded-button bg-amber-50 text-amber-600 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
                         <span class="text-caption font-medium text-gray-600">Invoice</span>
                     </a>
-                    <a href="{{ route('customer.checkout') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 transition-colors group">
+                    <a href="{{ route('customer.checkout') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent/40 transition-colors group">
                         <div class="w-10 h-10 rounded-button bg-violet-50 text-violet-600 flex items-center justify-center group-hover:bg-violet-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                         </div>
                         <span class="text-caption font-medium text-gray-600">Checkout</span>
                     </a>
-                    <a href="{{ route('customer.komplain') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 transition-colors group">
+                    <a href="{{ route('customer.komplain') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent/40 transition-colors group">
                         <div class="w-10 h-10 rounded-button bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <span class="text-caption font-medium text-gray-600">Komplain</span>
                     </a>
-                    <a href="{{ route('customer.kalkulator') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 transition-colors group">
+                    <a href="{{ route('customer.kalkulator') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 rounded-card hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent/40 transition-colors group">
                         <div class="w-10 h-10 rounded-button bg-gray-100 text-gray-600 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                         </div>
