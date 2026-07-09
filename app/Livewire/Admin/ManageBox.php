@@ -153,6 +153,8 @@ class ManageBox extends Component
         if ($box->customer_id) {
             $notifService = app(NotificationService::class);
             $notifService->boxStatusChanged($box, $oldStatus, Box::STATUS_CLOSED);
+            // Revisi §2.11.2: Box ditutup notification
+            $notifService->boxClosed($box);
         }
 
         $this->showStatusConfirm = false;

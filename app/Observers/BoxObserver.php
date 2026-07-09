@@ -5,17 +5,20 @@ namespace App\Observers;
 use App\Models\Box;
 use App\Models\Invoice;
 use App\Services\AuditLogService;
+use App\Services\NotificationService;
 
 /**
  * Box Observer — logs status change events.
  *
  * CLAUDE.md §3.3: Audit trail for Box (status change).
  * Revisi §2.10.5: Set arrived_indonesia + storage_deadline on box arrival.
+ * Revisi §2.11.2: Notify customer when box arrives at WH.
  */
 class BoxObserver
 {
     public function __construct(
         private AuditLogService $auditLog,
+        private NotificationService $notifService,
     ) {}
 
     /**
@@ -39,6 +42,11 @@ class BoxObserver
             if (in_array($box->status, [Box::STATUS_OTW_INA, Box::STATUS_UP_INVOICE])) {
                 $this->markItemsArrived($box);
                 $this->setStorageDeadline($box);
+
+                // Revisi §2.11.2: Notify customer barang sampai WH
+                if ($box->customer_id && $box->status === Box::STATUS_UP_INVOICE) {
+                    $this->notifService->itemArrivedWH($box);
+                }
             }
         }
     }

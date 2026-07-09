@@ -37,6 +37,12 @@ class NotificationService
     const TYPE_STORAGE_EXPIRED = 'storage_expired';
     const TYPE_ITEM_HOLD = 'item_hold';
 
+    // Revisi §2.11.2: Additional event types
+    const TYPE_ITEM_ARRIVED_WH = 'item_arrived_wh';
+    const TYPE_BOX_CLOSED = 'box_closed';
+    const TYPE_CLAIM_SUCCESSFUL = 'claim_successful';
+    const TYPE_STORAGE_DEADLINE_7DAY = 'storage_deadline_7day';
+
     /**
      * Get all valid notification types.
      *
@@ -61,6 +67,10 @@ class NotificationService
             self::TYPE_PAYMENT_OVERDUE_2WEEK,
             self::TYPE_STORAGE_EXPIRED,
             self::TYPE_ITEM_HOLD,
+            self::TYPE_ITEM_ARRIVED_WH,
+            self::TYPE_BOX_CLOSED,
+            self::TYPE_CLAIM_SUCCESSFUL,
+            self::TYPE_STORAGE_DEADLINE_7DAY,
         ];
     }
 
@@ -415,6 +425,101 @@ class NotificationService
         );
     }
 
+    // ─── Revisi §2.11.2: Additional Events ──────────────────────
+
+    /**
+     * Item arrived at WH Jakarta — notify customer.
+     *
+     * Revisi §2.11.2: "Barang Anda sudah sampai di WH Jakarta"
+     *
+     * @param  \App\Models\Box  $box  The box that arrived
+     * @return Notification
+     */
+    public function itemArrivedWH($box): Notification
+    {
+        return $this->create(
+            notifiable: $box->customer,
+            type: self::TYPE_ITEM_ARRIVED_WH,
+            data: [
+                'title' => 'Barang Sampai WH',
+                'message' => 'Barang Anda sudah sampai di WH Jakarta.',
+                'box_id' => $box->id,
+                'tracking_number' => $box->tracking_number,
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
+    /**
+     * Box closed — notify customer.
+     *
+     * Revisi §2.3, §2.11.2: "Box [no] sudah ditutup. Tidak bisa setor lagi."
+     *
+     * @param  \App\Models\Box  $box  The closed box
+     * @return Notification
+     */
+    public function boxClosed($box): Notification
+    {
+        return $this->create(
+            notifiable: $box->customer,
+            type: self::TYPE_BOX_CLOSED,
+            data: [
+                'title' => 'Box Ditutup',
+                'message' => "Box {$box->tracking_number} sudah ditutup. Tidak bisa setor lagi.",
+                'box_id' => $box->id,
+                'tracking_number' => $box->tracking_number,
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
+    /**
+     * Claim successful — notify customer.
+     *
+     * Revisi §2.1, §2.11.2: "Klaim barang berhasil. Denda: Rp 5.000"
+     *
+     * @param  \App\Models\Item  $item  The claimed item
+     * @return Notification
+     */
+    public function claimSuccessful($item): Notification
+    {
+        return $this->create(
+            notifiable: $item->customer,
+            type: self::TYPE_CLAIM_SUCCESSFUL,
+            data: [
+                'title' => 'Klaim Berhasil',
+                'message' => 'Klaim barang berhasil. Denda: Rp 5.000',
+                'item_id' => $item->id,
+                'item_name' => $item->name,
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
+    /**
+     * Storage deadline 7-day warning — notify customer.
+     *
+     * Revisi §2.10.3, §2.11.2: "Barang Anda sudah 23 hari di WH. Sisa: 7 hari"
+     *
+     * @param  \App\Models\Invoice  $invoice  The invoice with approaching storage deadline
+     * @return Notification
+     */
+    public function storageDeadline7Day($invoice): Notification
+    {
+        return $this->create(
+            notifiable: $invoice->customer,
+            type: self::TYPE_STORAGE_DEADLINE_7DAY,
+            data: [
+                'title' => 'Deadline Nimbun 7 Hari',
+                'message' => 'Barang Anda sudah 23 hari di WH. Sisa: 7 hari.',
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'storage_deadline' => $invoice->storage_deadline?->format('Y-m-d'),
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
     // ─── Private Helpers ──────────────────────────────────────────
 
     /**
@@ -431,8 +536,12 @@ class NotificationService
             'id' => \Illuminate\Support\Str::uuid()->toString(),
             'notifiable_type' => get_class($notifiable),
             'notifiable_id' => $notifiable->getKey(),
+            'user_id' => $notifiable->getKey(), // Revisi §3.3
             'type' => $type,
             'data' => $data,
+            'title' => $data['title'] ?? $type, // Revisi §3.3
+            'message' => $data['message'] ?? '', // Revisi §3.3
+            'is_read' => false, // Revisi §3.3
         ]);
     }
 

@@ -39,8 +39,7 @@ class NotificationBell extends Component
      */
     public function loadUnreadCount(): void
     {
-        $this->unreadCount = Notification::where('notifiable_type', 'App\Models\User')
-            ->where('notifiable_id', auth()->id())
+        $this->unreadCount = Notification::where('user_id', auth()->id())
             ->unread()
             ->count();
     }
@@ -70,8 +69,7 @@ class NotificationBell extends Component
      */
     public function markAsRead(string $notificationId): void
     {
-        $notification = Notification::where('notifiable_type', 'App\Models\User')
-            ->where('notifiable_id', auth()->id())
+        $notification = Notification::where('user_id', auth()->id())
             ->where('id', $notificationId)
             ->first();
 
@@ -86,10 +84,12 @@ class NotificationBell extends Component
      */
     public function markAllAsRead(): void
     {
-        Notification::where('notifiable_type', 'App\Models\User')
-            ->where('notifiable_id', auth()->id())
+        Notification::where('user_id', auth()->id())
             ->unread()
-            ->update(['read_at' => now()]);
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
 
         $this->loadUnreadCount();
     }
@@ -108,8 +108,7 @@ class NotificationBell extends Component
      */
     public function render()
     {
-        $notifications = Notification::where('notifiable_type', 'App\Models\User')
-            ->where('notifiable_id', auth()->id())
+        $notifications = Notification::where('user_id', auth()->id())
             ->latest()
             ->limit(15)
             ->get();

@@ -15,13 +15,24 @@ class NotificationModelTest extends TestCase
     private function createNotification(array $overrides = []): Notification
     {
         $user = User::factory()->create();
-        return Notification::create(array_merge([
+        $defaults = [
             'id' => (string) Str::uuid(),
             'type' => 'test_notification',
             'notifiable_type' => User::class,
             'notifiable_id' => $user->id,
+            'user_id' => $user->id, // Revisi §3.3
             'data' => ['title' => 'Test', 'message' => 'Test message'],
-        ], $overrides));
+            'title' => 'Test', // Revisi §3.3
+            'message' => 'Test message', // Revisi §3.3
+            'is_read' => false, // Revisi §3.3
+        ];
+
+        // If read_at is set, also set is_read to true
+        if (isset($overrides['read_at']) && $overrides['read_at'] !== null) {
+            $defaults['is_read'] = true;
+        }
+
+        return Notification::create(array_merge($defaults, $overrides));
     }
 
     public function test_data_is_cast_to_array(): void

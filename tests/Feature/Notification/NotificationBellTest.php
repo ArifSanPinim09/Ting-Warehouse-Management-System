@@ -29,7 +29,11 @@ class NotificationBellTest extends TestCase
             'type' => 'test_notification',
             'notifiable_type' => User::class,
             'notifiable_id' => $this->user->id,
+            'user_id' => $this->user->id, // Revisi §3.3
             'data' => ['title' => 'Test Notif', 'message' => 'Test message'],
+            'title' => 'Test Notif', // Revisi §3.3
+            'message' => 'Test message', // Revisi §3.3
+            'is_read' => $read, // Revisi §3.3
             'read_at' => $read ? now() : null,
         ]);
     }

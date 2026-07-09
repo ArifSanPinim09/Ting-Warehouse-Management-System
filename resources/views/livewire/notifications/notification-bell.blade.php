@@ -85,10 +85,10 @@
                             <!-- Content -->
                             <div class="flex-1 min-w-0">
                                 <p class="text-body font-medium text-gray-800">
-                                    {{ $notification->data['title'] ?? 'Notifikasi' }}
+                                    {{ $notification->title ?? $notification->data['title'] ?? 'Notifikasi' }}
                                 </p>
                                 <p class="text-caption text-gray-500 mt-0.5 line-clamp-2">
-                                    {{ $notification->data['message'] ?? '' }}
+                                    {{ $notification->message ?? $notification->data['message'] ?? '' }}
                                 </p>
                                 <p class="text-caption text-gray-400 mt-1">
                                     {{ $notification->created_at->diffForHumans() }}
@@ -100,9 +100,12 @@
                                 @php
                                     $iconColor = match ($notification->type) {
                                         'customer_register', 'new_complaint', 'payment_received' => 'text-orange-500',
-                                        'account_activated', 'payment_verified' => 'text-green-500',
+                                        'account_activated', 'payment_verified', 'claim_successful' => 'text-green-500',
                                         'payment_rejected' => 'text-red-500',
                                         'box_status_changed', 'invoice_generated', 'checkout_processed', 'complaint_updated' => 'text-blue-500',
+                                        'payment_reminder_h3', 'payment_reminder_h1', 'payment_reminder_h0' => 'text-yellow-500',
+                                        'payment_overdue_2week', 'storage_expired', 'item_hold' => 'text-red-600',
+                                        'item_arrived_wh', 'box_closed', 'storage_deadline_7day' => 'text-purple-500',
                                         default => 'text-gray-400',
                                     };
                                 @endphp
@@ -116,10 +119,10 @@
             @endif
         </div>
 
-        {{-- Footer link to full notification page (when implemented) --}}
+        {{-- Footer link to full notification page --}}
         @if ($notifications->isNotEmpty())
             <div class="px-4 py-2 border-t border-gray-100 text-center">
-                <a href="#" class="text-caption text-accent hover:text-primary font-medium min-h-[44px] inline-flex items-center">
+                <a href="{{ route('notifications') }}" wire:navigate class="text-caption text-accent hover:text-primary font-medium min-h-[44px] inline-flex items-center">
                     Lihat semua notifikasi
                 </a>
             </div>

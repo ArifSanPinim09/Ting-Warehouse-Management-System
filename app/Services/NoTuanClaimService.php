@@ -21,6 +21,7 @@ class NoTuanClaimService
 {
     public function __construct(
         private readonly ItemStatusService $itemStatusService,
+        private readonly NotificationService $notifService,
     ) {}
 
     /**
@@ -57,6 +58,7 @@ class NoTuanClaimService
      * 2. Verify status is still no_tuan
      * 3. Transition to claimed
      * 4. Create denda_claims entry
+     * 5. Notify customer (Revisi §2.11.2)
      *
      * @param  Item       $item      The item to claim
      * @param  User       $customer  The customer claiming
@@ -98,6 +100,10 @@ class NoTuanClaimService
                 'jumlah_denda' => 5000,
                 'status' => DendaClaim::STATUS_PENDING,
             ]);
+
+            // Revisi §2.11.2: Notify customer klaim berhasil
+            $lockedItem->customer_id = $customer->id; // temporary for notification
+            $this->notifService->claimSuccessful($lockedItem);
 
             return $dendaClaim;
         });

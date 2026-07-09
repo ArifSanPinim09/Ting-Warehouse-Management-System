@@ -820,8 +820,12 @@ class EdgeCaseTest extends TestCase
             'id' => \Illuminate\Support\Str::uuid()->toString(),
             'notifiable_type' => User::class,
             'notifiable_id' => $customerB->id,
+            'user_id' => $customerB->id, // Revisi §3.3
             'type' => 'test_notification',
             'data' => ['title' => 'Secret', 'message' => 'For B only'],
+            'title' => 'Secret', // Revisi §3.3
+            'message' => 'For B only', // Revisi §3.3
+            'is_read' => false, // Revisi §3.3
         ]);
 
         // Customer A's dashboard should NOT show B's notification

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Notification extends Model
@@ -30,8 +31,12 @@ class Notification extends Model
         'id',
         'notifiable_type',
         'notifiable_id',
+        'user_id', // Revisi §3.3
         'type',
         'data',
+        'title', // Revisi §3.3
+        'message', // Revisi §3.3
+        'is_read', // Revisi §3.3
         'read_at',
     ];
 
@@ -44,6 +49,7 @@ class Notification extends Model
     {
         return [
             'data' => 'array',
+            'is_read' => 'boolean', // Revisi §3.3
             'read_at' => 'datetime',
         ];
     }
@@ -58,6 +64,14 @@ class Notification extends Model
         return $this->morphTo();
     }
 
+    /**
+     * Get the user this notification belongs to (Revisi §3.3).
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // ─── Scopes ────────────────────────────────────────────────────
 
     /**
@@ -68,7 +82,7 @@ class Notification extends Model
      */
     public function scopeUnread($query)
     {
-        return $query->whereNull('read_at');
+        return $query->where('is_read', false);
     }
 
     /**
@@ -79,7 +93,7 @@ class Notification extends Model
      */
     public function scopeRead($query)
     {
-        return $query->whereNotNull('read_at');
+        return $query->where('is_read', true);
     }
 
     // ─── Methods ───────────────────────────────────────────────────
@@ -91,7 +105,10 @@ class Notification extends Model
      */
     public function markAsRead(): bool
     {
-        return $this->update(['read_at' => now()]);
+        return $this->update([
+            'is_read' => true,
+            'read_at' => now(),
+        ]);
     }
 
     /**
@@ -99,6 +116,6 @@ class Notification extends Model
      */
     public function isRead(): bool
     {
-        return $this->read_at !== null;
+        return $this->is_read;
     }
 }

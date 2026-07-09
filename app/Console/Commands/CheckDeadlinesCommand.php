@@ -102,10 +102,26 @@ class CheckDeadlinesCommand extends Command
     /**
      * Check storage deadlines.
      *
-     * When storage_deadline has passed, notify customer and auto-hold items.
+     * 1. Send 7-day warning when storage_deadline is 7 days away (Revisi §2.11.2)
+     * 2. When storage_deadline has passed, notify customer and auto-hold items
      */
     private function checkStorageDeadlines(NotificationService $notifService): void
     {
+        // 7-day warning: storage_deadline is 7 days from now
+        Invoice::where('status', Invoice::STATUS_WAITING_PAYMENT)
+            ->whereNotNull('storage_deadline')
+            ->whereDate('storage_deadline', now()->addDays(7)->startOfDay())
+            ->where(function ($q) {
+                $q->whereNull('reminder_sent')
+                  ->orWhereJsonDoesntContain('reminder_sent', 'storage_7day');
+            })
+            ->each(function ($invoice) use ($notifService) {
+                $notifService->storageDeadline7Day($invoice);
+                $invoice->markReminderSent('storage_7day');
+                $this->line("  Storage 7-day warning for invoice {$invoice->invoice_number}");
+            });
+
+        // Expired: storage_deadline has passed
         Invoice::where('status', Invoice::STATUS_WAITING_PAYMENT)
             ->whereNotNull('storage_deadline')
             ->whereDate('storage_deadline', '<', now())

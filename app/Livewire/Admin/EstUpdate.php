@@ -70,19 +70,25 @@ class EstUpdate extends Component
 
         // Notify customer
         if ($box->customer) {
+            $message = "Estimasi pengiriman box {$box->tracking_number} telah diperbarui." .
+                ($this->etd ? " ETD: " . \Carbon\Carbon::parse($this->etd)->format('d M Y') : '') .
+                ($this->eta ? " ETA: " . \Carbon\Carbon::parse($this->eta)->format('d M Y') : '');
+
             \App\Models\Notification::create([
                 'id' => \Illuminate\Support\Str::uuid()->toString(),
                 'notifiable_type' => \App\Models\User::class,
                 'notifiable_id' => $box->customer_id,
+                'user_id' => $box->customer_id, // Revisi §3.3
                 'type' => 'box_status_changed',
                 'data' => [
                     'title' => 'Estimasi Diperbarui',
-                    'message' => "Estimasi pengiriman box {$box->tracking_number} telah diperbarui." .
-                        ($this->etd ? " ETD: " . \Carbon\Carbon::parse($this->etd)->format('d M Y') : '') .
-                        ($this->eta ? " ETA: " . \Carbon\Carbon::parse($this->eta)->format('d M Y') : ''),
+                    'message' => $message,
                     'box_id' => $box->id,
                     'link' => route('dashboard'),
                 ],
+                'title' => 'Estimasi Diperbarui', // Revisi §3.3
+                'message' => $message, // Revisi §3.3
+                'is_read' => false, // Revisi §3.3
             ]);
         }
 

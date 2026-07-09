@@ -326,7 +326,7 @@ class NotificationServiceTest extends TestCase
     {
         $types = NotificationService::getValidTypes();
 
-        $this->assertCount(16, $types);
+        $this->assertCount(20, $types);
         $this->assertContains(NotificationService::TYPE_CUSTOMER_REGISTER, $types);
         $this->assertContains(NotificationService::TYPE_ACCOUNT_ACTIVATED, $types);
         $this->assertContains(NotificationService::TYPE_BOX_STATUS_CHANGED, $types);
@@ -343,6 +343,10 @@ class NotificationServiceTest extends TestCase
         $this->assertContains(NotificationService::TYPE_PAYMENT_OVERDUE_2WEEK, $types);
         $this->assertContains(NotificationService::TYPE_STORAGE_EXPIRED, $types);
         $this->assertContains(NotificationService::TYPE_ITEM_HOLD, $types);
+        $this->assertContains(NotificationService::TYPE_ITEM_ARRIVED_WH, $types);
+        $this->assertContains(NotificationService::TYPE_BOX_CLOSED, $types);
+        $this->assertContains(NotificationService::TYPE_CLAIM_SUCCESSFUL, $types);
+        $this->assertContains(NotificationService::TYPE_STORAGE_DEADLINE_7DAY, $types);
     }
 
     /**

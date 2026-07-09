@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Notifications\NotificationIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
@@ -10,5 +11,10 @@ Route::view('/', 'welcome');
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+// Notifications — accessible by all authenticated users (Revisi §2.11.3, §4.3)
+Route::get('/notifications', NotificationIndex::class)
+    ->middleware(['auth'])
+    ->name('notifications');
 
 require __DIR__.'/auth.php';

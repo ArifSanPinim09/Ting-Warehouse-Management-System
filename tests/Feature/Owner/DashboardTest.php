@@ -111,7 +111,11 @@ class DashboardTest extends TestCase
             'type' => 'App\\Models\\Notification',
             'notifiable_type' => User::class,
             'notifiable_id' => $owner->id,
+            'user_id' => $owner->id, // Revisi §3.3
             'data' => ['title' => 'Test Notif', 'message' => 'Test message'],
+            'title' => 'Test Notif', // Revisi §3.3
+            'message' => 'Test message', // Revisi §3.3
+            'is_read' => false, // Revisi §3.3
         ]);
 
         $this->actingAs($owner);
