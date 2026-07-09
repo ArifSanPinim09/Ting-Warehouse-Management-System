@@ -12,10 +12,9 @@ use Livewire\Component;
 #[Title('Pengaturan Rate — Ting Warehouse')]
 class SettingsIndex extends Component
 {
-    public string $activeTab = 'currency';
+    public string $activeTab = 'sharing';
 
     // ─── Rate Values ────────────────────────────────────────────
-    public string $kurs_yuan_idr = '';
     public string $rate_sharing_air_berat = '';
     public string $rate_sharing_air_volume = '';
     public string $rate_sharing_sea_berat = '';
@@ -49,7 +48,6 @@ class SettingsIndex extends Component
     public function loadSettings(): void
     {
         $keys = [
-            'kurs_yuan_idr',
             'rate_sharing_air_berat', 'rate_sharing_air_volume',
             'rate_sharing_sea_berat', 'rate_sharing_sea_volume',
             'rate_sharing_sensitive_air_berat', 'rate_sharing_sensitive_air_volume',
@@ -78,27 +76,6 @@ class SettingsIndex extends Component
     {
         $this->confirmSection = $section;
         $this->showConfirmModal = true;
-    }
-
-    public function saveCurrency(AuditLogService $auditService): void
-    {
-        $this->validate(['kurs_yuan_idr' => 'required|numeric|min:1|max:99999']);
-
-        $oldValue = $this->originalValues['kurs_yuan_idr'];
-        Setting::setValue('kurs_yuan_idr', $this->kurs_yuan_idr, 'currency');
-
-        $auditService->logCustom(
-            Setting::where('key', 'kurs_yuan_idr')->first(),
-            'rate_updated',
-            'Kurs Yuan IDR diupdate',
-            ['kurs_yuan_idr' => $oldValue],
-            ['kurs_yuan_idr' => $this->kurs_yuan_idr],
-        );
-
-        $this->originalValues['kurs_yuan_idr'] = $this->kurs_yuan_idr;
-        $this->lastUpdatedAt = now()->format('d M Y H:i');
-
-        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: 'Kurs berhasil diupdate.');
     }
 
     public function saveSharingRates(AuditLogService $auditService): void

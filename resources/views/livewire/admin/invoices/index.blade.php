@@ -186,6 +186,12 @@
                                         <span class="font-medium text-gray-800">Rp {{ number_format($selectedInvoice->add_on, 0, ',', '.') }}</span>
                                     </div>
                                 @endif
+                                @if($selectedInvoice->denda_total > 0)
+                                    <div class="flex justify-between text-body">
+                                        <span class="text-gray-500">Denda Klaim</span>
+                                        <span class="font-medium text-amber-600">Rp {{ number_format($selectedInvoice->denda_total, 0, ',', '.') }}</span>
+                                    </div>
+                                @endif
                                 <div class="flex justify-between text-[15px] font-bold pt-2 border-t border-gray-100">
                                     <span class="text-gray-700">Grand Total</span>
                                     <span class="text-primary">Rp {{ number_format($selectedInvoice->grand_total, 0, ',', '.') }}</span>
@@ -237,6 +243,12 @@
                             @error('selectedBoxId') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             @if($availableBoxes->isEmpty())
                                 <p class="text-caption text-amber-600 mt-1">Tidak ada box dengan status OTW Indonesia.</p>
+                            @endif
+                            @if($pending_denda_info)
+                                <div class="mt-2 flex items-center gap-2 p-2.5 bg-amber-50 border border-amber-200 rounded-[8px]">
+                                    <svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                                    <p class="text-caption text-amber-700">{{ $pending_denda_info['count'] }} denda klaim pending (Rp {{ number_format($pending_denda_info['total'], 0, ',', '.') }}) akan otomatis ditambahkan ke invoice ini.</p>
+                                </div>
                             @endif
                         </div>
 
@@ -306,6 +318,12 @@
                                             <div class="flex justify-between text-body">
                                                 <span class="text-gray-500">Add On</span>
                                                 <span class="font-medium text-gray-800">Rp {{ number_format($preview['add_on'], 0, ',', '.') }}</span>
+                                            </div>
+                                        @endif
+                                        @if($preview['denda_total'] > 0)
+                                            <div class="flex justify-between text-body">
+                                                <span class="text-gray-500">Denda Klaim</span>
+                                                <span class="font-medium text-amber-600">Rp {{ number_format($preview['denda_total'], 0, ',', '.') }}</span>
                                             </div>
                                         @endif
                                     </div>

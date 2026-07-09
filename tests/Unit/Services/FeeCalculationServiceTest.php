@@ -329,6 +329,50 @@ class FeeCalculationServiceTest extends TestCase
     }
 
     /**
+     * Skenario 8: With denda_total (Revisi §2.4.4)
+     *
+     * Same as scenario 7 but with dendaTotal = 10000
+     * Grand Total = fee_tax + fee_wh + fee_packing + add_on + denda_total
+     */
+    public function test_scenario_8_with_denda_total(): void
+    {
+        $result = $this->service->calculate(
+            type: 'direct',
+            method: 'air',
+            weight: 50,
+            length: 10,
+            width: 10,
+            height: 10,
+            isSensitive: false,
+            addOn: 50000,
+            dendaTotal: 10000,
+        );
+
+        $this->assertEquals(50000, $result['add_on']);
+        $this->assertEquals(10000, $result['denda_total']);
+        // fee_tax(26667) + fee_wh(5000) + fee_packing(5000) + add_on(50000) + denda(10000) = 96667
+        $this->assertEquals(96667, $result['grand_total']);
+    }
+
+    /**
+     * denda_total defaults to 0 when not passed (backward compat).
+     */
+    public function test_denda_total_defaults_to_zero(): void
+    {
+        $result = $this->service->calculate(
+            type: 'sharing',
+            method: 'air',
+            weight: 100,
+            length: 50,
+            width: 40,
+            height: 30,
+            isSensitive: false,
+        );
+
+        $this->assertEquals(0, $result['denda_total']);
+    }
+
+    /**
      * Test volume calculation standalone.
      */
     public function test_volume_calculation(): void

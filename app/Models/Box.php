@@ -26,6 +26,9 @@ class Box extends Model
         'notes',
         'etd',
         'eta',
+        'open_date',
+        'close_date',
+        'last_setor_date',
     ];
 
     /**
@@ -38,12 +41,17 @@ class Box extends Model
         return [
             'etd' => 'date',
             'eta' => 'date',
+            'open_date' => 'datetime',
+            'close_date' => 'datetime',
+            'last_setor_date' => 'datetime',
         ];
     }
 
     // ─── Status Constants ──────────────────────────────────────────
 
     const STATUS_OPEN = 'OPEN';
+    const STATUS_CLOSED = 'CLOSED';           // Revisi §2.3
+    const STATUS_LAST_SETOR = 'LAST_SETOR';   // Revisi §2.3
     const STATUS_SENT_TO_CARGO = 'SENT_TO_CARGO';
     const STATUS_OTW_INA = 'OTW_INA';
     const STATUS_UP_INVOICE = 'UP_INVOICE';
@@ -58,6 +66,8 @@ class Box extends Model
     {
         return [
             self::STATUS_OPEN,
+            self::STATUS_CLOSED,
+            self::STATUS_LAST_SETOR,
             self::STATUS_SENT_TO_CARGO,
             self::STATUS_OTW_INA,
             self::STATUS_UP_INVOICE,

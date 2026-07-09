@@ -26,6 +26,7 @@ class Invoice extends Model
         'fee_wh',
         'fee_packing',
         'add_on',
+        'denda_total',
         'grand_total',
         'payment_method',
         'payment_proof',
@@ -46,6 +47,7 @@ class Invoice extends Model
             'fee_wh' => 'decimal:2',
             'fee_packing' => 'decimal:2',
             'add_on' => 'decimal:2',
+            'denda_total' => 'decimal:2',
             'grand_total' => 'decimal:2',
         ];
     }
@@ -94,5 +96,13 @@ class Invoice extends Model
     public function checkouts(): HasMany
     {
         return $this->hasMany(Checkout::class);
+    }
+
+    /**
+     * Denda claims tagged to this invoice.
+     */
+    public function dendaClaims(): HasMany
+    {
+        return $this->hasMany(DendaClaim::class);
     }
 }

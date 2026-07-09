@@ -1,7 +1,7 @@
-<div class="relative" x-data="{ open: @entangle('showDropdown') }" @click.outside="open = false; @this.closeDropdown()">
+<div class="relative" x-data="{ open: false }" @click.outside="open = false">
     <!-- Bell Button -->
     <button
-        @click="open = !open; @this.toggleDropdown()"
+        @click="open = !open"
         class="relative p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-accent/40 transition ease-in-out duration-150"
     >
         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -11,7 +11,7 @@
 
         <!-- Unread Badge -->
         @if ($unreadCount > 0)
-            <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-caption font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-badge">
+            <span class="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full ring-2 ring-white">
                 {{ $unreadCount > 99 ? '99+' : $unreadCount }}
             </span>
         @endif

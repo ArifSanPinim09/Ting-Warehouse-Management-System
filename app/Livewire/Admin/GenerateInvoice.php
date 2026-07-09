@@ -3,10 +3,12 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Box;
+use App\Models\DendaClaim;
 use App\Models\Invoice;
 use App\Services\AuditLogService;
 use App\Services\FeeCalculationService;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -59,6 +61,8 @@ class GenerateInvoice extends Component
             return;
         }
 
+        $dendaTotal = $this->getPendingDendaTotal($box->customer_id);
+
         $feeService = app(FeeCalculationService::class);
         $this->preview = $feeService->calculate(
             type: $box->type,
@@ -69,7 +73,21 @@ class GenerateInvoice extends Component
             height: (float) $this->height,
             isSensitive: false,
             addOn: (float) ($this->addOn ?: 0),
+            dendaTotal: $dendaTotal,
         );
+    }
+
+    /**
+     * Get sum of pending denda_claims for a customer (not yet tagged to any invoice).
+     */
+    private function getPendingDendaTotal(?int $customerId): float
+    {
+        if (!$customerId) return 0;
+
+        return (float) DendaClaim::where('customer_id', $customerId)
+            ->where('status', DendaClaim::STATUS_PENDING)
+            ->whereNull('invoice_id')
+            ->sum('jumlah_denda');
     }
 
     // ─── Actions ────────────────────────────────────────────────
@@ -110,6 +128,14 @@ class GenerateInvoice extends Component
             return;
         }
 
+        // Fetch pending denda claims BEFORE creating invoice (inside transaction)
+        $pendingDenda = DendaClaim::where('customer_id', $box->customer_id)
+            ->where('status', DendaClaim::STATUS_PENDING)
+            ->whereNull('invoice_id')
+            ->lockForUpdate()
+            ->get();
+        $dendaTotal = (float) $pendingDenda->sum('jumlah_denda');
+
         $feeService = app(FeeCalculationService::class);
         $fees = $feeService->calculate(
             type: $box->type,
@@ -120,40 +146,53 @@ class GenerateInvoice extends Component
             height: (float) $this->height,
             isSensitive: false,
             addOn: (float) ($this->addOn ?: 0),
+            dendaTotal: $dendaTotal,
         );
 
-        // Generate invoice number
-        $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad(Invoice::count() + 1, 4, '0', STR_PAD_LEFT);
+        DB::transaction(function () use ($box, $fees, $pendingDenda, $dendaTotal, $notifService, $auditService) {
+            // Generate invoice number
+            $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad(Invoice::count() + 1, 4, '0', STR_PAD_LEFT);
 
-        $invoice = Invoice::create([
-            'invoice_number' => $invoiceNumber,
-            'box_id' => $box->id,
-            'customer_id' => $box->customer_id,
-            'weight' => (float) $this->weight,
-            'volume' => $fees['volume'],
-            'fee_tax' => $fees['fee_tax'],
-            'fee_wh' => $fees['fee_wh'],
-            'fee_packing' => $fees['fee_packing'],
-            'add_on' => $fees['add_on'],
-            'grand_total' => $fees['grand_total'],
-            'status' => Invoice::STATUS_WAITING_PAYMENT,
-        ]);
+            $invoice = Invoice::create([
+                'invoice_number' => $invoiceNumber,
+                'box_id' => $box->id,
+                'customer_id' => $box->customer_id,
+                'weight' => (float) $this->weight,
+                'volume' => $fees['volume'],
+                'fee_tax' => $fees['fee_tax'],
+                'fee_wh' => $fees['fee_wh'],
+                'fee_packing' => $fees['fee_packing'],
+                'add_on' => $fees['add_on'],
+                'denda_total' => $fees['denda_total'],
+                'grand_total' => $fees['grand_total'],
+                'status' => Invoice::STATUS_WAITING_PAYMENT,
+            ]);
 
-        // Update box status
-        $box->status = Box::STATUS_UP_INVOICE;
-        $box->save();
+            // Tag pending denda claims to this invoice
+            if ($pendingDenda->isNotEmpty()) {
+                $pendingDendaIds = $pendingDenda->pluck('id');
+                DendaClaim::whereIn('id', $pendingDendaIds)->update([
+                    'invoice_id' => $invoice->id,
+                    'status' => DendaClaim::STATUS_TAGGED,
+                ]);
+            }
 
-        // Audit logs
-        $auditService->logCustom($invoice, 'generated', "Invoice {$invoiceNumber} dibuat untuk box #{$box->id}");
-        $auditService->logCustom($box, 'status_changed', "Status box berubah dari OTW_INA ke UP_INVOICE");
+            // Update box status
+            $box->status = Box::STATUS_UP_INVOICE;
+            $box->save();
 
-        // Notify customer
-        $notifService->invoiceGenerated($invoice);
+            // Audit logs
+            $auditService->logCustom($invoice, 'generated', "Invoice {$invoiceNumber} dibuat untuk box #{$box->id}" . ($dendaTotal > 0 ? " (denda: Rp " . number_format($dendaTotal, 0, ',', '.') . ")" : ''));
+            $auditService->logCustom($box, 'status_changed', "Status box berubah dari OTW_INA ke UP_INVOICE");
+
+            // Notify customer
+            $notifService->invoiceGenerated($invoice);
+        });
 
         $this->showGenerateModal = false;
         $this->resetForm();
 
-        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "Invoice {$invoiceNumber} berhasil dibuat.");
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "Invoice berhasil dibuat.");
     }
 
     public function selectInvoice(int $id): void
@@ -187,6 +226,30 @@ class GenerateInvoice extends Component
             ->whereNotNull('customer_id')
             ->latest()
             ->get();
+    }
+
+    /**
+     * Get pending denda info for the selected box's customer.
+     * Returns ['count' => int, 'total' => float] or null if none.
+     */
+    public function getPendingDendaInfoProperty(): ?array
+    {
+        if (!$this->selectedBoxId) return null;
+
+        $box = Box::find($this->selectedBoxId);
+        if (!$box || !$box->customer_id) return null;
+
+        $claims = DendaClaim::where('customer_id', $box->customer_id)
+            ->where('status', DendaClaim::STATUS_PENDING)
+            ->whereNull('invoice_id')
+            ->get();
+
+        if ($claims->isEmpty()) return null;
+
+        return [
+            'count' => $claims->count(),
+            'total' => (float) $claims->sum('jumlah_denda'),
+        ];
     }
 
     public function getSelectedInvoiceProperty(): ?Invoice

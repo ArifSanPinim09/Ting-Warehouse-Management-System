@@ -4,7 +4,10 @@ use App\Livewire\Admin\CustomerIndex;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\EstUpdate;
 use App\Livewire\Admin\GenerateInvoice;
+use App\Livewire\Admin\KursHistoryIndex;
 use App\Livewire\Admin\ManageBox;
+use App\Livewire\Admin\ManageCheckout;
+use App\Livewire\Admin\ManageComplain;
 use App\Livewire\Admin\RecapIndex;
 use App\Livewire\Admin\SettingsIndex;
 use App\Livewire\Admin\VerificationIndex;
@@ -45,4 +48,13 @@ Route::middleware(['auth', 'verified', 'role:admin,owner'])->prefix('admin')->na
 
     // Recap (PRD §4.16)
     Route::get('/recap', RecapIndex::class)->name('recap');
+
+    // Checkout Requests (PRD §4.6, §7.3)
+    Route::get('/checkouts', ManageCheckout::class)->name('checkouts');
+
+    // Complains (PRD §4.7, §7.3)
+    Route::get('/complains', ManageComplain::class)->name('complains');
+
+    // History Kurs (Revisi §2.2, §4.1)
+    Route::get('/kurs-history', KursHistoryIndex::class)->name('kurs-history');
 });

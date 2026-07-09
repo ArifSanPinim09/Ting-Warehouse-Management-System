@@ -171,6 +171,12 @@
                                             <span class="text-gray-800">Rp {{ number_format($selectedInvoice->add_on, 0, ',', '.') }}</span>
                                         </div>
                                     @endif
+                                    @if($selectedInvoice->denda_total > 0)
+                                        <div class="flex justify-between text-body">
+                                            <span class="text-gray-500">Denda Klaim</span>
+                                            <span class="font-medium text-amber-600">Rp {{ number_format($selectedInvoice->denda_total, 0, ',', '.') }}</span>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 

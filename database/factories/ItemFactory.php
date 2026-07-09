@@ -35,6 +35,7 @@ class ItemFactory extends Factory
             'arrived_china_photo' => null,
             'arrived_indonesia' => false,
             'arrived_indonesia_photo' => null,
+            'status' => Item::STATUS_ACTIVE,
         ];
     }
 }

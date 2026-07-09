@@ -7,6 +7,7 @@ use App\Livewire\Customer\Dashboard;
 use App\Livewire\Customer\InvoiceIndex;
 use App\Livewire\Customer\Kalkulator;
 use App\Livewire\Customer\KomplainIndex;
+use App\Livewire\Customer\NoTuanIndex;
 use App\Livewire\Customer\SetorResi;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +43,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Kalkulator (PRD §4.8)
     Route::get('/kalkulator', Kalkulator::class)->name('customer.kalkulator');
+
+    // No Tuan (Revisi §2.1, §4.1)
+    Route::get('/no-tuan', NoTuanIndex::class)->name('customer.no-tuan');
 
     // Profile
     Route::view('/profile', 'profile')->name('profile');

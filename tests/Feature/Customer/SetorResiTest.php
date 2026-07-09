@@ -106,11 +106,11 @@ class SetorResiTest extends TestCase
     }
 
     /**
-     * Closed box rejected
+     * Revisi §8.1: Closed box rejected with exact message
      */
     public function test_closed_box_rejected(): void
     {
-        $this->box->update(['status' => Box::STATUS_DONE]);
+        $this->box->update(['status' => Box::STATUS_CLOSED]);
 
         $this->actingAs($this->customer);
 
@@ -124,5 +124,52 @@ class SetorResiTest extends TestCase
             ->set('isSensitive', false)
             ->call('submit')
             ->assertHasErrors(['boxId']);
+    }
+
+    /**
+     * Revisi §2.3: DONE box also rejected
+     */
+    public function test_done_box_rejected(): void
+    {
+        $this->box->update(['status' => Box::STATUS_DONE]);
+
+        $this->actingAs($this->customer);
+
+        Livewire::test(SetorResi::class)
+            ->set('boxId', $this->box->id)
+            ->set('name', 'Test Barang')
+            ->set('quantity', 1)
+            ->set('priceYuan', '50')
+            ->set('resiNumber', 'RESI-DONEBOX')
+            ->set('proofCo', UploadedFile::fake()->image('proof.jpg', 100, 100))
+            ->set('isSensitive', false)
+            ->call('submit')
+            ->assertHasErrors(['boxId']);
+    }
+
+    /**
+     * Revisi §2.3: last_setor_date auto-updated on setor resi
+     */
+    public function test_last_setor_date_auto_updated(): void
+    {
+        Storage::fake('public');
+
+        $this->assertNull($this->box->fresh()->last_setor_date);
+
+        $this->actingAs($this->customer);
+
+        Livewire::test(SetorResi::class)
+            ->set('boxId', $this->box->id)
+            ->set('name', 'Test Barang')
+            ->set('quantity', 1)
+            ->set('priceYuan', '50')
+            ->set('resiNumber', 'RESI-LASTSETOR')
+            ->set('proofCo', UploadedFile::fake()->image('proof.jpg', 100, 100))
+            ->set('isSensitive', false)
+            ->call('submit');
+
+        $this->box->refresh();
+        $this->assertNotNull($this->box->last_setor_date);
+        $this->assertEqualsWithDelta(now()->timestamp, $this->box->last_setor_date->timestamp, 2);
     }
 }

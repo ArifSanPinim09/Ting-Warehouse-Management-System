@@ -46,6 +46,7 @@
                 <select wire:model.live="filterStatus" class="py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600">
                     <option value="">Semua Status</option>
                     <option value="OPEN">Open</option>
+                    <option value="CLOSED">Closed</option>
                     <option value="SENT_TO_CARGO">Sent to Cargo</option>
                     <option value="OTW_INA">OTW Indonesia</option>
                     <option value="UP_INVOICE">Invoice Dibuat</option>
@@ -227,6 +228,24 @@
                                         <span class="text-body text-gray-700">{{ $selectedBox->eta->format('d M Y') }}</span>
                                     </div>
                                 @endif
+                                @if($selectedBox->open_date)
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-caption text-gray-500">Dibuka</span>
+                                        <span class="text-body text-gray-700">{{ $selectedBox->open_date->format('d M Y H:i') }}</span>
+                                    </div>
+                                @endif
+                                @if($selectedBox->close_date)
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-caption text-gray-500">Ditutup</span>
+                                        <span class="text-body text-gray-700">{{ $selectedBox->close_date->format('d M Y H:i') }}</span>
+                                    </div>
+                                @endif
+                                @if($selectedBox->last_setor_date)
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-caption text-gray-500">Last Setor</span>
+                                        <span class="text-body text-gray-700">{{ $selectedBox->last_setor_date->format('d M Y H:i') }}</span>
+                                    </div>
+                                @endif
                             </div>
 
                             {{-- Notes --}}
@@ -240,6 +259,16 @@
                             {{-- Status Timeline --}}
                             <div>
                                 <p class="text-caption font-semibold text-gray-700 mb-3 uppercase tracking-wide">Timeline Status</p>
+                                @if($selectedBox->status === 'CLOSED')
+                                    {{-- Special timeline for CLOSED box --}}
+                                    <div class="p-3 bg-red-50 border border-red-200 rounded-[8px] mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                            <span class="text-body font-semibold text-red-700">Box Ditutup</span>
+                                        </div>
+                                        <p class="text-caption text-red-600 mt-1">Customer tidak bisa setor resi lagi</p>
+                                    </div>
+                                @endif
                                 <div class="space-y-0">
                                     @php
                                         $steps = [
@@ -249,7 +278,9 @@
                                             ['status' => 'UP_INVOICE', 'label' => 'Invoice Dibuat', 'desc' => 'Invoice digenerate'],
                                             ['status' => 'DONE', 'label' => 'Selesai', 'desc' => 'Proses selesai'],
                                         ];
-                                        $currentIndex = collect($steps)->search(fn($s) => $s['status'] === $selectedBox->status);
+                                        // For CLOSED boxes, treat as OPEN for timeline purposes
+                                        $timelineStatus = $selectedBox->status === 'CLOSED' ? 'OPEN' : $selectedBox->status;
+                                        $currentIndex = collect($steps)->search(fn($s) => $s['status'] === $timelineStatus);
                                     @endphp
                                     @foreach($steps as $i => $step)
                                         @php
@@ -283,6 +314,7 @@
                             @php
                                 $nextStatus = match($selectedBox->status) {
                                     'OPEN' => 'SENT_TO_CARGO',
+                                    'CLOSED' => 'SENT_TO_CARGO',
                                     'SENT_TO_CARGO' => 'OTW_INA',
                                     'OTW_INA' => 'UP_INVOICE',
                                     'UP_INVOICE' => 'DONE',
@@ -296,30 +328,99 @@
                                     default => null,
                                 };
                             @endphp
-                            @if($nextStatus)
-                                <button
-                                    wire:click="confirmStatusChange('{{ $nextStatus }}')"
-                                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-body font-medium rounded-[8px] hover:bg-primary-light transition-colors"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                                    {{ $nextLabel }}
-                                </button>
-                            @endif
+                            <div class="space-y-2">
+                                @if($nextStatus)
+                                    <button
+                                        wire:click="confirmStatusChange('{{ $nextStatus }}')"
+                                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-body font-medium rounded-[8px] hover:bg-primary-light transition-colors"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                                        {{ $nextLabel }}
+                                    </button>
+                                @endif
+
+                                {{-- Close/Open Box Buttons (Revisi §2.3, §4.2) --}}
+                                @if($selectedBox->status === 'OPEN')
+                                    <button
+                                        wire:click="closeBox"
+                                        wire:confirm="Customer tidak bisa setor lagi setelah box ditutup. Lanjutkan?"
+                                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white text-body font-medium rounded-[8px] hover:bg-red-700 transition-colors"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                        Tutup Box
+                                    </button>
+                                @elseif($selectedBox->status === 'CLOSED')
+                                    <button
+                                        wire:click="openBox"
+                                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-body font-medium rounded-[8px] hover:bg-emerald-700 transition-colors"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                                        Buka Box
+                                    </button>
+                                @endif
+                            </div>
 
                             {{-- Items --}}
                             @if($selectedBox->items->count() > 0)
                                 <div>
                                     <p class="text-caption font-semibold text-gray-700 mb-3 uppercase tracking-wide">Daftar Barang ({{ $selectedBox->items->count() }})</p>
-                                    <div class="space-y-2 max-h-[200px] overflow-y-auto">
+                                    <div class="space-y-2 max-h-[300px] overflow-y-auto">
                                         @foreach($selectedBox->items as $item)
                                             <div class="flex items-center justify-between p-2.5 rounded-[8px] bg-gray-50">
-                                                <div class="min-w-0">
-                                                    <p class="text-body font-medium text-gray-800 truncate">{{ $item->name }}</p>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="flex items-center gap-2">
+                                                        <p class="text-body font-medium text-gray-800 truncate">{{ $item->name }}</p>
+                                                        @if($item->status !== 'active')
+                                                            @php
+                                                                $statusColors = [
+                                                                    'no_tuan' => 'bg-orange-100 text-orange-700',
+                                                                    'claimed' => 'bg-emerald-100 text-emerald-700',
+                                                                    'klaim_wh' => 'bg-red-100 text-red-700',
+                                                                    'shipped' => 'bg-blue-100 text-blue-700',
+                                                                ];
+                                                                $statusLabels = [
+                                                                    'no_tuan' => 'No Tuan',
+                                                                    'claimed' => 'Diklaim',
+                                                                    'klaim_wh' => 'Klaim WH',
+                                                                    'shipped' => 'Shipped',
+                                                                ];
+                                                            @endphp
+                                                            <span class="text-caption font-bold {{ $statusColors[$item->status] ?? 'bg-gray-100 text-gray-700' }} px-1.5 py-0.5 rounded-full flex-shrink-0">
+                                                                {{ $statusLabels[$item->status] ?? $item->status }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
                                                     <p class="text-caption text-gray-500">{{ $item->resi_number }} · {{ $item->quantity }}x</p>
                                                 </div>
-                                                @if($item->is_sensitive)
-                                                    <span class="text-caption font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full flex-shrink-0">Sensitive</span>
-                                                @endif
+                                                <div class="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                                                    @if($item->is_sensitive)
+                                                        <span class="text-caption font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">Sensitive</span>
+                                                    @endif
+
+                                                    {{-- Mark as No Tuan (active → no_tuan) --}}
+                                                    @if($item->status === 'active')
+                                                        <button
+                                                            wire:click="markItemNoTuan({{ $item->id }})"
+                                                            wire:confirm="Tandai barang '{{ $item->name }}' sebagai No Tuan?"
+                                                            class="text-caption font-medium px-2 py-1 rounded-[6px] bg-orange-100 text-orange-700 hover:bg-orange-200 transition-colors"
+                                                            title="Tandai sebagai No Tuan"
+                                                        >
+                                                            No Tuan
+                                                        </button>
+                                                    @endif
+
+                                                    {{-- Mark as Klaim WH (no_tuan → klaim_wh) --}}
+                                                    @if($item->status === 'no_tuan')
+                                                        <button
+                                                            wire:click="markItemKlaimWh({{ $item->id }})"
+                                                            wire:confirm="Barang '{{ $item->name }}' akan ditandai Klaim WH untuk dijual/dilelang dan tidak bisa diklaim customer lagi. Lanjutkan?"
+                                                            class="text-caption font-medium px-2 py-1 rounded-[6px] bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+                                                            title="Klaim WH untuk dijual/dilelang"
+                                                        >
+                                                            Klaim WH
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             </div>
                                         @endforeach
                                     </div>

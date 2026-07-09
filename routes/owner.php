@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Owner\ExportFinanceController;
 use App\Livewire\AuditLogIndex;
+use App\Livewire\Owner\AllDataIndex;
 use App\Livewire\Owner\Dashboard;
 use App\Livewire\Owner\FinanceIndex;
 use App\Livewire\Owner\ManageAdminIndex;
+use App\Livewire\Owner\UsersIndex;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,4 +35,10 @@ Route::middleware(['auth', 'verified', 'role:owner'])->prefix('owner')->name('ow
 
     // Export Finance (PRD §8.16)
     Route::get('/finance/export', ExportFinanceController::class)->name('export-finance');
+
+    // Manage Users (PRD §7.4)
+    Route::get('/users', UsersIndex::class)->name('users');
+
+    // All Data (PRD §7.4)
+    Route::get('/data', AllDataIndex::class)->name('all-data');
 });

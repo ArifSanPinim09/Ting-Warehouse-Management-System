@@ -22,6 +22,7 @@ new class extends Component
         ['label' => 'Checkout', 'route' => 'customer.checkout', 'icon' => 'truck'],
         ['label' => 'Komplain', 'route' => 'customer.komplain', 'icon' => 'exclamation'],
         ['label' => 'Kalkulator', 'route' => 'customer.kalkulator', 'icon' => 'calculator'],
+        ['label' => 'No Tuan', 'route' => 'customer.no-tuan', 'icon' => 'archive'],
     ] : [
         ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'home'],
     ];

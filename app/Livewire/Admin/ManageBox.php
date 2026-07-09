@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Box;
+use App\Models\Item;
 use App\Models\User;
 use App\Services\AuditLogService;
+use App\Services\NoTuanClaimService;
 use App\Services\NotificationService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -96,9 +98,10 @@ class ManageBox extends Component
         $box = Box::findOrFail($this->selectedBoxId);
         $oldStatus = $box->status;
 
-        // Validate transition order
+        // Validate transition order (Revisi §2.3: CLOSED/LAST_SETOR are side branches)
         $validTransitions = [
             Box::STATUS_OPEN => Box::STATUS_SENT_TO_CARGO,
+            Box::STATUS_CLOSED => Box::STATUS_SENT_TO_CARGO,
             Box::STATUS_SENT_TO_CARGO => Box::STATUS_OTW_INA,
             Box::STATUS_OTW_INA => Box::STATUS_UP_INVOICE,
             Box::STATUS_UP_INVOICE => Box::STATUS_DONE,
@@ -125,6 +128,106 @@ class ManageBox extends Component
         $this->statusNote = '';
 
         $this->dispatch('toast', type: 'success', title: 'Berhasil', message: 'Status box berhasil diupdate.');
+    }
+
+    /**
+     * Close a box — customer cannot setor resi anymore (Revisi §2.3, §4.2).
+     * Warning message per §8.3.
+     */
+    public function closeBox(AuditLogService $auditService): void
+    {
+        $box = Box::findOrFail($this->selectedBoxId);
+
+        if ($box->status !== Box::STATUS_OPEN) {
+            $this->dispatch('toast', type: 'error', title: 'Error', message: 'Hanya box dengan status Open yang bisa ditutup.');
+            return;
+        }
+
+        $oldStatus = $box->status;
+        $box->status = Box::STATUS_CLOSED;
+        $box->close_date = now();
+        $box->save();
+
+        $auditService->log('updated', $box, ['status' => $oldStatus], ['status' => Box::STATUS_CLOSED]);
+
+        if ($box->customer_id) {
+            $notifService = app(NotificationService::class);
+            $notifService->boxStatusChanged($box, $oldStatus, Box::STATUS_CLOSED);
+        }
+
+        $this->showStatusConfirm = false;
+
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: 'Box berhasil ditutup.');
+    }
+
+    /**
+     * Re-open a closed box (Revisi §2.3).
+     */
+    public function openBox(AuditLogService $auditService): void
+    {
+        $box = Box::findOrFail($this->selectedBoxId);
+
+        if ($box->status !== Box::STATUS_CLOSED) {
+            $this->dispatch('toast', type: 'error', title: 'Error', message: 'Hanya box yang sudah ditutup yang bisa dibuka kembali.');
+            return;
+        }
+
+        $oldStatus = $box->status;
+        $box->status = Box::STATUS_OPEN;
+        $box->close_date = null;
+        $box->save();
+
+        $auditService->log('updated', $box, ['status' => $oldStatus], ['status' => Box::STATUS_OPEN]);
+
+        if ($box->customer_id) {
+            $notifService = app(NotificationService::class);
+            $notifService->boxStatusChanged($box, $oldStatus, Box::STATUS_OPEN);
+        }
+
+        $this->showStatusConfirm = false;
+
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: 'Box berhasil dibuka.');
+    }
+
+    /**
+     * Mark an item as No Tuan (Revisi §2.1, §2.5.3).
+     */
+    public function markItemNoTuan(int $itemId, AuditLogService $auditService): void
+    {
+        $item = Item::findOrFail($itemId);
+
+        if ($item->status !== Item::STATUS_ACTIVE) {
+            $this->dispatch('toast', type: 'error', title: 'Error', message: 'Hanya barang aktif yang bisa ditandai sebagai No Tuan.');
+            return;
+        }
+
+        $service = app(NoTuanClaimService::class);
+        $service->markNoTuan($item);
+
+        $auditService->logCustom($item, 'no_tuan_marked', "Barang '{$item->name}' ditandai sebagai No Tuan");
+
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "Barang '{$item->name}' ditandai sebagai No Tuan.");
+    }
+
+    /**
+     * Mark a No Tuan item as Klaim WH (Revisi §2.5.3).
+     * Item becomes terminal — customer cannot claim anymore.
+     */
+    public function markItemKlaimWh(int $itemId, AuditLogService $auditService): void
+    {
+        $item = Item::findOrFail($itemId);
+
+        if ($item->status !== Item::STATUS_NO_TUAN) {
+            $this->dispatch('toast', type: 'error', title: 'Error', message: 'Hanya barang No Tuan yang bisa ditandai Klaim WH.');
+            return;
+        }
+
+        $service = app(NoTuanClaimService::class);
+        $service->markKlaimWh($item);
+
+        $auditService->logCustom($item, 'klaim_wh_marked', "Barang '{$item->name}' ditandai Klaim WH untuk dijual/dilelang");
+
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "Barang '{$item->name}' ditandai Klaim WH.");
     }
 
     public function openCreateModal(): void
@@ -158,6 +261,7 @@ class ManageBox extends Component
             'customer_id' => $this->newCustomerId,
             'notes' => $this->newNotes ?: null,
             'status' => Box::STATUS_OPEN,
+            'open_date' => now(),
         ]);
 
         $auditService->logCustom($box, 'created', 'Box baru dibuat oleh admin');

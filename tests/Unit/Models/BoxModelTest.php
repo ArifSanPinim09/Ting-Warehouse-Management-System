@@ -60,8 +60,10 @@ class BoxModelTest extends TestCase
     {
         $statuses = Box::getValidStatuses();
 
-        $this->assertCount(5, $statuses);
+        $this->assertCount(7, $statuses);
         $this->assertContains('OPEN', $statuses);
+        $this->assertContains('CLOSED', $statuses);
+        $this->assertContains('LAST_SETOR', $statuses);
         $this->assertContains('DONE', $statuses);
     }
 

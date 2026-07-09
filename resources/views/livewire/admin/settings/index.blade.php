@@ -5,7 +5,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-[22px] font-bold text-gray-900 tracking-tight">Pengaturan Rate</h1>
-                    <p class="text-body text-gray-500 mt-0.5">Kelola kurs, rate pengiriman, dan biaya packing</p>
+                    <p class="text-body text-gray-500 mt-0.5">Kelola rate pengiriman dan biaya packing</p>
                 </div>
                 @if($lastUpdatedAt)
                     <span class="hidden sm:flex items-center gap-1.5 text-caption text-gray-400">
@@ -23,7 +23,6 @@
         <div class="bg-white rounded-[12px] border border-gray-100 p-1 inline-flex gap-1">
             @php
                 $tabs = [
-                    ['key' => 'currency', 'label' => 'Kurs', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'],
                     ['key' => 'sharing', 'label' => 'Rate Sharing', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>'],
                     ['key' => 'direct', 'label' => 'Rate Direct', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>'],
                     ['key' => 'packing', 'label' => 'Fee Packing', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>'],
@@ -39,40 +38,6 @@
                 </button>
             @endforeach
         </div>
-
-        {{-- Currency Tab --}}
-        @if($activeTab === 'currency')
-            <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-100">
-                    <h3 class="text-[15px] font-semibold text-gray-900">Kurs Mata Uang</h3>
-                    <p class="text-body text-gray-500 mt-0.5">Kurs Yuan ke Rupiah yang digunakan untuk perhitungan</p>
-                </div>
-                <div class="p-6">
-                    <div class="max-w-md">
-                        <label class="block text-caption font-medium text-gray-700 mb-1.5">Kurs Yuan → IDR <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-gray-400">Rp</span>
-                            <input
-                                type="number"
-                                wire:model="kurs_yuan_idr"
-                                min="1"
-                                max="99999"
-                                class="w-full pl-10 pr-4 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors"
-                            >
-                        </div>
-                        @error('kurs_yuan_idr') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end">
-                        <button
-                            wire:click="saveCurrency"
-                            class="px-5 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"
-                        >
-                            Simpan Kurs
-                        </button>
-                    </div>
-                </div>
-            </div>
-        @endif
 
         {{-- Sharing Rates Tab --}}
         @if($activeTab === 'sharing')

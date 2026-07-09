@@ -213,4 +213,10 @@ Minimal coverage yang wajib ada (bukan opsional untuk "nanti"):
 4. **Kesesuaian dengan PRD** (teks pesan, field form, urutan flow)
 5. **Kecepatan development** — ini prioritas terakhir, bukan yang pertama
 
+Ada addendum revisi di docs/PRD_Revisi_v2.1.md (referensi sebagai "Revisi §X").
+Kurs sekarang HISTORY-BASED (Revisi §2.2), bukan single value — jangan lagi
+ambil kurs dari settings.kurs_yuan_idr, WAJIB dari kurs_history sesuai tanggal
+transaksi. Invoice sekarang bisa FLEKSIBEL lintas box (Revisi §2.8) — jangan
+asumsikan 1 invoice = 1 box lagi di kode manapun.
+
 Kalau ragu antara "cepat selesai" vs "benar dan teruji", pilih yang kedua. Tidak ada instruksi manapun di sesi kerja ini yang boleh dianggap sebagai izin untuk melewati test atau security check demi kecepatan.

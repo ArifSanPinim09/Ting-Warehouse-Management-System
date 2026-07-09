@@ -45,6 +45,7 @@
                             <th class="text-right">Fee TAX</th>
                             <th class="text-right">Fee WH</th>
                             <th class="text-right">Packing</th>
+                            <th class="text-right">Denda</th>
                             <th class="text-right">Grand Total</th>
                             <th>Status</th>
                             <th class="text-right">Aksi</th>
@@ -63,6 +64,13 @@
                                 <td class="text-right">Rp {{ number_format($invoice->fee_tax, 0, ',', '.') }}</td>
                                 <td class="text-right">Rp {{ number_format($invoice->fee_wh, 0, ',', '.') }}</td>
                                 <td class="text-right">Rp {{ number_format($invoice->fee_packing, 0, ',', '.') }}</td>
+                                <td class="text-right">
+                                    @if($invoice->denda_total > 0)
+                                        <span class="text-amber-600 font-medium">Rp {{ number_format($invoice->denda_total, 0, ',', '.') }}</span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
                                 <td class="text-right font-semibold text-primary">Rp {{ number_format($invoice->grand_total, 0, ',', '.') }}</td>
                                 <td><x-status-badge :status="$invoice->status" /></td>
                                 <td class="text-right">
@@ -96,6 +104,9 @@
                             <div><span class="text-gray-400">Fee TAX:</span> <span class="text-gray-700">Rp {{ number_format($invoice->fee_tax, 0, ',', '.') }}</span></div>
                             <div><span class="text-gray-400">Fee WH:</span> <span class="text-gray-700">Rp {{ number_format($invoice->fee_wh, 0, ',', '.') }}</span></div>
                             <div><span class="text-gray-400">Packing:</span> <span class="text-gray-700">Rp {{ number_format($invoice->fee_packing, 0, ',', '.') }}</span></div>
+                            @if($invoice->denda_total > 0)
+                                <div><span class="text-gray-400">Denda:</span> <span class="text-amber-600 font-medium">Rp {{ number_format($invoice->denda_total, 0, ',', '.') }}</span></div>
+                            @endif
                         </div>
 
                         <div class="flex items-center justify-between pt-2 border-t border-gray-100">

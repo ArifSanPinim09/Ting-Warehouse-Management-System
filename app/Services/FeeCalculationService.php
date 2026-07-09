@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\KursHistory;
 use App\Models\Setting;
 
 /**
@@ -69,6 +70,7 @@ class FeeCalculationService
      * @param  float   $height    Tinggi (cm)
      * @param  bool    $is_sensitive
      * @param  float   $addOn     Add on (opsional, admin input)
+     * @param  float   $dendaTotal Denda klaim total (auto dari pending denda_claims)
      * @return array{
      *     volume: float,
      *     basis: float,
@@ -76,6 +78,7 @@ class FeeCalculationService
      *     fee_wh: float,
      *     fee_packing: float,
      *     add_on: float,
+     *     denda_total: float,
      *     grand_total: float,
      *     rate_used: float,
      *     rate_key: string,
@@ -90,6 +93,7 @@ class FeeCalculationService
         float $height,
         bool $isSensitive = false,
         float $addOn = 0.0,
+        float $dendaTotal = 0.0,
     ): array {
         $this->loadRates();
 
@@ -101,7 +105,7 @@ class FeeCalculationService
         $feeTax = $this->calculateFeeTax($basis, $rate);
         $feeWh = $this->calculateFeeWh($weight);
         $feePacking = $this->calculateFeePacking($weight);
-        $grandTotal = $feeTax + $feeWh + $feePacking + $addOn;
+        $grandTotal = $feeTax + $feeWh + $feePacking + $addOn + $dendaTotal;
 
         return [
             'volume' => round($volume, 2),
@@ -110,6 +114,7 @@ class FeeCalculationService
             'fee_wh' => round($feeWh, 0),
             'fee_packing' => round($feePacking, 0),
             'add_on' => round($addOn, 0),
+            'denda_total' => round($dendaTotal, 0),
             'grand_total' => round($grandTotal, 0),
             'rate_used' => $rate,
             'rate_key' => $rateKey,
@@ -241,6 +246,41 @@ class FeeCalculationService
         $this->loadRates();
 
         return $this->rates;
+    }
+
+    // ─── Kurs Methods (Revisi §2.2) ─────────────────────────────
+
+    /**
+     * Get today's kurs value from kurs_history.
+     *
+     * Returns the kurs with the greatest effective_date <= today.
+     * Used by: Customer dashboard display ("Kurs Hari Ini").
+     *
+     * @return float Kurs value (0 if no kurs record exists)
+     */
+    public function getKursToday(): float
+    {
+        $kurs = KursHistory::getKursOnDate(now());
+
+        return $kurs ? (float) $kurs->kurs_value : 0;
+    }
+
+    /**
+     * Get kurs value effective on a specific transaction date.
+     *
+     * Returns the kurs with the greatest effective_date <= $transactionDate.
+     * Used by: Invoice generation, historical calculator — MUST use kurs at
+     * transaction time, not current kurs (CLAUDE.md §3.3 / Revisi §2.2).
+     *
+     * @param  \Illuminate\Support\Carbon|string|null  $transactionDate  Defaults to today if null
+     * @return float Kurs value (0 if no kurs record exists before that date)
+     */
+    public function getKursOnDate($transactionDate = null): float
+    {
+        $date = $transactionDate ?? now();
+        $kurs = KursHistory::getKursOnDate($date);
+
+        return $kurs ? (float) $kurs->kurs_value : 0;
     }
 
     // ─── Private Helpers ───────────────────────────────────────────

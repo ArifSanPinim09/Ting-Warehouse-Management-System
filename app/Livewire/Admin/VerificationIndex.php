@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\DendaClaim;
 use App\Models\Invoice;
 use App\Services\AuditLogService;
 use App\Services\NotificationService;
@@ -48,6 +49,11 @@ class VerificationIndex extends Component
 
         $invoice->status = Invoice::STATUS_VERIFIED;
         $invoice->save();
+
+        // Revisi §2.4.4: denda tagged → paid saat invoice verified
+        DendaClaim::where('invoice_id', $invoice->id)
+            ->where('status', DendaClaim::STATUS_TAGGED)
+            ->update(['status' => DendaClaim::STATUS_PAID]);
 
         $auditService->logCustom($invoice, 'payment_verified', "Pembayaran invoice {$invoice->invoice_number} diverifikasi");
         $notifService->paymentVerified($invoice);

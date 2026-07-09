@@ -74,10 +74,10 @@ class SetorResi extends Component
         $this->validate();
         $this->submitting = true;
 
-        // Verify box is OPEN
+        // Verify box is OPEN — Revisi §8.1: "Box sudah ditutup. Tidak bisa menambah barang."
         $box = Box::find($this->boxId);
         if (!$box || $box->status !== Box::STATUS_OPEN) {
-            $this->addError('boxId', 'Box sudah ditutup, tidak bisa menambah barang');
+            $this->addError('boxId', 'Box sudah ditutup. Tidak bisa menambah barang.');
             $this->submitting = false;
             return;
         }
@@ -108,6 +108,10 @@ class SetorResi extends Component
             'sensitive_type' => $this->isSensitive ? $this->sensitiveType : null,
         ]);
 
+        // Update last_setor_date on box (Revisi §2.3)
+        $box->last_setor_date = now();
+        $box->save();
+
         // Trigger notification to admin
         $notifService->customerRegister(auth()->user());
 
@@ -123,6 +127,7 @@ class SetorResi extends Component
     {
         $boxes = Box::where('customer_id', auth()->id())
             ->where('status', Box::STATUS_OPEN)
+            ->orderByDesc('last_setor_date')
             ->get();
 
         $sensitiveTypes = ['Elektronik', 'Baterai', 'Cairan', 'Kosmetik', 'Makanan', 'Obat-obatan', 'Magnet', 'Lainnya'];

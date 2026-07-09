@@ -29,6 +29,7 @@ class Item extends Model
         'arrived_china_photo',
         'arrived_indonesia',
         'arrived_indonesia_photo',
+        'status',
     ];
 
     /**
@@ -43,6 +44,30 @@ class Item extends Model
             'arrived_china' => 'boolean',
             'arrived_indonesia' => 'boolean',
             'price_yuan' => 'decimal:2',
+        ];
+    }
+
+    // ─── Status Constants (Revisi §2.5.2) ──────────────────────────
+
+    const STATUS_ACTIVE = 'active';
+    const STATUS_NO_TUAN = 'no_tuan';
+    const STATUS_CLAIMED = 'claimed';
+    const STATUS_KLAIM_WH = 'klaim_wh';
+    const STATUS_SHIPPED = 'shipped';
+
+    /**
+     * Get all valid statuses.
+     *
+     * @return array<string>
+     */
+    public static function getValidStatuses(): array
+    {
+        return [
+            self::STATUS_ACTIVE,
+            self::STATUS_NO_TUAN,
+            self::STATUS_CLAIMED,
+            self::STATUS_KLAIM_WH,
+            self::STATUS_SHIPPED,
         ];
     }
 

@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Item;
 use App\Models\Notification;
 use App\Models\Setting;
+use App\Services\FeeCalculationService;
 use Livewire\Component;
 
 /**
@@ -50,12 +51,15 @@ class Dashboard extends Component
         $receiptsThisMonth = (int) ($itemStats->receipts ?? 0);
 
         // Batch load settings (1 query instead of 3)
-        $settings = Setting::whereIn('key', ['kurs_yuan_idr', 'rate_sharing_air_berat', 'rate_sharing_sea_berat'])
+        $settings = Setting::whereIn('key', ['rate_sharing_air_berat', 'rate_sharing_sea_berat'])
             ->pluck('value', 'key');
 
-        $kursYuan = (float) ($settings['kurs_yuan_idr'] ?? 2460);
         $rateAir = (float) ($settings['rate_sharing_air_berat'] ?? 255);
         $rateSea = (float) ($settings['rate_sharing_sea_berat'] ?? 70);
+
+        // Kurs from history table (Revisi §2.2) — always use today's kurs
+        $feeService = app(FeeCalculationService::class);
+        $kursYuan = $feeService->getKursToday();
 
         // Box list with status
         $boxes = Box::where('customer_id', $user->id)

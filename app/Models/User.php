@@ -126,4 +126,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Complain::class, 'customer_id');
     }
+
+    /**
+     * Kurs history records input by this user (admin/owner).
+     */
+    public function kursHistory(): HasMany
+    {
+        return $this->hasMany(KursHistory::class, 'input_by');
+    }
+
+    /**
+     * Denda claims made by this user (customer).
+     */
+    public function dendaClaims(): HasMany
+    {
+        return $this->hasMany(DendaClaim::class, 'customer_id');
+    }
 }
