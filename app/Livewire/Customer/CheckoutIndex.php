@@ -25,6 +25,8 @@ class CheckoutIndex extends Component
     public string $recipientName = '';
     public string $recipientPhone = '';
     public string $address = '';
+    public string $senderName = '';
+    public string $senderPhone = '';
     public bool $confirmation = false;
     public bool $submitting = false;
 
@@ -39,7 +41,7 @@ class CheckoutIndex extends Component
     public function closeForm(): void
     {
         $this->showForm = false;
-        $this->reset(['invoiceId', 'addressType', 'recipientName', 'recipientPhone', 'address', 'confirmation']);
+        $this->reset(['invoiceId', 'addressType', 'recipientName', 'recipientPhone', 'address', 'senderName', 'senderPhone', 'confirmation']);
         $this->resetValidation();
     }
 
@@ -51,6 +53,8 @@ class CheckoutIndex extends Component
             'recipientName' => ['required', 'string', 'min:3', 'max:255'],
             'recipientPhone' => ['required', 'string', 'min:10', 'max:15'],
             'address' => ['required', 'string', 'min:10', 'max:500'],
+            'senderName' => [$this->addressType === 'dropship' ? 'required' : 'nullable', 'string', 'max:255'],
+            'senderPhone' => [$this->addressType === 'dropship' ? 'required' : 'nullable', 'string', 'max:20'],
             'confirmation' => ['required', 'accepted'],
         ], [
             'invoiceId.required' => 'Pilih invoice terlebih dahulu',
@@ -62,6 +66,8 @@ class CheckoutIndex extends Component
             'recipientPhone.min' => 'Nomor telepon minimal 10 digit',
             'address.required' => 'Alamat wajib diisi',
             'address.min' => 'Alamat minimal 10 karakter',
+            'senderName.required' => 'Nama pengirim wajib diisi untuk dropship',
+            'senderPhone.required' => 'No telp pengirim wajib diisi untuk dropship',
             'confirmation.accepted' => 'Centang konfirmasi terlebih dahulu',
         ]);
 
@@ -96,6 +102,8 @@ class CheckoutIndex extends Component
             'recipient_name' => $this->recipientName,
             'recipient_phone' => $this->recipientPhone,
             'address' => $this->address,
+            'sender_name' => $this->addressType === 'dropship' ? $this->senderName : null,
+            'sender_phone' => $this->addressType === 'dropship' ? $this->senderPhone : null,
             'status' => Checkout::STATUS_REQUEST,
         ]);
 

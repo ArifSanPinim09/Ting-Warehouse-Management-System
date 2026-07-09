@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Invoice extends Model
@@ -104,5 +105,42 @@ class Invoice extends Model
     public function dendaClaims(): HasMany
     {
         return $this->hasMany(DendaClaim::class);
+    }
+
+    /**
+     * Items in this flexible invoice (Revisi §2.8).
+     */
+    public function items(): BelongsToMany
+    {
+        return $this->belongsToMany(Item::class, 'invoice_items')->withTimestamps();
+    }
+
+    /**
+     * Display-friendly box info. Works for both old (box_id) and flexible (junction) invoices.
+     */
+    public function getBoxInfoAttribute(): string
+    {
+        if ($this->box_id && $this->relationLoaded('box') ? $this->box : $this->box_id) {
+            $box = $this->box;
+            if ($box) {
+                return $box->tracking_number ?? $box->batch_name ?? 'Box #' . $this->box_id;
+            }
+        }
+
+        // Flexible invoice: gather boxes from items
+        $boxes = $this->items->pluck('box')->filter()->unique('id');
+        if ($boxes->isEmpty()) {
+            return '-';
+        }
+
+        return $boxes->map(fn ($b) => $b->tracking_number ?? $b->batch_name ?? 'Box #' . $b->id)->join(', ');
+    }
+
+    /**
+     * Check if this is a flexible invoice (no box_id, uses junction items).
+     */
+    public function isFlexible(): bool
+    {
+        return $this->box_id === null;
     }
 }

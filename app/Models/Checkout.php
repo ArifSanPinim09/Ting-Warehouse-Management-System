@@ -22,6 +22,8 @@ class Checkout extends Model
         'recipient_name',
         'recipient_phone',
         'address',
+        'sender_name',
+        'sender_phone',
         'packing_photo',
         'tracking_number',
         'status',

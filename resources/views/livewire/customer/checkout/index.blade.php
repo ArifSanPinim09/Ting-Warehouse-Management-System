@@ -169,6 +169,25 @@
                             @error('address') <p class="ds-error">{{ $message }}</p> @enderror
                         </div>
 
+                        {{-- Sender Fields (Dropship Only — Revisi §7.3) --}}
+                        @if($addressType === 'dropship')
+                            <div class="border-t border-gray-100 pt-4">
+                                <p class="text-body font-medium text-gray-700 mb-3">Data Pengirim</p>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="ds-label">Nama Pengirim <span class="text-red-500">*</span></label>
+                                        <input type="text" wire:model="senderName" placeholder="Nama Anda sebagai pengirim" class="ds-input @error('senderName') ds-input-error @enderror" />
+                                        @error('senderName') <p class="ds-error">{{ $message }}</p> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="ds-label">No. Telepon Pengirim <span class="text-red-500">*</span></label>
+                                        <input type="tel" wire:model="senderPhone" placeholder="08123456789" class="ds-input @error('senderPhone') ds-input-error @enderror" />
+                                        @error('senderPhone') <p class="ds-error">{{ $message }}</p> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                         <label class="flex items-start gap-3 cursor-pointer">
                             <input type="checkbox" wire:model="confirmation" class="mt-0.5 rounded border-gray-300 text-accent focus:ring-accent/20" />
                             <span class="text-body text-gray-600">Saya mengkonfirmasi data di atas sudah benar dan ingin mengajukan checkout.</span>

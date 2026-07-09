@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Item extends Model
@@ -96,5 +97,21 @@ class Item extends Model
     public function whChinaData(): HasOne
     {
         return $this->hasOne(WhChinaData::class);
+    }
+
+    /**
+     * Flexible invoices this item belongs to (Revisi §2.8).
+     */
+    public function invoices(): BelongsToMany
+    {
+        return $this->belongsToMany(Invoice::class, 'invoice_items')->withTimestamps();
+    }
+
+    /**
+     * Check if this item is already in any invoice.
+     */
+    public function isInvoiced(): bool
+    {
+        return $this->invoices()->exists();
     }
 }

@@ -3,6 +3,7 @@
 use App\Livewire\Customer\BoxDirect;
 use App\Livewire\Customer\BoxSharing;
 use App\Livewire\Customer\CheckoutIndex;
+use App\Livewire\Customer\CreateInvoice;
 use App\Livewire\Customer\Dashboard;
 use App\Livewire\Customer\InvoiceIndex;
 use App\Livewire\Customer\Kalkulator;
@@ -34,6 +35,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // My Invoices (PRD §4.5)
     Route::get('/invoice', InvoiceIndex::class)->name('customer.invoice');
+
+    // Buat Invoice (Revisi §2.8)
+    Route::get('/create-invoice', CreateInvoice::class)->name('customer.create-invoice');
 
     // Checkout (PRD §4.6)
     Route::get('/checkout', CheckoutIndex::class)->name('customer.checkout');
