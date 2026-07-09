@@ -5,6 +5,7 @@ use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\EstUpdate;
 use App\Livewire\Admin\GenerateInvoice;
 use App\Livewire\Admin\KursHistoryIndex;
+use App\Livewire\Admin\LelangIndex;
 use App\Livewire\Admin\ManageBox;
 use App\Livewire\Admin\ManageCheckout;
 use App\Livewire\Admin\ManageComplain;
@@ -57,4 +58,7 @@ Route::middleware(['auth', 'verified', 'role:admin,owner'])->prefix('admin')->na
 
     // History Kurs (Revisi §2.2, §4.1)
     Route::get('/kurs-history', KursHistoryIndex::class)->name('kurs-history');
+
+    // Barang Lelang (Revisi §2.9, §4.1)
+    Route::get('/lelang', LelangIndex::class)->name('lelang');
 });

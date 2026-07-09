@@ -49,7 +49,7 @@ class Item extends Model
         ];
     }
 
-    // ─── Status Constants (Revisi §2.5.2, §2.10.2) ────────────────
+    // ─── Status Constants (Revisi §2.5.2, §2.10.2, §2.9) ─────────
 
     const STATUS_ACTIVE = 'active';
     const STATUS_NO_TUAN = 'no_tuan';
@@ -57,6 +57,8 @@ class Item extends Model
     const STATUS_KLAIM_WH = 'klaim_wh';
     const STATUS_SHIPPED = 'shipped';
     const STATUS_HOLD = 'hold'; // Revisi §2.10.2: Auto hold for overdue items
+    const STATUS_DIJUAL = 'dijual'; // Revisi §2.9: Barang ditandai untuk dijual
+    const STATUS_LELANG = 'lelang'; // Revisi §2.9: Barang ditandai untuk dilelang
 
     /**
      * Get all valid statuses.
@@ -72,7 +74,24 @@ class Item extends Model
             self::STATUS_KLAIM_WH,
             self::STATUS_SHIPPED,
             self::STATUS_HOLD,
+            self::STATUS_DIJUAL,
+            self::STATUS_LELANG,
         ];
+    }
+
+    /**
+     * Check if item is eligible for lelang page (klaim_wh or hold status).
+     *
+     * @return bool
+     */
+    public function isLelangEligible(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_KLAIM_WH,
+            self::STATUS_HOLD,
+            self::STATUS_DIJUAL,
+            self::STATUS_LELANG,
+        ]);
     }
 
     // ─── Relationships (ERD §18.1) ─────────────────────────────────

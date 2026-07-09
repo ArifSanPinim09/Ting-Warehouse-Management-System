@@ -277,13 +277,15 @@ class ItemStatusServiceTest extends TestCase
     {
         $statuses = Item::getValidStatuses();
 
-        $this->assertCount(6, $statuses);
+        $this->assertCount(8, $statuses);
         $this->assertContains(Item::STATUS_ACTIVE, $statuses);
         $this->assertContains(Item::STATUS_NO_TUAN, $statuses);
         $this->assertContains(Item::STATUS_CLAIMED, $statuses);
         $this->assertContains(Item::STATUS_KLAIM_WH, $statuses);
         $this->assertContains(Item::STATUS_SHIPPED, $statuses);
         $this->assertContains(Item::STATUS_HOLD, $statuses);
+        $this->assertContains(Item::STATUS_DIJUAL, $statuses);
+        $this->assertContains(Item::STATUS_LELANG, $statuses);
     }
 
     // ─── Full Flow Test ─────────────────────────────────────────────
