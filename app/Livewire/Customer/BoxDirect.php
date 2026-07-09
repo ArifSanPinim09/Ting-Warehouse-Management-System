@@ -10,6 +10,7 @@ use Livewire\WithPagination;
  * My Box — Direct view (§4.3, §8.6)
  *
  * Box tipe direct milik customer, per batch.
+ * Table view with detail modal on row click.
  */
 class BoxDirect extends Component
 {
@@ -17,6 +18,10 @@ class BoxDirect extends Component
 
     public string $search = '';
     public string $filterStatus = '';
+
+    // ─── Detail Modal State ─────────────────────────────────────
+    public ?int $detailBoxId = null;
+    public bool $showDetail = false;
 
     public function updatingSearch(): void
     {
@@ -26,6 +31,18 @@ class BoxDirect extends Component
     public function updatingFilterStatus(): void
     {
         $this->resetPage();
+    }
+
+    public function openBoxDetail(int $boxId): void
+    {
+        $this->detailBoxId = $boxId;
+        $this->showDetail = true;
+    }
+
+    public function closeBoxDetail(): void
+    {
+        $this->showDetail = false;
+        $this->detailBoxId = null;
     }
 
     public function render()
@@ -44,15 +61,27 @@ class BoxDirect extends Component
                 $query->where('status', $this->filterStatus);
             })
             ->with(['items' => function ($query) use ($user) {
-                $query->where('customer_id', $user->id);
+                $query->where('customer_id', $user->id)->with('whChinaData');
             }])
             ->withCount(['items' => function ($query) use ($user) {
                 $query->where('customer_id', $user->id);
             }])
             ->latest()
-            ->paginate(10);
+            ->paginate(15);
 
-        return view('livewire.customer.boxes.direct', compact('boxes'))
+        // Detail box (only if belongs to customer)
+        $detailBox = null;
+        if ($this->detailBoxId) {
+            $detailBox = Box::where('id', $this->detailBoxId)
+                ->where('customer_id', $user->id)
+                ->where('type', 'direct')
+                ->with(['items' => function ($query) use ($user) {
+                    $query->where('customer_id', $user->id)->with('whChinaData');
+                }])
+                ->first();
+        }
+
+        return view('livewire.customer.boxes.direct', compact('boxes', 'detailBox'))
             ->layout('layouts.app');
     }
 }

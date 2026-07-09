@@ -10,7 +10,7 @@ use Livewire\WithPagination;
  * My Box — Sharing view (§4.3, §8.5)
  *
  * Box tipe sharing + barang milik customer.
- * Filter: Tracking, Tanggal, Status
+ * Table view with detail modal on row click.
  */
 class BoxSharing extends Component
 {
@@ -18,6 +18,10 @@ class BoxSharing extends Component
 
     public string $search = '';
     public string $filterStatus = '';
+
+    // ─── Detail Modal State ─────────────────────────────────────
+    public ?int $detailBoxId = null;
+    public bool $showDetail = false;
 
     public function updatingSearch(): void
     {
@@ -27,6 +31,18 @@ class BoxSharing extends Component
     public function updatingFilterStatus(): void
     {
         $this->resetPage();
+    }
+
+    public function openBoxDetail(int $boxId): void
+    {
+        $this->detailBoxId = $boxId;
+        $this->showDetail = true;
+    }
+
+    public function closeBoxDetail(): void
+    {
+        $this->showDetail = false;
+        $this->detailBoxId = null;
     }
 
     public function render()
@@ -42,15 +58,27 @@ class BoxSharing extends Component
                 $query->where('status', $this->filterStatus);
             })
             ->with(['items' => function ($query) use ($user) {
-                $query->where('customer_id', $user->id);
+                $query->where('customer_id', $user->id)->with('whChinaData');
             }])
             ->withCount(['items' => function ($query) use ($user) {
                 $query->where('customer_id', $user->id);
             }])
             ->latest()
-            ->paginate(10);
+            ->paginate(15);
 
-        return view('livewire.customer.boxes.sharing', compact('boxes'))
+        // Detail box (only if belongs to customer)
+        $detailBox = null;
+        if ($this->detailBoxId) {
+            $detailBox = Box::where('id', $this->detailBoxId)
+                ->where('customer_id', $user->id)
+                ->where('type', 'sharing')
+                ->with(['items' => function ($query) use ($user) {
+                    $query->where('customer_id', $user->id)->with('whChinaData');
+                }])
+                ->first();
+        }
+
+        return view('livewire.customer.boxes.sharing', compact('boxes', 'detailBox'))
             ->layout('layouts.app');
     }
 }
