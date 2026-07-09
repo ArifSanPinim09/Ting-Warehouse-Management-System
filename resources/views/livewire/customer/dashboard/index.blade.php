@@ -185,44 +185,213 @@
             </div>
         </div>
 
-        {{-- Status Box List --}}
-        <div class="ds-card">
-            <div class="px-5 py-4 border-b border-gray-100">
-                <h3 class="ds-section-title">Status Box</h3>
+        {{-- Status Box Table --}}
+        <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-100">
+                <h3 class="text-[15px] font-semibold text-gray-900">Status Box</h3>
+                <p class="text-body text-gray-500 mt-0.5">Daftar box yang Anda miliki</p>
             </div>
+
             @if($boxes->isEmpty())
-                <x-empty-state
-                    icon="box"
-                    title="Belum ada aktivitas"
-                    text="Anda belum memiliki box. Mulai dengan menyetor resi pertama Anda."
-                    action="Setor Resi Sekarang"
-                    :actionUrl="route('customer.setor-resi')"
-                />
-            @else
-                <div class="divide-y divide-gray-50">
-                    @foreach($boxes as $box)
-                        <a href="{{ route('customer.box.sharing') }}" wire:navigate class="flex items-center justify-between px-5 py-4 hover:bg-gray-50/50 transition-colors group">
-                            <div class="flex items-center gap-4 min-w-0">
-                                <div class="w-10 h-10 rounded-button bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="text-body font-semibold text-primary truncate">
-                                        {{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}
-                                    </p>
-                                    <p class="text-caption text-gray-500 mt-0.5">
-                                        {{ ucfirst($box->type) }} · {{ strtoupper($box->method) }} · {{ $box->items_count }} barang
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-3 flex-shrink-0">
-                                <x-status-badge :status="$box->status" />
-                                <svg class="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                            </div>
-                        </a>
-                    @endforeach
+                <div class="p-12 text-center">
+                    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                        <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-body font-semibold text-gray-700 mb-1">Anda belum memiliki box</h3>
+                    <p class="text-body text-gray-500 mb-4">Mulai dengan menyetor resi pertama Anda.</p>
+                    <a href="{{ route('customer.setor-resi') }}" wire:navigate class="inline-flex items-center gap-2 px-5 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Setor Resi Sekarang
+                    </a>
                 </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b border-gray-100 bg-gray-50/50">
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">No</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Nomor Box</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Kode Box</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Jenis Kirim</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Open Date</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Close Date</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">ETD</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">ETA</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @foreach($boxes as $i => $box)
+                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                    <td class="px-5 py-3.5 text-body text-gray-500">{{ $boxes->firstItem() + $i }}</td>
+                                    <td class="px-5 py-3.5">
+                                        <button
+                                            wire:click="openBoxDetail({{ $box->id }})"
+                                            class="text-body font-semibold text-primary hover:text-primary-light hover:underline transition-colors"
+                                        >
+                                            {{ $box->tracking_number ?? 'Box #' . $box->id }}
+                                        </button>
+                                    </td>
+                                    <td class="px-5 py-3.5 text-body text-gray-700">{{ $box->batch_name ?? '-' }}</td>
+                                    <td class="px-5 py-3.5">
+                                        <span class="text-caption font-medium px-2 py-1 rounded-full {{ $box->method === 'air' ? 'bg-blue-50 text-blue-700' : 'bg-cyan-50 text-cyan-700' }}">
+                                            {{ strtoupper($box->method) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-3.5 text-body text-gray-700">
+                                        {{ $box->open_date ? $box->open_date->format('d M Y') : '-' }}
+                                    </td>
+                                    <td class="px-5 py-3.5 text-body text-gray-700">
+                                        {{ $box->close_date ? $box->close_date->format('d M Y') : '-' }}
+                                    </td>
+                                    <td class="px-5 py-3.5 text-body text-gray-700">
+                                        {{ $box->etd ? $box->etd->format('d M Y') : '-' }}
+                                    </td>
+                                    <td class="px-5 py-3.5 text-body text-gray-700">
+                                        {{ $box->eta ? $box->eta->format('d M Y') : '-' }}
+                                    </td>
+                                    <td class="px-5 py-3.5">
+                                        <x-status-badge :status="$box->status" />
+                                    </td>
+                                    <td class="px-5 py-3.5 text-body text-gray-500">
+                                        {{ $box->items_count }} barang
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($boxes->hasPages())
+                    <div class="px-5 py-4 border-t border-gray-100">
+                        {{ $boxes->links() }}
+                    </div>
+                @endif
             @endif
         </div>
+
+        {{-- Box Detail Modal --}}
+        @if($showDetail && $detailBox)
+            <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeBoxDetail">
+                <div class="fixed inset-0 bg-black/30 transition-opacity"></div>
+                <div class="flex min-h-full items-end sm:items-center justify-center p-4">
+                    <div class="relative bg-white rounded-[16px] shadow-modal w-full max-w-3xl max-h-[90vh] overflow-hidden transform transition-all" @click.stop>
+                        {{-- Modal Header --}}
+                        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-[16px] font-semibold text-gray-900">Detail Box</h3>
+                                <p class="text-body text-gray-500 mt-0.5">{{ $detailBox->tracking_number ?? 'Box #' . $detailBox->id }}</p>
+                            </div>
+                            <button wire:click="closeBoxDetail" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="overflow-y-auto max-h-[calc(90vh-140px)] p-6 space-y-6">
+                            {{-- Box Info --}}
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                <div class="p-3 bg-gray-50 rounded-[8px]">
+                                    <p class="text-caption text-gray-500 mb-1">Status</p>
+                                    <x-status-badge :status="$detailBox->status" />
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded-[8px]">
+                                    <p class="text-caption text-gray-500 mb-1">Tipe</p>
+                                    <p class="text-body font-medium text-gray-900 capitalize">{{ $detailBox->type }}</p>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded-[8px]">
+                                    <p class="text-caption text-gray-500 mb-1">Jenis Kirim</p>
+                                    <p class="text-body font-medium text-gray-900 uppercase">{{ $detailBox->method }}</p>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded-[8px]">
+                                    <p class="text-caption text-gray-500 mb-1">Kode Box</p>
+                                    <p class="text-body font-medium text-gray-900">{{ $detailBox->batch_name ?? '-' }}</p>
+                                </div>
+                            </div>
+
+                            {{-- Items Table --}}
+                            <div>
+                                <h4 class="text-body font-semibold text-gray-900 mb-3">Daftar Barang ({{ $detailBox->items->count() }})</h4>
+                                @if($detailBox->items->isEmpty())
+                                    <div class="p-6 text-center bg-gray-50 rounded-[8px]">
+                                        <p class="text-body text-gray-500">Belum ada barang di box ini</p>
+                                    </div>
+                                @else
+                                    <div class="overflow-x-auto border border-gray-200 rounded-[8px]">
+                                        <table class="w-full text-left">
+                                            <thead>
+                                                <tr class="bg-gray-50">
+                                                    <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">No</th>
+                                                    <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Nama Barang</th>
+                                                    <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Qty</th>
+                                                    <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Berat</th>
+                                                    <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Volume</th>
+                                                    <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Keterangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-100">
+                                                @foreach($detailBox->items as $j => $item)
+                                                    <tr class="hover:bg-gray-50/50">
+                                                        <td class="px-4 py-2.5 text-body text-gray-500">{{ $j + 1 }}</td>
+                                                        <td class="px-4 py-2.5">
+                                                            <div class="flex items-center gap-2">
+                                                                <span class="text-body font-medium text-gray-900">{{ $item->name }}</span>
+                                                                @if($item->is_sensitive)
+                                                                    <span class="text-caption font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">Sensitive</span>
+                                                                @endif
+                                                            </div>
+                                                            <p class="text-caption text-gray-500">{{ $item->resi_number }}</p>
+                                                        </td>
+                                                        <td class="px-4 py-2.5 text-body text-gray-700">{{ $item->quantity }}</td>
+                                                        <td class="px-4 py-2.5 text-body text-gray-700">
+                                                            {{ $item->whChinaData ? number_format($item->whChinaData->berat, 1) . ' kg' : '-' }}
+                                                        </td>
+                                                        <td class="px-4 py-2.5 text-body text-gray-700">
+                                                            {{ $item->whChinaData->ukuran_box ?? '-' }}
+                                                        </td>
+                                                        <td class="px-4 py-2.5">
+                                                            @if($item->status !== 'active')
+                                                                @php
+                                                                    $statusColors = [
+                                                                        'no_tuan' => 'bg-orange-100 text-orange-700',
+                                                                        'claimed' => 'bg-emerald-100 text-emerald-700',
+                                                                        'klaim_wh' => 'bg-red-100 text-red-700',
+                                                                        'shipped' => 'bg-blue-100 text-blue-700',
+                                                                    ];
+                                                                    $statusLabels = [
+                                                                        'no_tuan' => 'No Tuan',
+                                                                        'claimed' => 'Diklaim',
+                                                                        'klaim_wh' => 'Klaim WH',
+                                                                        'shipped' => 'Shipped',
+                                                                    ];
+                                                                @endphp
+                                                                <span class="text-caption font-bold {{ $statusColors[$item->status] ?? 'bg-gray-100 text-gray-700' }} px-1.5 py-0.5 rounded-full">
+                                                                    {{ $statusLabels[$item->status] ?? $item->status }}
+                                                                </span>
+                                                            @else
+                                                                <span class="text-body text-gray-500">-</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- Modal Footer --}}
+                        <div class="px-6 py-4 border-t border-gray-100 flex justify-end">
+                            <button wire:click="closeBoxDetail" class="px-5 py-2.5 text-body font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>

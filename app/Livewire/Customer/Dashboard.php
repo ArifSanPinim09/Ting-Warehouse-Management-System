@@ -14,10 +14,26 @@ use Livewire\Component;
  * Customer Dashboard — §4.2, §8.4
  *
  * Komponen: Rate Card, Invoice Unpaid Card, Goods Card, Receipt Card,
- * Status Box List, Notifikasi, Shortcuts
+ * Status Box Table, Notifikasi, Shortcuts
  */
 class Dashboard extends Component
 {
+    // ─── Detail Modal State ─────────────────────────────────────
+    public ?int $detailBoxId = null;
+    public bool $showDetail = false;
+
+    public function openBoxDetail(int $boxId): void
+    {
+        $this->detailBoxId = $boxId;
+        $this->showDetail = true;
+    }
+
+    public function closeBoxDetail(): void
+    {
+        $this->showDetail = false;
+        $this->detailBoxId = null;
+    }
+
     public function render()
     {
         $user = auth()->user();
@@ -61,12 +77,25 @@ class Dashboard extends Component
         $feeService = app(FeeCalculationService::class);
         $kursYuan = $feeService->getKursToday();
 
-        // Box list with status
+        // Box list with items count and whChinaData for weight
         $boxes = Box::where('customer_id', $user->id)
             ->withCount('items')
+            ->with(['items' => function ($query) {
+                $query->with('whChinaData');
+            }])
             ->latest()
-            ->limit(10)
-            ->get();
+            ->paginate(15);
+
+        // Detail box (only if belongs to customer)
+        $detailBox = null;
+        if ($this->detailBoxId) {
+            $detailBox = Box::where('id', $this->detailBoxId)
+                ->where('customer_id', $user->id)
+                ->with(['items' => function ($query) {
+                    $query->with('whChinaData');
+                }])
+                ->first();
+        }
 
         // Recent notifications
         $notifications = Notification::where('notifiable_type', 'App\Models\User')
@@ -85,6 +114,7 @@ class Dashboard extends Component
             'rateAir',
             'rateSea',
             'boxes',
+            'detailBox',
             'notifications',
         ))->layout('layouts.app');
     }
