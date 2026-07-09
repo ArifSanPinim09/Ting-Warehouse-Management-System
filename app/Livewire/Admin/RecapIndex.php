@@ -7,16 +7,31 @@ use App\Models\Checkout;
 use App\Models\Complain;
 use App\Models\Invoice;
 use App\Models\Item;
-use App\Models\User;
+use App\Models\WhChinaData;
+use App\Services\RecapMatchingService;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
+/**
+ * Recap page — Revisi §2.7.3: dual-source (Customer + WH China).
+ *
+ * Panel 1: Data Customer (from items / setor resi)
+ * Panel 2: Data WH China (admin input)
+ * Auto-matching by exact resi_number.
+ */
 #[Layout('layouts.admin')]
 #[Title('Recap — Ting Warehouse')]
 class RecapIndex extends Component
 {
+    use WithFileUploads;
+    use WithPagination;
+
+    // ─── Filters (shared) ──────────────────────────────────────
     #[Url]
     public string $search = '';
     #[Url]
@@ -28,13 +43,31 @@ class RecapIndex extends Component
     #[Url]
     public string $filterDateTo = '';
 
-    // ─── Summary Stats ──────────────────────────────────────────
+    // ─── Tab State ─────────────────────────────────────────────
+    #[Url]
+    public string $activeTab = 'customer';
+
+    // ─── Summary Stats ─────────────────────────────────────────
     public int $totalBoxes = 0;
     public int $totalItems = 0;
     public int $totalInvoices = 0;
     public float $totalRevenue = 0;
     public int $totalCheckouts = 0;
     public int $totalComplaints = 0;
+    public int $totalWhChina = 0;
+    public int $totalMatched = 0;
+    public int $totalUnmatched = 0;
+
+    // ─── WH China Modal State ───────────────────────────────────
+    public bool $showWhModal = false;
+
+    // ─── WH China Form (§7.4) ──────────────────────────────────
+    public string $resiNumber = '';
+    public string $berat = '';
+    public string $ukuranBox = '';
+    public string $biayaJasa = '';
+    public $fotoBarang = null;
+    public ?int $editingWhId = null;
 
     public function mount(): void
     {
@@ -48,7 +81,6 @@ class RecapIndex extends Component
 
     public function loadStats(): void
     {
-        // Box stats — 1 query with conditional aggregation
         $boxQuery = Box::query();
         if ($this->filterType) $boxQuery->where('type', $this->filterType);
         if ($this->filterMethod) $boxQuery->where('method', $this->filterMethod);
@@ -57,7 +89,6 @@ class RecapIndex extends Component
 
         $this->totalBoxes = $boxQuery->count();
 
-        // Items count — use box filters via subquery
         $itemQuery = Item::query();
         if ($this->filterType || $this->filterMethod || $this->filterDateFrom || $this->filterDateTo) {
             $itemQuery->whereHas('box', function ($q) {
@@ -69,7 +100,6 @@ class RecapIndex extends Component
         }
         $this->totalItems = $itemQuery->count();
 
-        // Invoice stats — 1 query with conditional aggregation
         $invoiceQuery = Invoice::query();
         if ($this->filterDateFrom) $invoiceQuery->whereDate('created_at', '>=', $this->filterDateFrom);
         if ($this->filterDateTo) $invoiceQuery->whereDate('created_at', '<=', $this->filterDateTo);
@@ -78,7 +108,6 @@ class RecapIndex extends Component
         $this->totalInvoices = (int) $invoiceStats->total;
         $this->totalRevenue = (float) $invoiceStats->revenue;
 
-        // Checkouts + Complaints — 1 query each
         $checkoutQuery = Checkout::query();
         $complaintQuery = Complain::query();
 
@@ -93,40 +122,211 @@ class RecapIndex extends Component
 
         $this->totalCheckouts = $checkoutQuery->count();
         $this->totalComplaints = $complaintQuery->count();
+
+        // WH China stats
+        $this->totalWhChina = WhChinaData::count();
+        $this->totalMatched = WhChinaData::whereNotNull('item_id')->count();
+        $this->totalUnmatched = WhChinaData::whereNull('item_id')->count();
+    }
+
+    // ─── Tab Switch ────────────────────────────────────────────
+
+    public function switchTab(string $tab): void
+    {
+        $this->activeTab = $tab;
+        $this->resetPage();
+    }
+
+    // ─── WH China Modal ────────────────────────────────────────
+
+    public function openWhModal(): void
+    {
+        $this->resetForm();
+        $this->showWhModal = true;
+    }
+
+    public function closeWhModal(): void
+    {
+        $this->resetForm();
+        $this->showWhModal = false;
+    }
+
+    // ─── WH China CRUD ─────────────────────────────────────────
+
+    public function submitWhChinaData(RecapMatchingService $matching): void
+    {
+        $this->validate([
+            'resiNumber' => 'required|string|max:100',
+            'berat' => 'required|numeric|min:0.01',
+            'ukuranBox' => 'required|string|max:100',
+            'biayaJasa' => 'nullable|numeric|min:0',
+            'fotoBarang' => 'nullable|image|max:5120',
+        ], [
+            'resiNumber.required' => 'Nomor resi wajib diisi',
+            'berat.required' => 'Berat wajib diisi',
+            'berat.numeric' => 'Berat harus berupa angka',
+            'berat.min' => 'Berat minimal 0.01 kg',
+            'ukuranBox.required' => 'Ukuran box wajib diisi',
+            'biayaJasa.numeric' => 'Biaya jasa harus berupa angka',
+            'fotoBarang.image' => 'File harus berupa gambar',
+            'fotoBarang.max' => 'Ukuran foto maksimal 5MB',
+        ]);
+
+        $fotoPath = null;
+        if ($this->fotoBarang) {
+            $fotoPath = $this->fotoBarang->store('wh-china-photos', 'public');
+        }
+
+        if ($this->editingWhId) {
+            $whData = WhChinaData::findOrFail($this->editingWhId);
+
+            // If resi changed, clear existing match
+            if ($whData->resi_number !== $this->resiNumber && $whData->item_id) {
+                $whData->item_id = null;
+                $whData->matched_at = null;
+            }
+
+            // Delete old photo if replaced
+            if ($fotoPath && $whData->foto_barang) {
+                Storage::disk('public')->delete($whData->foto_barang);
+            }
+
+            $whData->update([
+                'resi_number' => $this->resiNumber,
+                'berat' => (float) $this->berat,
+                'ukuran_box' => $this->ukuranBox,
+                'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
+                'foto_barang' => $fotoPath ?? $whData->foto_barang,
+            ]);
+
+            $matching->matchByResi($whData);
+        } else {
+            $whData = WhChinaData::create([
+                'resi_number' => $this->resiNumber,
+                'berat' => (float) $this->berat,
+                'ukuran_box' => $this->ukuranBox,
+                'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
+                'foto_barang' => $fotoPath,
+                'input_by' => auth()->id(),
+            ]);
+
+            $matching->matchByResi($whData);
+        }
+
+        $this->showWhModal = false;
+        $this->resetForm();
+        $this->loadStats();
+
+        $this->dispatch('toast',
+            type: 'success',
+            title: 'Berhasil',
+            message: 'Data WH China berhasil diinput.',
+        );
+    }
+
+    public function editWhChinaData(int $id): void
+    {
+        $whData = WhChinaData::findOrFail($id);
+        $this->editingWhId = $whData->id;
+        $this->resiNumber = $whData->resi_number;
+        $this->berat = (string) $whData->berat;
+        $this->ukuranBox = $whData->ukuran_box;
+        $this->biayaJasa = $whData->biaya_jasa !== null ? (string) $whData->biaya_jasa : '';
+        $this->showWhModal = true;
+    }
+
+    public function cancelEdit(): void
+    {
+        $this->resetForm();
+    }
+
+    public function deleteWhChinaData(int $id): void
+    {
+        $whData = WhChinaData::findOrFail($id);
+
+        if ($whData->foto_barang) {
+            Storage::disk('public')->delete($whData->foto_barang);
+        }
+
+        $whData->delete();
+        $this->loadStats();
+
+        $this->dispatch('toast',
+            type: 'success',
+            title: 'Berhasil',
+            message: 'Data WH China berhasil dihapus.',
+        );
+    }
+
+    public function runAutoMatch(RecapMatchingService $matching): void
+    {
+        $count = $matching->tryMatchAll();
+        $this->loadStats();
+
+        $this->dispatch('toast',
+            type: $count > 0 ? 'success' : 'info',
+            title: 'Auto Match',
+            message: $count > 0
+                ? "{$count} data berhasil di-match."
+                : 'Tidak ada data baru yang cocok.',
+        );
+    }
+
+    private function resetForm(): void
+    {
+        $this->resiNumber = '';
+        $this->berat = '';
+        $this->ukuranBox = '';
+        $this->biayaJasa = '';
+        $this->fotoBarang = null;
+        $this->editingWhId = null;
     }
 
     public function render()
     {
-        $query = Box::with('customer')
-            ->withCount('items');
+        // Customer data: items with box + customer
+        $customerQuery = Item::with(['box', 'customer', 'whChinaData'])
+            ->whereNotNull('resi_number');
 
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('tracking_number', 'like', "%{$this->search}%")
-                  ->orWhere('batch_name', 'like', "%{$this->search}%")
+            $customerQuery->where(function ($q) {
+                $q->where('resi_number', 'like', "%{$this->search}%")
+                  ->orWhere('name', 'like', "%{$this->search}%")
                   ->orWhereHas('customer', function ($cq) {
                       $cq->where('name', 'like', "%{$this->search}%");
                   });
             });
         }
 
-        if ($this->filterType) {
-            $query->where('type', $this->filterType);
+        if ($this->filterType || $this->filterMethod || $this->filterDateFrom || $this->filterDateTo) {
+            $customerQuery->whereHas('box', function ($q) {
+                if ($this->filterType) $q->where('type', $this->filterType);
+                if ($this->filterMethod) $q->where('method', $this->filterMethod);
+                if ($this->filterDateFrom) $q->whereDate('created_at', '>=', $this->filterDateFrom);
+                if ($this->filterDateTo) $q->whereDate('created_at', '<=', $this->filterDateTo);
+            });
         }
-        if ($this->filterMethod) {
-            $query->where('method', $this->filterMethod);
+
+        $customerItems = $customerQuery->latest()->paginate(20, ['*'], 'customer_page');
+
+        // WH China data
+        $whChinaQuery = WhChinaData::with(['item', 'admin']);
+
+        if ($this->search) {
+            $whChinaQuery->where('resi_number', 'like', "%{$this->search}%");
         }
         if ($this->filterDateFrom) {
-            $query->whereDate('created_at', '>=', $this->filterDateFrom);
+            $whChinaQuery->whereDate('created_at', '>=', $this->filterDateFrom);
         }
         if ($this->filterDateTo) {
-            $query->whereDate('created_at', '<=', $this->filterDateTo);
+            $whChinaQuery->whereDate('created_at', '<=', $this->filterDateTo);
         }
 
-        $boxes = $query->latest()->paginate(20);
+        $whChinaData = $whChinaQuery->latest()->paginate(20, ['*'], 'wh_page');
 
         return view('livewire.admin.recap.index', [
-            'boxes' => $boxes,
+            'customerItems' => $customerItems,
+            'whChinaData' => $whChinaData,
         ]);
     }
 }
