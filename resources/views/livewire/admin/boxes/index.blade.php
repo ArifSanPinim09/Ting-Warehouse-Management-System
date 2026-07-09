@@ -72,14 +72,8 @@
                         <x-empty-state
                             icon="box"
                             title="Belum ada box"
-                            text="Belum ada box yang terdaftar. Buat box baru untuk memulai."
-                            action="Buat Box Baru"
-                            actionUrl="#"
-                        >
-                            <button wire:click="openCreateModal" class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-body font-medium rounded-[8px] hover:bg-primary-light transition-colors mt-2">
-                                Buat Box Baru
-                            </button>
-                        </x-empty-state>
+                            text="Belum ada box yang terdaftar. Klik tombol 'Buat Box' di pojok kanan atas untuk memulai."
+                        />
                     </div>
                 @else
                     {{-- Desktop Table --}}
