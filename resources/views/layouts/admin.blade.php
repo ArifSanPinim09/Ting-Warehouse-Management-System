@@ -174,5 +174,8 @@
                 </main>
             </div>
         </div>
+
+        {{-- Toast Notifications --}}
+        <x-toast />
     </body>
 </html>
