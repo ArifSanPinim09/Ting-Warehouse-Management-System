@@ -13,7 +13,7 @@ use Livewire\WithPagination;
  * Pengaturan Kurs History — Revisi §2.2, §4.1, §7.2
  *
  * Admin/Owner bisa input kurs + tanggal effective.
- * Duplicate (kurs_value, effective_date) ditolak sesuai §8.1.
+ * ONE kurs per date only — duplicate dates ditolak sesuai §8.1.
  */
 #[Layout('layouts.admin')]
 #[Title('History Kurs — Ting Warehouse')]
@@ -27,6 +27,7 @@ class KursHistoryIndex extends Component
 
     // ─── UI State ───────────────────────────────────────────────
     public bool $showForm = false;
+    public ?int $editingId = null;
 
     public function toggleForm(): void
     {
@@ -34,6 +35,18 @@ class KursHistoryIndex extends Component
         if (! $this->showForm) {
             $this->resetForm();
         }
+    }
+
+    /**
+     * Load kurs data into form for editing.
+     */
+    public function editKurs(int $id): void
+    {
+        $kurs = KursHistory::findOrFail($id);
+        $this->editingId = $kurs->id;
+        $this->kurs_value = (string) $kurs->kurs_value;
+        $this->effective_date = $kurs->effective_date->format('Y-m-d');
+        $this->showForm = true;
     }
 
     public function saveKurs(AuditLogService $auditService): void
@@ -50,8 +63,9 @@ class KursHistoryIndex extends Component
         ]);
 
         // Check duplicate — §8.1: "Kurs untuk tanggal ini sudah ada."
-        $exists = KursHistory::where('kurs_value', $this->kurs_value)
-            ->whereDate('effective_date', $this->effective_date)
+        // ONE kurs per date only (except when editing same record)
+        $exists = KursHistory::whereDate('effective_date', $this->effective_date)
+            ->when($this->editingId, fn ($q) => $q->where('id', '!=', $this->editingId))
             ->exists();
 
         if ($exists) {
@@ -63,17 +77,32 @@ class KursHistoryIndex extends Component
             return;
         }
 
-        $kurs = KursHistory::create([
-            'kurs_value' => (float) $this->kurs_value,
-            'effective_date' => $this->effective_date,
-            'input_by' => auth()->id(),
-        ]);
-
-        $auditService->logCustom(
-            $kurs,
-            'kurs_created',
-            "Kurs baru: Rp {$this->kurs_value} untuk tanggal {$this->effective_date}",
-        );
+        if ($this->editingId) {
+            // Update existing
+            $kurs = KursHistory::findOrFail($this->editingId);
+            $oldValues = ['kurs_value' => $kurs->kurs_value, 'effective_date' => $kurs->effective_date->format('Y-m-d')];
+            $kurs->update([
+                'kurs_value' => (float) $this->kurs_value,
+                'effective_date' => $this->effective_date,
+            ]);
+            $auditService->logCustom(
+                $kurs,
+                'kurs_updated',
+                "Kurs diupdate: Rp {$this->kurs_value} untuk tanggal {$this->effective_date}",
+            );
+        } else {
+            // Create new
+            $kurs = KursHistory::create([
+                'kurs_value' => (float) $this->kurs_value,
+                'effective_date' => $this->effective_date,
+                'input_by' => auth()->id(),
+            ]);
+            $auditService->logCustom(
+                $kurs,
+                'kurs_created',
+                "Kurs baru: Rp {$this->kurs_value} untuk tanggal {$this->effective_date}",
+            );
+        }
 
         $this->resetForm();
         $this->showForm = false;
@@ -89,6 +118,7 @@ class KursHistoryIndex extends Component
     {
         $this->kurs_value = '';
         $this->effective_date = '';
+        $this->editingId = null;
     }
 
     public function render()
