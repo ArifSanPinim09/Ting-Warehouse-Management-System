@@ -118,6 +118,19 @@ class TingWarehouseFullFlowTest extends TestCase
         $this->assertNull($this->customer->email_verified_at);
         $this->assertGuest();
 
+        // Admin AND Owner must receive registration notification (PRD §4.1)
+        $adminRegNotif = Notification::where('notifiable_id', $this->admin->id)
+            ->where('type', NotificationService::TYPE_CUSTOMER_REGISTER)
+            ->first();
+        $this->assertNotNull($adminRegNotif, 'Admin must receive customer registration notification');
+        $this->assertEquals('Customer Baru', $adminRegNotif->data['title']);
+        $this->assertEquals($this->customer->name, $adminRegNotif->data['customer_name']);
+
+        $ownerRegNotif = Notification::where('notifiable_id', $this->owner->id)
+            ->where('type', NotificationService::TYPE_CUSTOMER_REGISTER)
+            ->first();
+        $this->assertNotNull($ownerRegNotif, 'Owner must receive customer registration notification');
+
         // PENDING customer cannot login — Volt login rejects (PRD §13.1)
         Volt::test('pages.auth.login')
             ->set('form.email', 'budi@example.com')

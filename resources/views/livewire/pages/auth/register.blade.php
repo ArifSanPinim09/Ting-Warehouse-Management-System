@@ -2,6 +2,7 @@
 
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -43,6 +44,9 @@ new #[Layout('layouts.guest')] class extends Component
         $validated['role'] = 'customer';
 
         event(new Registered($user = User::create($validated)));
+
+        // Notify admins about new registration (PRD §4.1)
+        app(NotificationService::class)->customerRegister($user);
 
         // Tidak login otomatis — customer harus tunggu aktivasi admin (PRD §4.1)
         $this->redirect(route('login', absolute: false), navigate: true);
