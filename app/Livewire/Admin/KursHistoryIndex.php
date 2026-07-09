@@ -69,14 +69,8 @@ class KursHistoryIndex extends Component
             ->first();
 
         if ($existingKurs) {
-            $formattedDate = $existingKurs->effective_date->translatedFormat('d F Y');
             $formattedKurs = 'Rp ' . number_format($existingKurs->kurs_value, 0, ',', '.');
-            $this->dispatch('toast',
-                type: 'warning',
-                title: 'Kurs Sudah Ada',
-                message: "Kurs untuk tanggal {$formattedDate} sudah diinput ({$formattedKurs}). Klik tombol Edit pada baris tersebut untuk mengubahnya.",
-                duration: 6000,
-            );
+            $this->addError('effective_date', "Kurs untuk tanggal ini sudah ada ({$formattedKurs}). Klik tombol Edit untuk mengubahnya.");
             return;
         }
 

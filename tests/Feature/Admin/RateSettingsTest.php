@@ -50,7 +50,7 @@ class RateSettingsTest extends TestCase
     }
 
     /**
-     * Revisi §8.1: Duplicate (kurs_value, effective_date) rejected
+     * Revisi §8.1: Duplicate date rejected (ONE kurs per date)
      */
     public function test_duplicate_kurs_date_rejected(): void
     {
@@ -63,13 +63,13 @@ class RateSettingsTest extends TestCase
         ]);
 
         Livewire::test(KursHistoryIndex::class)
-            ->set('kurs_value', '2660')
+            ->set('kurs_value', '2700')
             ->set('effective_date', '2026-07-09')
             ->call('saveKurs')
-            ->assertDispatched('toast');
+            ->assertHasErrors(['effective_date']);
 
         // Should not create a duplicate
-        $this->assertEquals(1, KursHistory::where('kurs_value', 2660)->whereDate('effective_date', '2026-07-09')->count());
+        $this->assertEquals(1, KursHistory::whereDate('effective_date', '2026-07-09')->count());
     }
 
     /**
