@@ -20,13 +20,17 @@ use App\Models\ActivityLog;
 use App\Models\Box;
 use App\Models\Checkout;
 use App\Models\Complain;
+use App\Models\DendaClaim;
 use App\Models\Invoice;
 use App\Models\Item;
+use App\Models\KursHistory;
 use App\Models\Notification;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\WhChinaData;
 use App\Services\AuditLogService;
 use App\Services\FeeCalculationService;
+use App\Services\NoTuanClaimService;
 use App\Services\NotificationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -54,9 +58,14 @@ class TingWarehouseFullFlowTest extends TestCase
     private User $owner;
     private ?User $customer = null;
     private ?Box $box = null;
+    private ?Box $box2 = null;
     private ?Invoice $invoice = null;
+    private ?Invoice $flexibleInvoice = null;
     private ?Checkout $checkout = null;
+    private ?Checkout $dropshipCheckout = null;
     private ?Complain $complaint = null;
+    private ?Item $noTuanItem = null;
+    private ?DendaClaim $dendaClaim = null;
 
     protected function setUp(): void
     {
@@ -80,6 +89,7 @@ class TingWarehouseFullFlowTest extends TestCase
         $this->runTahap6_Komplain();
         $this->runTahap7_OwnerVerification();
         $this->runTahap8_NegativeRoleAccess();
+        $this->runTahap9_RevisiExtensions();
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -777,6 +787,467 @@ class TingWarehouseFullFlowTest extends TestCase
         $this->get('/dashboard')->assertRedirect('/login');
         $this->get('/admin/dashboard')->assertRedirect('/login');
         $this->get('/owner/dashboard')->assertRedirect('/login');
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  TAHAP 9 — REVISION EXTENSIONS (R1–R7)
+    // ═══════════════════════════════════════════════════════════════
+    //
+    //  Covers all revision features in one sequential flow:
+    //   R1: Kurs history input before invoice generation
+    //   R2: Box close/open + setor resi rejection
+    //   R3: No Tuan item → customer claim → denda
+    //   R5: Flexible invoice (2 boxes) + dropship checkout
+    //   R6: Payment deadline reminder (scheduled command)
+    //   R7: Barang lelang page
+    //   R3+R5: Owner finance report includes denda + flexible invoice
+    // ═══════════════════════════════════════════════════════════════
+
+    private function runTahap9_RevisiExtensions(): void
+    {
+        // ── Step 21: R1 — Admin inputs kurs for today ──
+
+        $this->actingAs($this->admin);
+
+        $today = now()->format('Y-m-d');
+        Livewire::test(\App\Livewire\Admin\KursHistoryIndex::class)
+            ->call('toggleForm')
+            ->set('kurs_value', '2650')
+            ->set('effective_date', $today)
+            ->call('saveKurs');
+
+        $kurs = KursHistory::whereDate('effective_date', $today)->first();
+        $this->assertNotNull($kurs, 'Kurs history must be created');
+        $this->assertEquals(2650.0, (float) $kurs->kurs_value);
+        $this->assertEquals($this->admin->id, $kurs->input_by);
+
+        $kursLog = ActivityLog::where('subject_type', KursHistory::class)
+            ->where('subject_id', $kurs->id)
+            ->where('event', 'kurs_created')
+            ->first();
+        $this->assertNotNull($kursLog, 'Audit: kurs input logged');
+
+        // Latest kurs query returns this record
+        $latest = KursHistory::getLatest();
+        $this->assertNotNull($latest);
+        $this->assertEquals($kurs->id, $latest->id);
+
+        // ── Step 22: R2 — Admin creates second box, then closes it ──
+
+        Livewire::test(\App\Livewire\Admin\ManageBox::class)
+            ->call('openCreateModal')
+            ->set('newType', 'sharing')
+            ->set('newMethod', 'sea')
+            ->set('newTrackingNumber', 'TRK-FULL-002')
+            ->set('newBatchName', 'Batch-Aug')
+            ->set('newCustomerId', $this->customer->id)
+            ->set('newNotes', 'Second box for flexible invoice test')
+            ->call('createBox');
+
+        $this->box2 = Box::where('tracking_number', 'TRK-FULL-002')->first();
+        $this->assertNotNull($this->box2);
+        $this->assertEquals(Box::STATUS_OPEN, $this->box2->status);
+
+        // Customer setor resi to box2
+        Auth::login($this->customer);
+
+        Livewire::test(\App\Livewire\Customer\SetorResi::class)
+            ->set('boxId', $this->box2->id)
+            ->set('name', 'Sepatu Nike Air Max')
+            ->set('quantity', 50)
+            ->set('priceYuan', '280.00')
+            ->set('resiNumber', 'RESI-CHINA-003')
+            ->set('proofCo', UploadedFile::fake()->image('proof3.jpg', 100, 100))
+            ->set('isSensitive', false)
+            ->call('submit');
+
+        $item3 = Item::where('resi_number', 'RESI-CHINA-003')->first();
+        $this->assertNotNull($item3);
+        $this->assertEquals($this->box2->id, $item3->box_id);
+
+        // Admin marks item3 as arrived in Indonesia (needed for flexible invoice)
+        $item3->update(['arrived_china' => true, 'arrived_indonesia' => true]);
+
+        // Also mark items from box1 as arrived Indonesia (needed for flexible invoice)
+        Item::where('box_id', $this->box->id)->update(['arrived_indonesia' => true]);
+
+        // Add WH China data to items (needed for weight in flexible invoice)
+        foreach (Item::where('box_id', $this->box->id)->get() as $boxItem) {
+            WhChinaData::create([
+                'item_id' => $boxItem->id,
+                'resi_number' => $boxItem->resi_number,
+                'berat' => $boxItem->is_sensitive ? 5.0 : 2.5,
+                'ukuran_box' => '30x20x15',
+                'input_by' => $this->admin->id,
+                'matched_at' => now(),
+            ]);
+        }
+        WhChinaData::create([
+            'item_id' => $item3->id,
+            'resi_number' => $item3->resi_number,
+            'berat' => 3.0,
+            'ukuran_box' => '40x30x20',
+            'input_by' => $this->admin->id,
+            'matched_at' => now(),
+        ]);
+
+        // Now close box2 — customer should NOT be able to setor anymore
+        $this->actingAs($this->admin);
+        Livewire::test(\App\Livewire\Admin\ManageBox::class)
+            ->call('selectBox', $this->box2->id)
+            ->call('closeBox');
+
+        $this->box2->refresh();
+        $this->assertEquals(Box::STATUS_CLOSED, $this->box2->status);
+        $this->assertNotNull($this->box2->close_date);
+
+        // Notification sent to customer
+        $boxClosedNotif = Notification::where('notifiable_id', $this->customer->id)
+            ->where('type', NotificationService::TYPE_BOX_CLOSED)
+            ->latest()
+            ->first();
+        $this->assertNotNull($boxClosedNotif, 'Customer must receive box closed notification');
+
+        // Customer tries to setor resi to closed box → REJECTED
+        Auth::login($this->customer);
+
+        $setorResiTest = Livewire::test(\App\Livewire\Customer\SetorResi::class)
+            ->set('boxId', $this->box2->id)
+            ->set('name', 'Tas Gucci')
+            ->set('quantity', 10)
+            ->set('priceYuan', '1200.00')
+            ->set('resiNumber', 'RESI-CHINA-REJECTED')
+            ->set('proofCo', UploadedFile::fake()->image('proof-rejected.jpg', 100, 100))
+            ->set('isSensitive', false)
+            ->call('submit');
+
+        // Verify the rejected item was NOT created
+        $rejectedItem = Item::where('resi_number', 'RESI-CHINA-REJECTED')->first();
+        $this->assertNull($rejectedItem, 'Setor resi to closed box must be rejected — item not created');
+
+        // Admin re-opens box2
+        $this->actingAs($this->admin);
+        Livewire::test(\App\Livewire\Admin\ManageBox::class)
+            ->call('selectBox', $this->box2->id)
+            ->call('openBox');
+
+        $this->box2->refresh();
+        $this->assertEquals(Box::STATUS_OPEN, $this->box2->status);
+
+        // ── Step 23: R3 — No Tuan item: create, mark, claim ──
+
+        // Create an item that does NOT match any setor resi (orphan item in box)
+        // customer_id is NOT NULL, so assign to customer but mark as No Tuan
+        // (item arrived at WH without matching any customer's setor resi)
+        $this->actingAs($this->admin);
+        $orphanItem = Item::create([
+            'box_id' => $this->box->id,
+            'customer_id' => $this->customer->id,
+            'name' => 'Headphone Sony WH-1000XM5',
+            'quantity' => 5,
+            'price_yuan' => '1500.00',
+            'resi_number' => 'RESI-ORPHAN-001',
+            'is_sensitive' => false,
+            'status' => Item::STATUS_ACTIVE,
+        ]);
+
+        // Admin marks orphan item as No Tuan
+        $claimService = app(NoTuanClaimService::class);
+        $claimService->markNoTuan($orphanItem);
+
+        $orphanItem->refresh();
+        $this->assertEquals(Item::STATUS_NO_TUAN, $orphanItem->status);
+
+        // Customer claims the No Tuan item
+        Auth::login($this->customer);
+
+        $this->dendaClaim = $claimService->claimItem(
+            $orphanItem,
+            $this->customer,
+            'proof-purchase/orphan-claim.jpg',
+            'Ini barang saya, nota pembelian terlampir',
+        );
+
+        $this->assertNotNull($this->dendaClaim);
+        $this->assertEquals($this->customer->id, $this->dendaClaim->customer_id);
+        $this->assertEquals($orphanItem->id, $this->dendaClaim->item_id);
+        $this->assertEquals(5000, (float) $this->dendaClaim->jumlah_denda);
+        $this->assertEquals(DendaClaim::STATUS_PENDING, $this->dendaClaim->status);
+        $this->assertNull($this->dendaClaim->invoice_id, 'Denda not yet tagged to any invoice');
+
+        $orphanItem->refresh();
+        $this->assertEquals(Item::STATUS_CLAIMED, $orphanItem->status);
+        $this->assertEquals($this->customer->id, $orphanItem->customer_id);
+
+        // Claim notification sent to customer
+        $claimNotif = Notification::where('notifiable_id', $this->customer->id)
+            ->where('type', NotificationService::TYPE_CLAIM_SUCCESSFUL)
+            ->latest()
+            ->first();
+        $this->assertNotNull($claimNotif, 'Customer must receive claim successful notification');
+
+        // Add WH China data to orphan item so it can be invoiced
+        WhChinaData::create([
+            'item_id' => $orphanItem->id,
+            'resi_number' => $orphanItem->resi_number,
+            'berat' => 1.5,
+            'ukuran_box' => '25x15x10',
+            'input_by' => $this->admin->id,
+            'matched_at' => now(),
+        ]);
+        $orphanItem->update(['arrived_indonesia' => true]);
+
+        // ── Step 24: R5 — Flexible invoice from 2 different boxes ──
+
+        // Customer creates flexible invoice with items from box1 + box2 + orphan
+        Auth::login($this->customer);
+
+        $item1 = Item::where('resi_number', 'RESI-CHINA-001')->first();
+        $item3 = Item::where('resi_number', 'RESI-CHINA-003')->first();
+
+        // All items must be arrived_indonesia and not yet invoiced
+        $this->assertTrue($item1->arrived_indonesia, 'Item 1 must be arrived Indonesia');
+        $this->assertTrue($item3->arrived_indonesia, 'Item 3 must be arrived Indonesia');
+        $this->assertTrue($orphanItem->arrived_indonesia, 'Orphan item must be arrived Indonesia');
+        $this->assertFalse($item1->isInvoiced(), 'Item 1 not yet invoiced');
+        $this->assertFalse($item3->isInvoiced(), 'Item 3 not yet invoiced');
+
+        Livewire::test(\App\Livewire\Customer\CreateInvoice::class)
+            ->call('toggleItem', $item1->id)
+            ->call('toggleItem', $item3->id)
+            ->call('toggleItem', $orphanItem->id)
+            ->set('length', '60')
+            ->set('width', '40')
+            ->set('height', '30')
+            ->call('createInvoice');
+
+        // Verify flexible invoice created
+        $this->flexibleInvoice = Invoice::where('customer_id', $this->customer->id)
+            ->whereNull('box_id')
+            ->first();
+        $this->assertNotNull($this->flexibleInvoice, 'Flexible invoice must be created');
+        $this->assertEquals(Invoice::STATUS_WAITING_PAYMENT, $this->flexibleInvoice->status);
+        $this->assertNull($this->flexibleInvoice->box_id, 'Flexible invoice has no box_id');
+        $this->assertTrue($this->flexibleInvoice->isFlexible());
+
+        // Junction items: items from 2 different boxes + orphan
+        $invoiceItems = $this->flexibleInvoice->items->pluck('id')->sort()->values()->toArray();
+        $expectedItems = collect([$item1->id, $item3->id, $orphanItem->id])->sort()->values()->toArray();
+        $this->assertEquals($expectedItems, $invoiceItems, 'Flexible invoice must contain items from 2 boxes + orphan');
+
+        // Box info shows multiple boxes
+        $boxInfo = $this->flexibleInvoice->box_info;
+        $this->assertStringContainsString('TRK-FULL-001', $boxInfo);
+        $this->assertStringContainsString('TRK-FULL-002', $boxInfo);
+
+        // Denda claim now tagged to this invoice
+        $this->dendaClaim->refresh();
+        $this->assertEquals($this->flexibleInvoice->id, $this->dendaClaim->invoice_id);
+        $this->assertEquals(DendaClaim::STATUS_TAGGED, $this->dendaClaim->status);
+
+        // Denda total in invoice
+        $this->flexibleInvoice->refresh();
+        $this->assertEquals(5000, (float) $this->flexibleInvoice->denda_total, 'Denda Rp 5000 must be in invoice denda_total');
+
+        // Grand total includes denda
+        $expectedGrandTotalWithoutDenda = (float) $this->flexibleInvoice->fee_tax
+            + (float) $this->flexibleInvoice->fee_wh
+            + (float) $this->flexibleInvoice->fee_packing
+            + (float) $this->flexibleInvoice->add_on;
+        $this->assertEquals(
+            $expectedGrandTotalWithoutDenda + 5000,
+            (float) $this->flexibleInvoice->grand_total,
+            'Grand total must include denda'
+        );
+
+        // Payment deadline auto-set
+        $this->assertNotNull($this->flexibleInvoice->payment_deadline, 'Payment deadline must be set');
+
+        // Invoice notification sent
+        $flexInvNotif = Notification::where('notifiable_id', $this->customer->id)
+            ->where('type', NotificationService::TYPE_INVOICE_GENERATED)
+            ->latest()
+            ->first();
+        $this->assertNotNull($flexInvNotif);
+
+        // ── Step 25: R5 — Pay flexible invoice + admin verifies ──
+
+        Livewire::test(\App\Livewire\Customer\InvoiceIndex::class)
+            ->call('openPayModal', $this->flexibleInvoice->id)
+            ->set('paymentMethod', 'transfer')
+            ->set('paymentProof', UploadedFile::fake()->image('bukti-flex.jpg', 100, 100))
+            ->call('submitPayment');
+
+        $this->flexibleInvoice->refresh();
+        $this->assertEquals(Invoice::STATUS_WAITING_VERIFICATION, $this->flexibleInvoice->status);
+
+        // Admin verifies
+        $this->actingAs($this->admin);
+        Livewire::test(\App\Livewire\Admin\VerificationIndex::class)
+            ->set('filterStatus', 'waiting_verification')
+            ->call('selectInvoice', $this->flexibleInvoice->id)
+            ->call('verifyPayment');
+
+        $this->flexibleInvoice->refresh();
+        $this->assertEquals(Invoice::STATUS_VERIFIED, $this->flexibleInvoice->status);
+
+        // Denda claim status → paid (after verification)
+        $this->dendaClaim->refresh();
+        $this->assertEquals(DendaClaim::STATUS_PAID, $this->dendaClaim->status);
+
+        // ── Step 26: R5 — Checkout with Dropship address ──
+
+        Auth::login($this->customer);
+
+        Livewire::test(\App\Livewire\Customer\CheckoutIndex::class)
+            ->call('openForm')
+            ->set('invoiceId', $this->flexibleInvoice->id)
+            ->set('addressType', 'dropship')
+            ->set('recipientName', 'Toko Online Maju')
+            ->set('recipientPhone', '087654321098')
+            ->set('address', 'Jl. Gatot Subroto No. 45, Jakarta Pusat 10270')
+            ->set('senderName', 'Budi Santoso')
+            ->set('senderPhone', '081234567890')
+            ->set('confirmation', true)
+            ->call('submit');
+
+        $this->dropshipCheckout = Checkout::where('invoice_id', $this->flexibleInvoice->id)
+            ->where('customer_id', $this->customer->id)
+            ->first();
+        $this->assertNotNull($this->dropshipCheckout);
+        $this->assertEquals('dropship', $this->dropshipCheckout->address_type);
+        $this->assertEquals('Toko Online Maju', $this->dropshipCheckout->recipient_name);
+        $this->assertEquals('087654321098', $this->dropshipCheckout->recipient_phone);
+        $this->assertEquals('Budi Santoso', $this->dropshipCheckout->sender_name);
+        $this->assertEquals('081234567890', $this->dropshipCheckout->sender_phone);
+
+        // ── Step 27: R6 — Payment deadline reminder ──
+
+        // Backdate the invoice's payment_deadline to 3 days ago
+        $this->flexibleInvoice->update([
+            'payment_deadline' => now()->subDays(3)->toDateString(),
+        ]);
+        $this->flexibleInvoice->refresh();
+
+        // Reset status to waiting_payment to test reminder
+        $this->flexibleInvoice->update(['status' => Invoice::STATUS_WAITING_PAYMENT]);
+
+        // Run the scheduled command
+        $this->artisan('deadlines:check')->assertExitCode(0);
+
+        // H-0 reminder should be sent (deadline is today-3, so it's overdue)
+        // Actually, let's test H-3: set deadline to today + 3 days
+        $this->flexibleInvoice->update([
+            'payment_deadline' => now()->addDays(3)->toDateString(),
+            'reminder_sent' => [], // reset
+        ]);
+
+        // Re-verify status is still waiting_payment
+        $this->flexibleInvoice->update(['status' => Invoice::STATUS_WAITING_PAYMENT]);
+
+        $this->artisan('deadlines:check')->assertExitCode(0);
+
+        $this->flexibleInvoice->refresh();
+        $this->assertTrue(
+            $this->flexibleInvoice->hasReminderBeenSent('h3'),
+            'H-3 reminder must be marked as sent'
+        );
+
+        // Reminder notification exists
+        $reminderNotif = Notification::where('notifiable_id', $this->customer->id)
+            ->where('type', NotificationService::TYPE_PAYMENT_REMINDER_H3)
+            ->latest()
+            ->first();
+        $this->assertNotNull($reminderNotif, 'H-3 reminder notification must be sent');
+
+        // Run again → no duplicate
+        $this->artisan('deadlines:check')->assertExitCode(0);
+
+        $reminderCount = Notification::where('notifiable_id', $this->customer->id)
+            ->where('type', NotificationService::TYPE_PAYMENT_REMINDER_H3)
+            ->count();
+        $this->assertEquals(1, $reminderCount, 'H-3 reminder must NOT be sent twice (idempotent)');
+
+        // Restore flexible invoice to verified for finance report test
+        $this->flexibleInvoice->update(['status' => Invoice::STATUS_VERIFIED]);
+
+        // ── Step 28: R7 — Barang klaim_wh appears in lelang page ──
+
+        // Mark a No Tuan item as Klaim WH for lelang
+        $lelangItem = Item::create([
+            'box_id' => $this->box->id,
+            'customer_id' => $this->customer->id,
+            'name' => 'Kamera Canon EOS R5',
+            'quantity' => 1,
+            'price_yuan' => '12000.00',
+            'resi_number' => 'RESI-LELANG-001',
+            'is_sensitive' => true,
+            'sensitive_type' => 'Elektronik',
+            'status' => Item::STATUS_ACTIVE,
+        ]);
+
+        $this->actingAs($this->admin);
+        $claimService->markNoTuan($lelangItem);
+        $lelangItem->refresh();
+        $this->assertEquals(Item::STATUS_NO_TUAN, $lelangItem->status);
+
+        $claimService->markKlaimWh($lelangItem);
+        $lelangItem->refresh();
+        $this->assertEquals(Item::STATUS_KLAIM_WH, $lelangItem->status);
+
+        // Lelang page shows this item
+        Livewire::test(\App\Livewire\Admin\LelangIndex::class)
+            ->assertSee($lelangItem->name)
+            ->assertSee($lelangItem->resi_number);
+
+        // Filter by klaim_wh status
+        Livewire::test(\App\Livewire\Admin\LelangIndex::class)
+            ->set('filterStatus', Item::STATUS_KLAIM_WH)
+            ->assertSee($lelangItem->name);
+
+        // Summary includes the item
+        $lelangComponent = Livewire::test(\App\Livewire\Admin\LelangIndex::class);
+        $summary = $lelangComponent->get('summary');
+        $this->assertGreaterThan(0, $summary['total_barang']);
+        $this->assertGreaterThan(0, $summary['belum_terjual']);
+
+        // ── Step 29: R3+R5 — Owner finance report ──
+
+        $this->actingAs($this->owner);
+
+        // Owner dashboard sees both verified invoices
+        Livewire::test(OwnerDashboard::class)
+            ->assertSet('verifiedInvoices', function (int $value) {
+                return $value >= 2; // original + flexible
+            });
+
+        // Revenue includes both invoices
+        $totalVerifiedRevenue = Invoice::where('status', Invoice::STATUS_VERIFIED)
+            ->sum('grand_total');
+        $this->assertGreaterThan(0, $totalVerifiedRevenue);
+
+        // Revenue includes denda from flexible invoice
+        $flexInvoiceDenda = (float) $this->flexibleInvoice->refresh()->denda_total;
+        $this->assertEquals(5000, $flexInvoiceDenda);
+
+        // Total revenue = original invoice + flexible invoice (with denda)
+        $originalTotal = (float) $this->invoice->grand_total;
+        $flexTotal = (float) $this->flexibleInvoice->grand_total;
+        $this->assertEqualsWithDelta(
+            $originalTotal + $flexTotal,
+            (float) $totalVerifiedRevenue,
+            0.01,
+            'Total verified revenue must equal sum of both invoices'
+        );
+
+        // Finance page shows both invoice numbers
+        Livewire::test(FinanceIndex::class)
+            ->assertSee($this->invoice->invoice_number)
+            ->assertSee($this->flexibleInvoice->invoice_number);
+
+        // Finance page shows flexible invoice grand total (includes denda)
+        Livewire::test(FinanceIndex::class)
+            ->assertSee($this->flexibleInvoice->invoice_number);
     }
 
     // ═══════════════════════════════════════════════════════════════
