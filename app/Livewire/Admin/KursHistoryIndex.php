@@ -64,15 +64,18 @@ class KursHistoryIndex extends Component
 
         // Check duplicate — §8.1: "Kurs untuk tanggal ini sudah ada."
         // ONE kurs per date only (except when editing same record)
-        $exists = KursHistory::whereDate('effective_date', $this->effective_date)
+        $existingKurs = KursHistory::whereDate('effective_date', $this->effective_date)
             ->when($this->editingId, fn ($q) => $q->where('id', '!=', $this->editingId))
-            ->exists();
+            ->first();
 
-        if ($exists) {
+        if ($existingKurs) {
+            $formattedDate = $existingKurs->effective_date->translatedFormat('d F Y');
+            $formattedKurs = 'Rp ' . number_format($existingKurs->kurs_value, 0, ',', '.');
             $this->dispatch('toast',
-                type: 'error',
-                title: 'Error',
-                message: 'Kurs untuk tanggal ini sudah ada.',
+                type: 'warning',
+                title: 'Kurs Sudah Ada',
+                message: "Kurs untuk tanggal {$formattedDate} sudah diinput ({$formattedKurs}). Klik tombol Edit pada baris tersebut untuk mengubahnya.",
+                duration: 6000,
             );
             return;
         }
