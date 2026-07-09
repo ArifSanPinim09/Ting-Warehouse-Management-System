@@ -32,6 +32,9 @@ class Invoice extends Model
         'payment_method',
         'payment_proof',
         'status',
+        'payment_deadline',
+        'storage_deadline',
+        'reminder_sent',
     ];
 
     /**
@@ -50,6 +53,9 @@ class Invoice extends Model
             'add_on' => 'decimal:2',
             'denda_total' => 'decimal:2',
             'grand_total' => 'decimal:2',
+            'payment_deadline' => 'date',
+            'storage_deadline' => 'date',
+            'reminder_sent' => 'array',
         ];
     }
 
@@ -142,5 +148,53 @@ class Invoice extends Model
     public function isFlexible(): bool
     {
         return $this->box_id === null;
+    }
+
+    // ─── Deadline Helpers (Revisi §2.10) ──────────────────────────
+
+    /**
+     * Mark a reminder type as sent.
+     *
+     * @param  string  $type  Reminder type: h3, h1, h0, 2week, storage_expired
+     * @return void
+     */
+    public function markReminderSent(string $type): void
+    {
+        $sent = $this->reminder_sent ?? [];
+        if (!in_array($type, $sent)) {
+            $sent[] = $type;
+            $this->update(['reminder_sent' => $sent]);
+        }
+    }
+
+    /**
+     * Check if a specific reminder type has been sent.
+     *
+     * @param  string  $type  Reminder type: h3, h1, h0, 2week, storage_expired
+     * @return bool
+     */
+    public function hasReminderBeenSent(string $type): bool
+    {
+        return in_array($type, $this->reminder_sent ?? []);
+    }
+
+    /**
+     * Check if payment is overdue (past payment_deadline).
+     *
+     * @return bool
+     */
+    public function isPaymentOverdue(): bool
+    {
+        return $this->payment_deadline && $this->payment_deadline->isPast();
+    }
+
+    /**
+     * Check if storage deadline has expired (past storage_deadline).
+     *
+     * @return bool
+     */
+    public function isStorageExpired(): bool
+    {
+        return $this->storage_deadline && $this->storage_deadline->isPast();
     }
 }

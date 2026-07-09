@@ -23,9 +23,15 @@ class InvoiceObserver
      * Handle the Invoice "created" event.
      *
      * Logs invoice generation with fee snapshot.
+     * Sets payment_deadline = created_at + 7 days (Revisi §2.10.5).
      */
     public function created(Invoice $invoice): void
     {
+        // Set payment deadline if not already set (Revisi §2.10.5)
+        if (!$invoice->payment_deadline) {
+            $invoice->update(['payment_deadline' => $invoice->created_at->addDays(7)]);
+        }
+
         $this->auditLog->logCustom(
             subject: $invoice,
             event: 'generated',
@@ -43,6 +49,7 @@ class InvoiceObserver
                 'add_on'         => $invoice->add_on,
                 'grand_total'    => $invoice->grand_total,
                 'status'         => $invoice->status,
+                'payment_deadline' => $invoice->payment_deadline,
             ],
         );
     }

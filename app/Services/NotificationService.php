@@ -29,6 +29,14 @@ class NotificationService
     const TYPE_NEW_COMPLAINT = 'new_complaint';
     const TYPE_COMPLAINT_UPDATED = 'complaint_updated';
 
+    // Revisi §2.11.2: Deadline reminder types
+    const TYPE_PAYMENT_REMINDER_H3 = 'payment_reminder_h3';
+    const TYPE_PAYMENT_REMINDER_H1 = 'payment_reminder_h1';
+    const TYPE_PAYMENT_REMINDER_H0 = 'payment_reminder_h0';
+    const TYPE_PAYMENT_OVERDUE_2WEEK = 'payment_overdue_2week';
+    const TYPE_STORAGE_EXPIRED = 'storage_expired';
+    const TYPE_ITEM_HOLD = 'item_hold';
+
     /**
      * Get all valid notification types.
      *
@@ -47,6 +55,12 @@ class NotificationService
             self::TYPE_CHECKOUT_PROCESSED,
             self::TYPE_NEW_COMPLAINT,
             self::TYPE_COMPLAINT_UPDATED,
+            self::TYPE_PAYMENT_REMINDER_H3,
+            self::TYPE_PAYMENT_REMINDER_H1,
+            self::TYPE_PAYMENT_REMINDER_H0,
+            self::TYPE_PAYMENT_OVERDUE_2WEEK,
+            self::TYPE_STORAGE_EXPIRED,
+            self::TYPE_ITEM_HOLD,
         ];
     }
 
@@ -264,6 +278,138 @@ class NotificationService
                 'complaint_id' => $complaint->id,
                 'old_status' => $oldStatus,
                 'new_status' => $newStatus,
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
+    // ─── Deadline Reminders (Revisi §2.11.2) ─────────────────────
+
+    /**
+     * Payment reminder H-3 — 3 days before deadline.
+     *
+     * @param  \App\Models\Invoice  $invoice  The invoice approaching deadline
+     * @return Notification
+     */
+    public function paymentReminderH3($invoice): Notification
+    {
+        return $this->create(
+            notifiable: $invoice->customer,
+            type: self::TYPE_PAYMENT_REMINDER_H3,
+            data: [
+                'title' => 'Invoice Jatuh Tempo',
+                'message' => "Invoice {$invoice->invoice_number} jatuh tempo dalam 3 hari. Segera lakukan pembayaran.",
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'payment_deadline' => $invoice->payment_deadline->format('Y-m-d'),
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
+    /**
+     * Payment reminder H-1 — 1 day before deadline.
+     *
+     * @param  \App\Models\Invoice  $invoice  The invoice approaching deadline
+     * @return Notification
+     */
+    public function paymentReminderH1($invoice): Notification
+    {
+        return $this->create(
+            notifiable: $invoice->customer,
+            type: self::TYPE_PAYMENT_REMINDER_H1,
+            data: [
+                'title' => 'Invoice Jatuh Tempo Besok',
+                'message' => "Invoice {$invoice->invoice_number} jatuh tempo besok! Segera lakukan pembayaran.",
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'payment_deadline' => $invoice->payment_deadline->format('Y-m-d'),
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
+    /**
+     * Payment reminder H-0 — on deadline day.
+     *
+     * @param  \App\Models\Invoice  $invoice  The invoice at deadline
+     * @return Notification
+     */
+    public function paymentReminderH0($invoice): Notification
+    {
+        return $this->create(
+            notifiable: $invoice->customer,
+            type: self::TYPE_PAYMENT_REMINDER_H0,
+            data: [
+                'title' => 'Invoice Sudah Jatuh Tempo',
+                'message' => "Invoice {$invoice->invoice_number} sudah jatuh tempo! Segera lakukan pembayaran.",
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'payment_deadline' => $invoice->payment_deadline->format('Y-m-d'),
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
+    /**
+     * Payment overdue 2 weeks — warning about hold and lelang.
+     *
+     * @param  \App\Models\Invoice  $invoice  The overdue invoice
+     * @return Notification
+     */
+    public function paymentOverdue2Week($invoice): Notification
+    {
+        return $this->create(
+            notifiable: $invoice->customer,
+            type: self::TYPE_PAYMENT_OVERDUE_2WEEK,
+            data: [
+                'title' => 'Barang Akan Dilelang',
+                'message' => 'Barang akan ditahan WH dan bisa dilelang. Hubungi admin untuk info.',
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
+    /**
+     * Storage expired — notification that storage deadline has passed.
+     *
+     * @param  \App\Models\Invoice  $invoice  The invoice with expired storage
+     * @return Notification
+     */
+    public function storageExpired($invoice): Notification
+    {
+        return $this->create(
+            notifiable: $invoice->customer,
+            type: self::TYPE_STORAGE_EXPIRED,
+            data: [
+                'title' => 'Deadline Nimbun Habis',
+                'message' => 'Barang Anda sudah melewati deadline nimbun. Akan ditahan WH.',
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'storage_deadline' => $invoice->storage_deadline?->format('Y-m-d'),
+                'link' => route('dashboard'),
+            ]
+        );
+    }
+
+    /**
+     * Item hold — notification that items have been held.
+     *
+     * @param  \App\Models\Invoice  $invoice  The invoice with held items
+     * @return Notification
+     */
+    public function itemHold($invoice): Notification
+    {
+        return $this->create(
+            notifiable: $invoice->customer,
+            type: self::TYPE_ITEM_HOLD,
+            data: [
+                'title' => 'Barang Ditahan',
+                'message' => 'Barang Anda ditahan WH. Hubungi admin.',
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
                 'link' => route('dashboard'),
             ]
         );

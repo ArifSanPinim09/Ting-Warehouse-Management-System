@@ -49,13 +49,14 @@ class Item extends Model
         ];
     }
 
-    // ─── Status Constants (Revisi §2.5.2) ──────────────────────────
+    // ─── Status Constants (Revisi §2.5.2, §2.10.2) ────────────────
 
     const STATUS_ACTIVE = 'active';
     const STATUS_NO_TUAN = 'no_tuan';
     const STATUS_CLAIMED = 'claimed';
     const STATUS_KLAIM_WH = 'klaim_wh';
     const STATUS_SHIPPED = 'shipped';
+    const STATUS_HOLD = 'hold'; // Revisi §2.10.2: Auto hold for overdue items
 
     /**
      * Get all valid statuses.
@@ -70,6 +71,7 @@ class Item extends Model
             self::STATUS_CLAIMED,
             self::STATUS_KLAIM_WH,
             self::STATUS_SHIPPED,
+            self::STATUS_HOLD,
         ];
     }
 
