@@ -150,8 +150,12 @@ class UnmatchedResi extends Component
             ->latest()
             ->paginate(20);
 
-        $openBoxes = Box::where('customer_id', auth()->id())
-            ->where('status', Box::STATUS_OPEN)
+        // PRD §4.3: Sharing box (customer_id NULL) + direct box milik customer
+        $openBoxes = Box::where('status', Box::STATUS_OPEN)
+            ->where(function ($query) use ($userId) {
+                $query->whereNull('customer_id')
+                    ->orWhere('customer_id', $userId);
+            })
             ->orderByDesc('last_setor_date')
             ->get();
 

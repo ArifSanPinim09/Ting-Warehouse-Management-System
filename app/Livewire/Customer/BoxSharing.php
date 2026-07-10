@@ -49,8 +49,13 @@ class BoxSharing extends Component
     {
         $user = auth()->user();
 
-        $boxes = Box::where('customer_id', $user->id)
-            ->where('type', 'sharing')
+        $boxes = Box::where('type', 'sharing')
+            ->where(function ($query) use ($user) {
+                // Sharing box: semua customer bisa lihat (customer_id NULL)
+                $query->whereNull('customer_id')
+                    // Atau box yang memang milik customer ini
+                    ->orWhere('customer_id', $user->id);
+            })
             ->when($this->search, function ($query) {
                 $query->where('tracking_number', 'like', "%{$this->search}%");
             })
@@ -66,12 +71,15 @@ class BoxSharing extends Component
             ->latest()
             ->paginate(15);
 
-        // Detail box (only if belongs to customer)
+        // Detail box (sharing box bisa diakses semua customer)
         $detailBox = null;
         if ($this->detailBoxId) {
             $detailBox = Box::where('id', $this->detailBoxId)
-                ->where('customer_id', $user->id)
                 ->where('type', 'sharing')
+                ->where(function ($query) use ($user) {
+                    $query->whereNull('customer_id')
+                        ->orWhere('customer_id', $user->id);
+                })
                 ->with(['items' => function ($query) use ($user) {
                     $query->where('customer_id', $user->id)->with('whChinaData');
                 }])

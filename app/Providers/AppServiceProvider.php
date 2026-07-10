@@ -34,7 +34,9 @@ class AppServiceProvider extends ServiceProvider
         Invoice::observe(InvoiceObserver::class);
         Setting::observe(SettingObserver::class);
 
-        if ($this->app->environment('production') || request()->server('HTTP_X_FORWARDED_PROTO') === 'https') {
+        // Force HTTPS when APP_URL is https (ngrok, production, etc.)
+        // Prevents Mixed Content: browser blocks HTTP assets on HTTPS page
+        if (str_starts_with(config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
     }

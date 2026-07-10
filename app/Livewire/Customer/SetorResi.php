@@ -161,8 +161,16 @@ class SetorResi extends Component
 
     public function render()
     {
-        $boxes = Box::where('customer_id', auth()->id())
-            ->where('status', Box::STATUS_OPEN)
+        // PRD §4.3: Sharing box bisa dipakai semua customer (customer_id = NULL)
+        // Direct box hanya untuk customer tertentu (customer_id = auth user)
+        $userId = auth()->id();
+        $boxes = Box::where('status', Box::STATUS_OPEN)
+            ->where(function ($query) use ($userId) {
+                // Box sharing (customer_id NULL) → semua customer bisa lihat
+                $query->whereNull('customer_id')
+                    // Box direct → hanya milik customer ini
+                    ->orWhere('customer_id', $userId);
+            })
             ->orderByDesc('last_setor_date')
             ->get();
 

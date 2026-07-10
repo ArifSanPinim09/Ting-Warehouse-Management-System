@@ -51,8 +51,11 @@ class Dashboard extends Component
         $unpaidInvoices = (float) ($invoiceStats->unpaid_total ?? 0);
         $unpaidCount = (int) ($invoiceStats->unpaid_count ?? 0);
 
-        // Single query for box stats
-        $activeBoxes = Box::where('customer_id', $user->id)
+        // PRD §4.3: Sharing box (customer_id NULL) + direct box milik customer
+        $activeBoxes = Box::where(function ($query) use ($user) {
+                $query->whereNull('customer_id')
+                    ->orWhere('customer_id', $user->id);
+            })
             ->whereIn('status', [Box::STATUS_OPEN, Box::STATUS_SENT_TO_CARGO, Box::STATUS_OTW_INA])
             ->count();
 
@@ -78,8 +81,11 @@ class Dashboard extends Component
         $feeService = app(FeeCalculationService::class);
         $kursYuan = $feeService->getKursToday();
 
-        // Box list with items count and whChinaData for weight
-        $boxes = Box::where('customer_id', $user->id)
+        // PRD §4.3: Sharing box (customer_id NULL) + direct box milik customer
+        $boxes = Box::where(function ($query) use ($user) {
+                $query->whereNull('customer_id')
+                    ->orWhere('customer_id', $user->id);
+            })
             ->withCount('items')
             ->with(['items' => function ($query) {
                 $query->with('whChinaData');
@@ -87,11 +93,14 @@ class Dashboard extends Component
             ->latest()
             ->paginate(15);
 
-        // Detail box (only if belongs to customer)
+        // Detail box (sharing box bisa diakses semua customer)
         $detailBox = null;
         if ($this->detailBoxId) {
             $detailBox = Box::where('id', $this->detailBoxId)
-                ->where('customer_id', $user->id)
+                ->where(function ($query) use ($user) {
+                    $query->whereNull('customer_id')
+                        ->orWhere('customer_id', $user->id);
+                })
                 ->with(['items' => function ($query) {
                     $query->with('whChinaData');
                 }])
