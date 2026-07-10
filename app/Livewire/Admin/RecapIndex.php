@@ -157,19 +157,19 @@ class RecapIndex extends Component
     {
         $this->validate([
             'resiNumber' => 'required|string|max:100',
-            'berat' => 'required|numeric|min:0.01',
-            'ukuranBox' => 'required|string|max:100',
-            'biayaJasa' => 'nullable|numeric|min:0',
-            'fotoBarang' => 'nullable|image|max:5120',
+            'berat' => 'nullable|numeric|min:0.01',
+            'ukuranBox' => 'nullable|string|max:100',
+            'biayaJasa' => 'required|numeric|min:0',
+            'fotoBarang' => 'required_if:editingWhId,null|nullable|image|max:5120',
         ], [
-            'resiNumber.required' => 'Nomor resi wajib diisi',
-            'berat.required' => 'Berat wajib diisi',
-            'berat.numeric' => 'Berat harus berupa angka',
-            'berat.min' => 'Berat minimal 0.01 kg',
-            'ukuranBox.required' => 'Ukuran box wajib diisi',
-            'biayaJasa.numeric' => 'Biaya jasa harus berupa angka',
-            'fotoBarang.image' => 'File harus berupa gambar',
-            'fotoBarang.max' => 'Ukuran foto maksimal 5MB',
+            'resiNumber.required' => 'Resi number is required',
+            'berat.numeric' => 'Weight must be a number',
+            'berat.min' => 'Weight must be at least 0.01 kg',
+            'biayaJasa.required' => 'Service fee is required',
+            'biayaJasa.numeric' => 'Service fee must be a number',
+            'fotoBarang.required_if' => 'Photo is required',
+            'fotoBarang.image' => 'File must be an image',
+            'fotoBarang.max' => 'Photo max 5MB',
         ]);
 
         $fotoPath = null;

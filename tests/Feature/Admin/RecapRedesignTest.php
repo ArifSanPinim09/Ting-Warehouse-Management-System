@@ -87,12 +87,15 @@ class RecapRedesignTest extends TestCase
     {
         $this->actingAs($this->admin);
 
+        $photo = UploadedFile::fake()->image('barang.jpg', 640, 480);
+
         Livewire::test(RecapIndex::class)
             ->set('activeTab', 'wh-china')
             ->set('resiNumber', 'RESI-001')
             ->set('berat', '2.50')
             ->set('ukuranBox', '60x40x50')
             ->set('biayaJasa', '50000')
+            ->set('fotoBarang', $photo)
             ->call('submitWhChinaData')
             ->assertHasNoErrors();
 
@@ -109,18 +112,19 @@ class RecapRedesignTest extends TestCase
     {
         $this->actingAs($this->admin);
 
+        $photo = UploadedFile::fake()->image('barang.jpg', 640, 480);
+
         Livewire::test(RecapIndex::class)
             ->set('activeTab', 'wh-china')
             ->set('resiNumber', 'RESI-002')
-            ->set('berat', '1.00')
-            ->set('ukuranBox', '30x20x20')
+            ->set('biayaJasa', '30000')
+            ->set('fotoBarang', $photo)
             ->call('submitWhChinaData')
             ->assertHasNoErrors();
 
         $this->assertDatabaseHas('wh_china_data', [
             'resi_number' => 'RESI-002',
-            'biaya_jasa' => null,
-            'foto_barang' => null,
+            'biaya_jasa' => 30000,
         ]);
     }
 
@@ -135,6 +139,7 @@ class RecapRedesignTest extends TestCase
             ->set('resiNumber', 'RESI-003')
             ->set('berat', '3.00')
             ->set('ukuranBox', '50x50x50')
+            ->set('biayaJasa', '45000')
             ->set('fotoBarang', $photo)
             ->call('submitWhChinaData')
             ->assertHasNoErrors();
@@ -150,11 +155,15 @@ class RecapRedesignTest extends TestCase
     {
         $this->actingAs($this->admin);
 
+        $photo = UploadedFile::fake()->image('test.jpg', 100, 100);
+
         Livewire::test(RecapIndex::class)
             ->set('activeTab', 'wh-china')
             ->set('resiNumber', 'RESI-001')
             ->set('berat', '2.50')
             ->set('ukuranBox', '60x40x50')
+            ->set('biayaJasa', '50000')
+            ->set('fotoBarang', $photo)
             ->call('submitWhChinaData');
 
         $whData = WhChinaData::where('resi_number', 'RESI-001')->first();
@@ -167,11 +176,15 @@ class RecapRedesignTest extends TestCase
     {
         $this->actingAs($this->admin);
 
+        $photo = UploadedFile::fake()->image('test.jpg', 100, 100);
+
         Livewire::test(RecapIndex::class)
             ->set('activeTab', 'wh-china')
             ->set('resiNumber', 'RESI-NOTEXIST')
             ->set('berat', '1.00')
             ->set('ukuranBox', '30x30x30')
+            ->set('biayaJasa', '20000')
+            ->set('fotoBarang', $photo)
             ->call('submitWhChinaData');
 
         $whData = WhChinaData::where('resi_number', 'RESI-NOTEXIST')->first();
@@ -192,11 +205,15 @@ class RecapRedesignTest extends TestCase
 
         $this->actingAs($this->admin);
 
+        $photo = UploadedFile::fake()->image('test.jpg', 100, 100);
+
         Livewire::test(RecapIndex::class)
             ->set('activeTab', 'wh-china')
             ->set('resiNumber', 'RESI-001')
             ->set('berat', '2.00')
             ->set('ukuranBox', '40x40x40')
+            ->set('biayaJasa', '35000')
+            ->set('fotoBarang', $photo)
             ->call('submitWhChinaData');
 
         $whData = WhChinaData::where('resi_number', 'RESI-001')->first();
@@ -275,7 +292,7 @@ class RecapRedesignTest extends TestCase
         Livewire::test(RecapIndex::class)
             ->set('activeTab', 'wh-china')
             ->call('submitWhChinaData')
-            ->assertHasErrors(['resiNumber', 'berat', 'ukuranBox']);
+            ->assertHasErrors(['resiNumber', 'biayaJasa', 'fotoBarang']);
     }
 
     public function test_validation_rejects_invalid_photo_type(): void
@@ -313,6 +330,7 @@ class RecapRedesignTest extends TestCase
             ->set('activeTab', 'wh-china')
             ->call('editWhChinaData', $whData->id)
             ->set('resiNumber', 'RESI-001')
+            ->set('biayaJasa', '50000')
             ->call('submitWhChinaData');
 
         $whData->refresh();

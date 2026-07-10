@@ -17,7 +17,7 @@
                         <button wire:click="openWhModal"
                             class="inline-flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors shadow-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Input Data WH
+                            Input WH Data
                         </button>
                     @endif
                 </div>
@@ -403,15 +403,15 @@
                 <div class="relative bg-white rounded-[16px] shadow-lg w-full max-w-lg transform transition-all" @click.stop>
                     {{-- Modal Header --}}
                     <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-[10px] bg-violet-50 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                            </div>
-                            <div>
-                                <h3 class="text-[15px] font-semibold text-gray-900">{{ $editingWhId ? 'Edit Data WH China' : 'Input Data WH China' }}</h3>
-                                <p class="text-[12px] text-gray-400 mt-0.5">Data dari warehouse China</p>
-                            </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-[10px] bg-violet-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         </div>
+                        <div>
+                            <h3 class="text-[15px] font-semibold text-gray-900">{{ $editingWhId ? 'Edit WH Data' : 'Input WH China Data' }}</h3>
+                            <p class="text-[12px] text-gray-400 mt-0.5">Data from China warehouse</p>
+                        </div>
+                    </div>
                         <button wire:click="closeWhModal" class="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-[8px] text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
@@ -419,46 +419,48 @@
 
                     {{-- Modal Body --}}
                     <form wire:submit.prevent="submitWhChinaData" class="p-6 space-y-4">
-                        {{-- Row 1: Resi + Berat --}}
+                        {{-- Row 1: Resi + Service Fee --}}
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-600 mb-1">No Resi <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="resiNumber" maxlength="100" placeholder="Nomor resi"
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Resi Number <span class="text-red-500">*</span></label>
+                                <input type="text" wire:model="resiNumber" maxlength="100" placeholder="Resi number"
                                     class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
                                 @error('resiNumber') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Berat (kg) <span class="text-red-500">*</span></label>
-                                <input type="number" wire:model="berat" step="0.01" min="0.01" placeholder="0.00"
-                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
-                                @error('berat') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
-
-                        {{-- Row 2: Ukuran + Biaya --}}
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Ukuran Box <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="ukuranBox" maxlength="100" placeholder="60x40x50"
-                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
-                                @error('ukuranBox') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Biaya Jasa <span class="text-gray-400 font-normal">(opsional)</span></label>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Service Fee (Rp) <span class="text-red-500">*</span></label>
                                 <input type="number" wire:model="biayaJasa" step="0.01" min="0" placeholder="0"
                                     class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
                                 @error('biayaJasa') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
 
-                        {{-- Foto --}}
+                        {{-- Row 2: Weight + Dimensions (optional) --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Weight (kg) <span class="text-gray-400 font-normal">(optional)</span></label>
+                                <input type="number" wire:model="berat" step="0.01" min="0.01" placeholder="0.00"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                                @error('berat') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Dimensions <span class="text-gray-400 font-normal">(optional)</span></label>
+                                <input type="text" wire:model="ukuranBox" maxlength="100" placeholder="60x40x50"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                                @error('ukuranBox') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        <p class="text-[11px] text-gray-400">Weight & dimensions can be filled later when goods arrive in Indonesia.</p>
+
+                        {{-- Photo (required) --}}
                         <div>
-                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Foto Barang <span class="text-gray-400 font-normal">(opsional, max 5MB)</span></label>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Photo <span class="text-red-500">*</span></label>
                             <input type="file" wire:model="fotoBarang" accept="image/*"
                                 class="w-full text-[13px] text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-[6px] file:border-0 file:text-[12px] file:font-medium file:bg-gray-100 file:text-gray-600 hover:file:bg-gray-200 transition-colors file:cursor-pointer">
                             @error('fotoBarang') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                             @if($editingWhId && $fotoBarang === null)
-                                <p class="text-[11px] text-gray-400 mt-1">Kosongkan jika tidak ingin mengganti foto.</p>
+                                <p class="text-[11px] text-gray-400 mt-1">Leave empty to keep current photo.</p>
                             @endif
                         </div>
 
@@ -466,12 +468,12 @@
                         <div class="flex items-center justify-end gap-3 pt-2">
                             <button type="button" wire:click="closeWhModal"
                                 class="px-4 py-2 text-[13px] font-medium text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">
-                                Batal
+                                Cancel
                             </button>
                             <button type="submit"
                                 class="inline-flex items-center gap-2 px-5 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                {{ $editingWhId ? 'Update' : 'Simpan' }}
+                                {{ $editingWhId ? 'Update' : 'Save' }}
                             </button>
                         </div>
                     </form>

@@ -36,6 +36,11 @@ class ManageBox extends Component
     public string $pendingStatus = '';
     public string $statusNote = '';
 
+    // ─── Box Edit (Tracking + ETA) ──────────────────────────────
+    public bool $showEditModal = false;
+    public string $editTrackingNumber = '';
+    public string $editEta = '';
+
     // ─── Box Creation ───────────────────────────────────────────
     public bool $showCreateModal = false;
     public string $newType = 'sharing';
@@ -77,6 +82,57 @@ class ManageBox extends Component
     {
         $this->showDetail = false;
         $this->selectedBoxId = null;
+    }
+
+    // ─── Edit Tracking Number + ETA ─────────────────────────────
+    public function openEditModal(): void
+    {
+        $box = Box::findOrFail($this->selectedBoxId);
+        $this->editTrackingNumber = $box->tracking_number ?? '';
+        $this->editEta = $box->eta ? $box->eta->format('Y-m-d') : '';
+        $this->showEditModal = true;
+    }
+
+    public function closeEditModal(): void
+    {
+        $this->showEditModal = false;
+        $this->editTrackingNumber = '';
+        $this->editEta = '';
+    }
+
+    public function saveBoxEdit(AuditLogService $auditService): void
+    {
+        $box = Box::findOrFail($this->selectedBoxId);
+
+        $this->validate([
+            'editTrackingNumber' => 'nullable|string|max:100',
+            'editEta' => 'nullable|date',
+        ], [
+            'editTrackingNumber.max' => 'Tracking number max 100 characters',
+            'editEta.date' => 'ETA must be a valid date',
+        ]);
+
+        $oldValues = [
+            'tracking_number' => $box->tracking_number,
+            'eta' => $box->eta?->format('Y-m-d'),
+        ];
+
+        $box->tracking_number = $this->editTrackingNumber ?: null;
+        $box->eta = $this->editEta ?: null;
+        $box->save();
+
+        $newValues = [
+            'tracking_number' => $box->tracking_number,
+            'eta' => $box->eta?->format('Y-m-d'),
+        ];
+
+        $auditService->log('updated', $box, $oldValues, $newValues);
+
+        $this->showEditModal = false;
+        $this->editTrackingNumber = '';
+        $this->editEta = '';
+
+        $this->dispatch('toast', type: 'success', title: 'Success', message: 'Box updated successfully.');
     }
 
     public function confirmStatusChange(string $newStatus): void

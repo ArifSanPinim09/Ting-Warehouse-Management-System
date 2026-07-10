@@ -242,6 +242,13 @@
                                 @endif
                             </div>
 
+                            {{-- Edit Tracking + ETA --}}
+                            <button wire:click="openEditModal"
+                                class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-[12px] font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-[8px] hover:bg-gray-100 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                Edit Tracking & ETA
+                            </button>
+
                             {{-- Notes --}}
                             @if($selectedBox->notes)
                                 <div class="p-3 bg-gray-50 rounded-[8px]">
@@ -559,6 +566,49 @@
                             Buat Box
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- ═══════════════════════════════════════════════════════════ --}}
+    {{-- MODAL: Edit Tracking Number + ETA                         --}}
+    {{-- ═══════════════════════════════════════════════════════════ --}}
+    @if($showEditModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeEditModal">
+            <div class="fixed inset-0 bg-black/30 transition-opacity"></div>
+            <div class="flex min-h-full items-end sm:items-center justify-center p-4">
+                <div class="relative bg-white rounded-[16px] shadow-lg w-full max-w-md transform transition-all" @click.stop>
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                        <h3 class="text-[15px] font-semibold text-gray-900">Edit Box</h3>
+                        <button wire:click="closeEditModal" class="p-2 text-gray-400 hover:text-gray-600 rounded-[8px]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <form wire:submit.prevent="saveBoxEdit" class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Tracking Number</label>
+                            <input type="text" wire:model="editTrackingNumber" maxlength="100" placeholder="Enter tracking number"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                            @error('editTrackingNumber') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">ETA</label>
+                            <input type="date" wire:model="editEta"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                            @error('editEta') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="flex items-center justify-end gap-3 pt-2">
+                            <button type="button" wire:click="closeEditModal"
+                                class="px-4 py-2 text-[13px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
+                                Save
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
