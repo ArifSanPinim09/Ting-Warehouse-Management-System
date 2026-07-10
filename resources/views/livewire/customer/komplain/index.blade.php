@@ -29,10 +29,7 @@
                 icon="checklist"
                 title="Belum ada komplain"
                 text="Jika ada masalah dengan pengiriman Anda, silakan ajukan komplain."
-                action="Ajukan Komplain"
-            >
-                <button wire:click="openForm" class="ds-btn-primary mt-2">Ajukan Komplain</button>
-            </x-empty-state>
+            />
         @else
             <div class="space-y-3">
                 @foreach($complaints as $complaint)
