@@ -6,261 +6,291 @@
 
 # Daftar Isi
 
-1. Tentang Sistem ini
-2. Role Pengguna
-3. Halaman Publik (Login, Register, Lupa Password)
-4. CUSTOMER — Lengkap (Dari Daftar hingga Selesai)
-5. ADMIN — Lengkap (Semua Halaman & Fitur)
-6. OWNER — Lengkap (Semua Halaman & Fitur)
-7. Status Barang & Box — Referensi Cepat
-8. Pesan Error & Sukses
+1. Tentang Sistem
+2. Alur Lengkap dari Awal hingga Akhir
+3. Status — Referensi Cepat
+4. Pesan Error & Sukses
 
 ---
 
-# 1. Tentang Sistem ini
+# 1. Tentang Sistem
 
-Ting Warehouse Management System adalah website operasional untuk perusahaan freight forwarding China → Jakarta. Sistem ini menggantikan Airtable dan Google Sheets yang sebelumnya digunakan.
+Ting Warehouse Management System adalah website operasional untuk perusahaan freight forwarding China → Jakarta. Sistem ini menggantikan Airtable dan Google Sheets.
 
 | Informasi | Detail |
 |-----------|--------|
 | Website | www.tingwarehouse.my.id |
 | Bahasa | Indonesia |
-| Browser | Chrome, Safari, Firefox (terbaru) |
 | Perangkat | Laptop, HP Android, iPhone |
 
 ### Tiga Role Pengguna
 
-| Role | Siapa | Jumlah |
-|------|-------|--------|
-| Customer | Pengguna jasa forwarding (pedagang, reseller, dropshipper) | 50-200 orang |
-| Admin | Staff operasional di kantor/gudang | 3 orang |
-| Owner | Pemilik bisnis (Ahmad Ting) | 1 orang |
+| Role | Siapa | Akses |
+|------|-------|-------|
+| Customer | Pengguna jasa forwarding | Dashboard, Setor Resi, Invoice, Checkout, Komplain |
+| Admin | Staff operasional (3 orang) | Kelola box, invoice, verifikasi, rate, customer |
+| Owner | Pemilik bisnis | Semua akses admin + laporan keuangan + kelola user |
 
 ---
 
-# 2. Halaman Publik
+# 2. Alur Lengkap dari Awal hingga Akhir
 
-Halaman ini bisa diakses tanpa login.
-
----
-
-## 2.1 Halaman Utama (/)
-
-Halaman pertama saat membuka website. Menampilkan informasi tentang layanan Ting Warehouse.
-
-| Komponen | Isi |
-|----------|-----|
-| Header | Logo "Ting Warehouse" + tombol Login/Register |
-| Navigasi | Link ke Login dan Register |
+Dokumen ini mengalir mengikuti proses bisnis nyata. Setiap langkah bergantian antara Customer, Admin, dan Owner sesuai urutan kerja yang sebenarnya.
 
 ---
 
-## 2.2 Login (/login)
+## LANGKAH 1 — Customer Mendaftar
 
-Halaman untuk masuk ke sistem.
+**Siapa:** Customer
+**Halaman:** /register
 
-### Form Login
-
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Email | Email | Ya | Alamat email yang terdaftar |
-| Password | Password | Ya | Password akun |
-| Remember Me | Checkbox | Tidak | Tetap login meski browser ditutup |
-
-### Tombol yang Tersedia
-
-| Tombol | Fungsi |
-|--------|--------|
-| Masuk | Login ke sistem |
-| Lupa Password? | Ke halaman reset password |
-| Belum punya akun? Daftar | Ke halaman register |
-
-### Setelah Login
-
-Sistem akan mengarahkan ke halaman dashboard sesuai role:
-
-| Role | Halaman Tujuan |
-|------|---------------|
-| Customer | /dashboard |
-| Admin | /admin/dashboard |
-| Owner | /owner/dashboard |
-
-### Kondisi Error
-
-| Kondisi | Pesan |
-|---------|-------|
-| Email atau password salah | "Email atau password salah" |
-| Akun belum aktif (PENDING) | "Akun belum aktif. Hubungi admin." |
-| Akun dinonaktifkan (INACTIVE) | "Akun telah dinonaktifkan." |
-| Gagal 5x berturut-turut | "Akun terkunci. Coba lagi dalam 15 menit." |
-
----
-
-## 2.3 Register (/register)
-
-Halaman untuk mendaftar sebagai customer baru.
+Customer membuka website dan mendaftar sebagai pengguna baru.
 
 ### Form Register
 
-| Field | Tipe | Placeholder | Required | Validasi |
-|-------|------|-------------|----------|----------|
-| Nama | Text | "Nama lengkap" | Ya | Min 3 karakter |
-| Email | Email | "email@contoh.com" | Ya | Format email valid, unik |
-| No Telepon | Text | "08123456789" | Ya | Min 10 digit, angka saja |
-| No KTP | Text | "16 digit No KTP" | Ya | Tepat 16 digit, angka saja, unik |
-| Alamat | Textarea | "Alamat lengkap" | Ya | Min 10 karakter |
-| Password | Password | "Min 8 karakter" | Ya | Min 8 karakter |
-| Konfirmasi Password | Password | "Ulangi password" | Ya | Harus sama dengan password |
+| Field | Tipe | Placeholder | Aturan |
+|-------|------|-------------|--------|
+| Nama | Text | "Nama lengkap" | Wajib, min 3 karakter |
+| Email | Email | "email@contoh.com" | Wajib, format email, tidak boleh sama dengan yang sudah daftar |
+| No Telepon | Text | "08123456789" | Wajib, angka saja, min 10 digit |
+| No KTP | Text | "16 digit No KTP" | Wajib, tepat 16 digit angka, tidak boleh sama |
+| Alamat | Textarea | "Alamat lengkap" | Wajib, min 10 karakter |
+| Password | Password | "Min 8 karakter" | Wajib, min 8 karakter |
+| Konfirmasi Password | Password | "Ulangi password" | Wajib, harus sama dengan password |
 
 ### Tombol
 
 | Tombol | Fungsi |
 |--------|--------|
-| Daftar | Kirim registrasi |
-| Sudah punya akun? Masuk | Kembali ke halaman login |
-
-### Setelah Registrasi
-
-1. Akun berstatus PENDING
-2. Muncul pesan: "Registrasi berhasil! Menunggu aktivasi dari admin."
-3. Customer belum bisa login sampai admin mengaktifkan akunnya
-
----
-
-## 2.4 Lupa Password (/forgot-password)
-
-| Field | Tipe | Required |
-|-------|------|----------|
-| Email | Email | Ya |
-
-| Tombol | Fungsi |
-|--------|--------|
-| Kirim Link Reset | Mengirim email reset password |
+| Daftar | Kirim data registrasi |
+| Sudah punya akun? Masuk | Ke halaman login |
 
 ### Setelah Submit
 
-- Link reset dikirim ke email
-- Link berlaku 60 menit
-- Buka link → isi password baru → login
+- Akun berstatus **PENDING** (belum bisa login)
+- Pesan: "Registrasi berhasil! Menunggu aktivasi dari admin."
+- Customer menunggu admin mengaktifkan akunnya
 
 ---
 
-## 2.5 Reset Password (/reset-password/{token})
+## LANGKAH 2 — Admin Aktivasi Akun Customer
 
-| Field | Tipe | Required |
-|-------|------|----------|
-| Email | Email | Ya |
-| Password | Password | Ya (min 8 karakter) |
-| Confirm Password | Password | Ya (harus sama) |
+**Siapa:** Admin
+**Halaman:** /admin/customers (Info Customer)
+
+Admin login terlebih dahulu, lalu masuk ke halaman Info Customer untuk mengaktivasi akun customer yang baru mendaftar.
+
+### Form Login Admin
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Email | Email | Wajib |
+| Password | Password | Wajib |
+| Remember Me | Checkbox | Opsional |
+
+Setelah login, admin diarahkan ke Dashboard Admin (/admin/dashboard).
+
+### Sidebar Admin — Grup "Customer" → "Info Customer"
+
+Admin klik menu **Info Customer** di sidebar.
+
+### Halaman Info Customer
+
+| Komponen | Keterangan |
+|----------|------------|
+| Search | Cari nama/email/customer |
+| Filter Status | Pending / Active / Inactive |
+| Tabel Customer | Daftar semua customer |
+
+### Tabel Customer
+
+| Kolom | Keterangan |
+|-------|------------|
+| Nama | Nama customer |
+| Email | Alamat email |
+| No Telepon | Nomor HP |
+| Status | Badge: PENDING (kuning) / ACTIVE (hijau) / INACTIVE (merah) |
+| Terdaftar | Tanggal registrasi |
+
+### Proses Aktivasi
+
+1. Klik nama customer yang berstatus PENDING
+2. Detail customer muncul (nama, email, telepon, KTP, alamat)
+3. Klik tombol **"Aktivasi"**
+4. Konfirmasi: "Aktivasi customer ini?"
+5. Status berubah: PENDING → ACTIVE
+6. Pesan: "Akun [nama] berhasil diaktivasi."
+7. Customer mendapat notifikasi: "Akun Anda sudah aktif."
+
+---
+
+## LANGKAH 3 — Customer Login Pertama Kali
+
+**Siapa:** Customer
+**Halaman:** /login
+
+Customer yang sudah diaktivasi bisa login.
+
+### Form Login
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Email | Email | Wajib |
+| Password | Password | Wajib |
+| Remember Me | Checkbox | Opsional |
+
+### Tombol
 
 | Tombol | Fungsi |
 |--------|--------|
-| Reset Password | Simpan password baru |
+| Masuk | Login ke sistem |
+
+### Setelah Login
+
+- Customer diarahkan ke Dashboard (/dashboard)
 
 ---
 
-# 3. CUSTOMER — Lengkap
+## LANGKAH 4 — Customer Melihat Dashboard
 
-## Alur Customer dari Awal hingga Akhir
+**Siapa:** Customer
+**Halaman:** /dashboard
 
-```
-Register (PENDING) → Admin Aktivasi → Login → Dashboard
-→ Setor Resi → My Box → Tunggu Invoice → Bayar Invoice
-→ Upload Bukti → Admin Verifikasi → Checkout → Isi Alamat
-→ Admin Packing + Kirim → Terima Barang
-→ (Komplain jika ada masalah)
-```
+Dashboard menampilkan ringkasan aktivitas customer.
 
----
-
-## 3.1 Dashboard Customer (/dashboard)
-
-Halaman utama customer setelah login. Menampilkan ringkasan aktivitas.
-
-### Stat Cards (4 kartu di atas)
+### Stat Cards (4 kartu di atas halaman)
 
 | Kartu | Informasi | Klik ke |
 |-------|-----------|---------|
-| Box Aktif | Jumlah box dengan status OPEN/SENT/OTW | /box/sharing |
-| Invoice Belum Bayar | Jumlah + total nominal invoice yang belum dibayar | /invoice |
-| Barang Bulan Ini | Jumlah barang yang diinput bulan ini | /setor-resi |
-| Resi Bulan Ini | Jumlah resi yang diinput bulan ini | /setor-resi |
+| Box Aktif | Jumlah box OPEN/SENT/OTW | /box/sharing |
+| Invoice Belum Bayar | Jumlah + total nominal | /invoice |
+| Barang Bulan Ini | Jumlah barang bulan ini | /setor-resi |
+| Resi Bulan Ini | Jumlah resi bulan ini | /setor-resi |
 
 ### Alert Banner (muncul jika ada data WH China yang belum dikenali)
 
-| Komponen | Isi |
-|----------|-----|
+| Komponen | Keterangan |
+|----------|------------|
 | Pesan | "Ada X resi dari gudang China yang belum dikenali" |
-| Sub-pesan | "Klik di sini untuk melihat dan mengklaim resi yang mungkin milik Anda." |
 | Klik ke | /unmatched-resi |
 
-### Status Box (tabel daftar box)
+### Status Box (tabel daftar box milik customer)
 
 | Kolom (Desktop) | Keterangan |
 |-----------------|------------|
 | Nomor Box | Tracking number atau "Box #ID" |
 | Kode Box | Batch name |
-| Jenis Kirim | AIR (biru) atau SEA (cyan) |
+| Jenis Kirim | AIR atau SEA |
 | ETD | Estimasi tanggal keberangkatan |
 | ETA | Estimasi tanggal tiba |
-| Status | Badge status box (Terbuka, Dikirim ke Cargo, dll) |
+| Status | Badge status box |
 | Barang | Jumlah barang di box |
 
-Klik salah satu box → muncul **Detail Box** modal yang menampilkan:
-- Info box (Status, Tipe, Jenis Kirim, Kode Box)
+Klik salah satu box → **Detail Box** modal:
+- Info box (Status, Tipe, Jenis Kirim, Kode)
 - Tabel barang: No, Nama Barang, Qty, Berat, Volume, Keterangan
 
 ### Menu Cepat (7 shortcut)
 
-| Menu | Klik ke | Ikon |
-|------|---------|------|
-| Setor Resi | /setor-resi | + |
-| My Box | /box/sharing | Box |
-| Invoice | /invoice | Dokumen |
-| Checkout | /checkout | Truk |
-| Komplain | /komplain | Peringatan |
-| Kalkulator | /kalkulator | Kalkulator |
-| No Tuan | /no-tuan | Arsip |
+| Menu | Klik ke |
+|------|---------|
+| Setor Resi | /setor-resi |
+| My Box | /box/sharing |
+| Invoice | /invoice |
+| Checkout | /checkout |
+| Komplain | /komplain |
+| Kalkulator | /kalkulator |
+| No Tuan | /no-tuan |
 
 ### Rate Hari Ini
 
 | Informasi | Keterangan |
 |-----------|------------|
-| Kurs Yuan | Rp X (dari history kurs terbaru) |
-| Rate Air | Rp X/kg (rate sharing air berat) |
-| Rate Sea | Rp X/kg (rate sharing sea berat) |
-| Tombol "Buka Kalkulator" | Ke halaman kalkulator |
+| Kurs Yuan | Rp X |
+| Rate Air | Rp X/kg |
+| Rate Sea | Rp X/kg |
+| Tombol "Buka Kalkulator" | Ke /kalkulator |
 
 ### Notifikasi (5 terbaru)
 
 | Komponen | Keterangan |
 |----------|------------|
-| Judul notifikasi | Contoh: "Invoice baru", "Pembayaran diverifikasi" |
-| Pesan | Detail notifikasi |
+| Judul | Jenis notifikasi |
+| Pesan | Detail |
 | Waktu | "X menit yang lalu" |
-| Badge "X baru" | Jumlah notifikasi belum dibaca |
 
-### Tombol & FAB (Floating Action Button)
+### FAB (Floating Action Button) — Mobile
 
-| Lokasi | Tombol | Fungsi |
-|--------|--------|--------|
-| Header (desktop) | "Setor Resi" | Ke /setor-resi |
-| FAB (mobile) | Tombol hijau bulat di kanan bawah | Ke /setor-resi |
+Tombol hijau bulat di kanan bawah → langsung ke Setor Resi.
 
 ---
 
-## 3.2 My Box Sharing (/box/sharing)
+## LANGKAH 5 — Admin Membuat Box Baru
 
-Halaman untuk melihat box sharing milik customer.
+**Siapa:** Admin
+**Halaman:** /admin/manage-boxes (Manage Box)
 
-### Komponen
+Admin membuat box baru untuk menampung barang customer.
+
+### Sidebar Admin → "Barang & Box" → "Manage Box"
+
+### Halaman Manage Box
+
+| Komponen | Keterangan |
+|----------|------------|
+| Search | Cari box berdasarkan tracking/batch |
+| Filter | Tipe (Sharing/Direct/Handcarry), Status, Customer, Tanggal |
+| Tombol "Tambah Box" | Buka modal form buat box |
+
+### Form Tambah Box (Modal)
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Tipe Box | Select | Wajib: Sharing / Direct / Handcarry |
+| Metode | Select | Wajib: Air / Sea |
+| Customer | Select | Opsional: Pilih customer atau "Tanpa Customer" |
+| Tracking Number | Text | Opsional |
+| Batch Name | Text | Opsional |
+| Catatan | Textarea | Opsional |
+
+### Tombol
+
+| Tombol | Fungsi |
+|--------|--------|
+| Batal | Tutup modal |
+| Simpan | Buat box baru |
+
+### Setelah Submit
+
+- Box dibuat dengan status **OPEN**
+- open_date otomatis diisi waktu sekarang
+- Pesan: "Box berhasil dibuat."
+
+---
+
+## LANGKAH 6 — Customer Melihat My Box
+
+**Siapa:** Customer
+**Halaman:** /box/sharing atau /box/direct
+
+Customer melihat box yang sudah dibuat admin.
+
+### My Box Sharing (/box/sharing)
 
 | Komponen | Keterangan |
 |----------|------------|
 | Filter | Tracking Number, Tanggal, ETD, ETA, Status |
 | Box List | Card per box dengan status badge |
-| Box Detail | Expand/collapse: daftar barang di box |
-| Barang Row | Nama, Qty, Harga, Foto Bukti, Status Arrived |
+| Barang Row | Nama, Qty, Harga, Foto, Status Arrived |
+
+### My Box Direct (/box/direct)
+
+| Komponen | Keterangan |
+|----------|------------|
+| Filter | Tracking, Batch, Status |
+| Tombol "Request Direct Sharing" | Request box direct baru |
+| Batch List | Card per batch + daftar barang |
+| Tombol "Request to Close" | Tutup batch |
 
 ### Empty State
 
@@ -268,89 +298,168 @@ Halaman untuk melihat box sharing milik customer.
 
 ---
 
-## 3.3 My Box Direct (/box/direct)
+## LANGKAH 7 — Customer Setor Resi (Input Barang)
 
-Halaman untuk melihat box direct milik customer.
+**Siapa:** Customer
+**Halaman:** /setor-resi
 
-### Komponen
-
-| Komponen | Keterangan |
-|----------|------------|
-| Filter | Tracking, Batch, Status |
-| Tombol "Request Direct Sharing" | Request box direct baru |
-| Batch List | Card per batch dengan daftar barang |
-| Tombol per batch | "Request to Close" |
-
----
-
-## 3.4 Setor Resi (/setor-resi)
-
-Halaman untuk mendaftarkan barang baru yang akan dikirim.
+Customer mendaftarkan barang yang akan dikirim.
 
 ### Form Setor Resi
 
-| Field | Tipe | Placeholder | Required | Validasi |
-|-------|------|-------------|----------|----------|
-| Box Tujuan | Select | "Pilih box..." | Ya | Hanya box dengan status OPEN |
-| Nama Barang | Text | "Contoh: Baju kaos, Sepatu, dll" | Ya | Min 2 karakter |
-| Jumlah | Number | - | Ya | Min 1, max 9999 |
-| Harga (Yuan) | Number | "0.00" | Ya | Min 0.01, max 999999 |
-| Nomor Resi | Text | "Nomor resi dari supplier China" | Ya | Min 3 karakter |
-| Foto Bukti (Proof CO) | File | - | Ya | JPG/PNG/WebP, max 5MB |
-| Barang Sensitive | Checkbox | - | Tidak | Centang jika barang kategori khusus |
-| Jenis Sensitive | Select | "Pilih jenis..." | Jika sensitive | Elektronik, Baterai, Cairan, Kosmetik, Makanan, Obat-obatan, Magnet, Lainnya |
+| Field | Tipe | Placeholder | Aturan |
+|-------|------|-------------|--------|
+| Box Tujuan | Select | "Pilih box..." | Wajib, hanya box OPEN |
+| Nama Barang | Text | "Contoh: Baju kaos" | Wajib, min 2 karakter |
+| Jumlah | Number | - | Wajib, min 1 |
+| Harga (Yuan) | Number | "0.00" | Wajib, min 0.01 |
+| Nomor Resi | Text | "Nomor resi dari supplier China" | Wajib |
+| Foto Bukti (Proof CO) | File | - | Wajib, JPG/PNG/WebP, max 5MB |
+| Barang Sensitive | Checkbox | - | Opsional |
+| Jenis Sensitive | Select | "Pilih jenis..." | Wajib jika sensitive: Elektronik, Baterai, Cairan, Kosmetik, Makanan, Obat-obatan, Magnet, Lainnya |
 
 ### Indikator Real-time WH China
 
-Saat customer mengetik nomor resi, sistem otomatis mengecek apakah ada data dari gudang China dengan resi yang sama:
+Saat customer mengetik nomor resi, sistem otomatis mengecek:
 
 | Kondisi | Tampilan |
 |---------|----------|
-| Resi ditemukan di WH China | Box hijau: "Resi ditemukan di data gudang China!" + info Berat, Ukuran, Tanggal, Foto barang |
+| Resi ditemukan di WH China | Box hijau: "Resi ditemukan di data gudang China!" + Berat, Ukuran, Tanggal, Foto |
 | Resi tidak ditemukan | Tidak ada indikator |
-| Resi < 3 karakter | Tidak ada pengecekan |
 
 ### Tombol
 
 | Tombol | Fungsi |
 |--------|--------|
 | Batal | Kembali ke dashboard |
-| Daftarkan Barang | Submit form |
+| Daftarkan Barang | Submit |
 
 ### Setelah Submit
 
-- Pesan sukses: "Barang berhasil didaftarkan."
-- Jika resi cocok dengan data WH China → otomatis terhubung (matched)
-- Form direset untuk input barang berikutnya
+- Barang tersimpan di box yang dipilih
+- Jika resi cocok dengan data WH China → otomatis matched
+- last_setor_date box diupdate
+- Notifikasi ke admin
+- Pesan: "Barang berhasil didaftarkan."
 
-### Error yang Mungkin Muncul
+### Error
 
 | Kondisi | Pesan |
 |---------|-------|
-| Resi duplikat di box yang sama | "Nomor resi sudah terdaftar di box ini" |
-| Box sudah ditutup | "Box sudah ditutup. Tidak bisa menambah barang." |
+| Resi duplikat di box sama | "Nomor resi sudah terdaftar di box ini" |
+| Box ditutup | "Box sudah ditutup. Tidak bisa menambah barang." |
 | Format foto salah | "Format foto harus jpg, png, atau webp" |
 | Foto terlalu besar | "Ukuran foto maksimal 5MB" |
 
 ---
 
-## 3.5 Resi Belum Dikenali (/unmatched-resi)
+## LANGKAH 8 — Admin Input Data WH China (Recap)
 
-Halaman untuk melihat data dari gudang China yang belum terhubung dengan data customer.
+**Siapa:** Admin
+**Halaman:** /admin/recap (Recap)
+
+Admin memasukkan data barang dari gudang China. Data ini nantinya dicocokkan dengan resi customer.
+
+### Sidebar Admin → "Barang & Box" → "Recap"
+
+### Halaman Recap — 2 Tab
+
+**Summary Stats (6 kartu):**
+
+| Kartu | Informasi |
+|-------|-----------|
+| Box | Total box |
+| Barang | Total item dari customer |
+| WH China | Total data WH China |
+| Matched | Data yang sudah cocok |
+| Unmatched | Data yang belum cocok |
+| Revenue | Total revenue |
+
+**Filter:**
+
+| Filter | Keterangan |
+|--------|------------|
+| Search | Cari resi, nama, customer |
+| Tipe | Sharing / Direct / Handcarry |
+| Metode | Air / Sea |
+| Tanggal | Dari - Sampai |
+
+---
+
+### Tab "Customer" — Data dari Setor Resi
+
+| Kolom | Keterangan |
+|-------|------------|
+| No Resi | Nomor resi barang |
+| Nama Barang | Nama barang |
+| Qty | Jumlah |
+| Harga (¥) | Harga Yuan |
+| Box | Box tempat barang |
+| Customer | Nama customer |
+| Status | Matched (hijau) / Unmatched (kuning) |
+
+---
+
+### Tab "WH China" — Data dari Gudang China
+
+| Kolom | Keterangan |
+|-------|------------|
+| No Resi | Resi dari WH China |
+| Berat | Berat (kg) |
+| Ukuran | Dimensi box |
+| Biaya Jasa | Biaya jasa (admin only, tersembunyi dari customer) |
+| Foto | Link foto barang |
+| Match | Nama barang + customer (jika matched) |
+| Status | Matched / Unmatched |
+| Tanggal | Tanggal input |
+| Aksi | Edit / Hapus |
+
+**Tombol:**
+
+| Tombol | Fungsi |
+|--------|--------|
+| Auto Match | Jalankan auto-matching semua data unmatched |
+| Input Data WH | Buka modal input data WH China |
+
+### Form Input Data WH China (Modal)
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Nomor Resi | Text | Wajib |
+| Berat (kg) | Number | Wajib |
+| Ukuran Box | Text | Wajib (contoh: 40x30x25 cm) |
+| Biaya Jasa | Number | Opsional (tersembunyi dari customer) |
+| Foto Barang | File | Opsional |
+
+### Setelah Submit
+
+- Data masuk ke tabel wh_china_data
+- Sistem otomatis cari match: ada customer yang setor resi dengan nomor yang sama?
+  - YA → Auto-match, status "Matched"
+  - TIDAK → Status "Unmatched", menunggu customer klaim
+
+---
+
+## LANGKAH 9 — Customer Klaim Resi dari WH China (Jika Ada)
+
+**Siapa:** Customer
+**Halaman:** /unmatched-resi (Resi Belum Dikenali)
+
+Jika ada data WH China yang resinya milik customer tapi customer belum setor resi, customer bisa klaim dari halaman ini.
 
 ### Info Box
 
-Pesan biru: "Jika Anda melihat nomor resi yang merupakan milik Anda, klik 'Klaim Resi' lalu isi data barang. Sistem akan otomatis menghubungkan data Anda dengan data gudang China."
+Pesan biru: "Jika Anda melihat nomor resi yang merupakan milik Anda, klik 'Klaim Resi' lalu isi data barang."
 
 ### Daftar Resi (Grid Card)
 
 | Informasi | Keterangan |
 |-----------|------------|
 | Nomor Resi | Dari data WH China |
-| Tanggal Input | Kapan data dimasukkan admin |
-| Berat | Dari data WH China (kg) |
-| Ukuran Box | Dimensi dari WH China |
-| Foto Barang | Foto dari WH China (jika ada) |
+| Tanggal | Kapan data dimasukkan |
+| Berat | Dari WH China (kg) |
+| Ukuran | Dimensi dari WH China |
+| Foto | Foto dari WH China |
 | Badge | "Belum Dikenali" (kuning) |
 
 ### Tombol per Card
@@ -359,263 +468,119 @@ Pesan biru: "Jika Anda melihat nomor resi yang merupakan milik Anda, klik 'Klaim
 |--------|--------|
 | Klaim Resi Ini | Buka modal form klaim |
 
-### Modal Form Klaim Resi
+### Modal Form Klaim
 
-| Field | Tipe | Required | Validasi |
-|-------|------|----------|----------|
-| Data dari Gudang China | Info | - | Berat + Ukuran (read-only) |
-| Pilih Box | Select | Ya | Hanya box OPEN milik customer |
-| Nama Barang | Text | Ya | Min 2 karakter |
-| Jumlah | Number | Ya | Min 1 |
-| Harga (Yuan) | Number | Ya | Min 0.01 |
-| Barang Sensitive | Checkbox | Tidak | - |
-| Jenis Sensitive | Select | Jika sensitive | 8 opsi |
-| Foto Bukti Barang (CO) | File | Ya | JPG/PNG/WebP, max 5MB |
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Data dari Gudang China | Info | Berat + Ukuran (read-only) |
+| Pilih Box | Select | Wajib, hanya box OPEN milik customer |
+| Nama Barang | Text | Wajib, min 2 karakter |
+| Jumlah | Number | Wajib, min 1 |
+| Harga (Yuan) | Number | Wajib, min 0.01 |
+| Barang Sensitive | Checkbox | Opsional |
+| Jenis Sensitive | Select | Wajib jika sensitive |
+| Foto Bukti (CO) | File | Wajib, JPG/PNG/WebP, max 5MB |
 
-### Tombol Modal
+### Setelah Klaim
 
-| Tombol | Fungsi |
-|--------|--------|
-| Batal | Tutup modal |
-| Klaim Resi | Submit → buat barang + auto-match dengan WH China |
-
-### Empty State
-
-"Semua resi sudah dikenali" — tidak ada data WH China yang menunggu.
+- Barang dibuat + auto-match dengan data WH China
+- Pesan: "Resi [nomor] berhasil diklaim dan terhubung ke data WH China."
 
 ---
 
-## 3.6 Invoice (/invoice)
+## LANGKAH 10 — Admin Manage Box (Update Status & Kelola Barang)
 
-Halaman untuk melihat dan membayar invoice.
+**Siapa:** Admin
+**Halaman:** /admin/manage-boxes
 
-### Komponen
+Admin mengelola box: update status, lihat barang, tandai barang khusus.
+
+### Detail Box (klik salah satu box)
 
 | Komponen | Keterangan |
 |----------|------------|
-| Filter | Tracking, Box, Status |
-| Tabel Invoice | Daftar invoice dengan kolom lengkap |
+| Info Box | Status, Tipe, Jenis Kirim, Kode |
+| Timeline Status | OPEN → SENT TO CARGO → OTW INA → UP INVOICE → DONE |
+| Tabel Barang | Daftar barang + status per item |
 
-### Tabel Invoice
+### Update Status Box
 
-| Kolom | Keterangan |
-|-------|------------|
-| Invoice Number | Nomor invoice unik |
-| Box | Box terkait |
-| Weight | Berat barang (kg) |
-| Volume | Volume barang |
-| Fee TAX | Biaya berdasarkan berat/volume × rate |
-| Fee WH | Warehouse fee (tiered) |
-| Fee Packing | Biaya packing (tiered) |
-| Grand Total | Total keseluruhan |
-| Status | Badge status |
+| Status Saat | Tombol | Status Baru |
+|-------------|--------|-------------|
+| OPEN | "Tutup Box" | CLOSED (customer tidak bisa setor lagi) |
+| CLOSED | "Buka Box" | OPEN |
+| OPEN/SENT_TO_CARGO | "Sent to Cargo" | SENT_TO_CARGO |
+| SENT_TO_CARGO | "OTW Indonesia" | OTW_INA |
+| OTW_INA | "UP Invoice" | UP_INVOICE |
+| UP_INVOICE | "DONE" | DONE |
 
-### Status Invoice
+### Status Item di Box
 
-| Status | Badge | Arti |
-|--------|-------|------|
-| waiting_payment | Kuning | Menunggu pembayaran customer |
-| waiting_verification | Biru | Sudah bayar, menunggu verifikasi admin |
-| verified | Hijau | Pembayaran terverifikasi |
+| Status | Badge | Tombol Aksi |
+|--------|-------|-------------|
+| active | - | "No Tuan" (tandai barang tidak diklaim) |
+| no_tuan | Oranye | "Klaim WH" (tandai untuk lelang) |
+| claimed | Hijau | - |
+| klaim_wh | Merah | - |
+| shipped | Biru | - |
 
-### Tombol
+### Tandai Barang No Tuan
 
-| Tombol | Muncul Saat | Fungsi |
-|--------|-------------|--------|
-| Bayar | Status waiting_payment | Buka halaman bayar |
+1. Klik item status "active"
+2. Klik tombol "No Tuan"
+3. Konfirmasi: "Tandai barang '[nama]' sebagai No Tuan?"
+4. Status: active → no_tuan
+5. Barang muncul di halaman customer /no-tuan
+
+### Tandai Barang Klaim WH
+
+1. Klik item status "no_tuan"
+2. Klik tombol "Klaim WH"
+3. Konfirmasi: "Barang '[nama]' akan ditandai Klaim WH untuk dijual/dilelang. Lanjutkan?"
+4. Status: no_tuan → klaim_wh
+5. Barang masuk halaman Barang Lelang (/admin/lelang)
+6. Customer TIDAK BISA klaim lagi
 
 ---
 
-## 3.7 Bayar Invoice (/invoice/{id}/pay)
+## LANGKAH 11 — Admin Input Barang No Tuan Langsung
 
-Halaman untuk membayar invoice.
+**Siapa:** Admin
+**Halaman:** /admin/no-tuan/create
 
-### Form Pembayaran
+Untuk barang yang tiba di warehouse tanpa ada customer yang setor resi, admin bisa input langsung.
 
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Metode Pembayaran | Radio | Ya | Transfer / QRIS |
-| Bukti Transfer | File | Ya | JPG/PNG, max 5MB |
+### Sidebar Admin → "Barang & Box" → "Input No Tuan"
 
-### Tombol
+### Info Box
 
-| Tombol | Fungsi |
-|--------|--------|
-| Upload Bukti | Kirim bukti transfer |
+Pesan kuning: "Barang yang tiba di warehouse tanpa ada customer yang setor resi. Barang akan otomatis tampil di halaman 'No Tuan' customer."
+
+### Form Input Barang
+
+| Field | Tipe | Placeholder | Aturan |
+|-------|------|-------------|--------|
+| Nama Barang | Text | "Contoh: Sepatu Nike Air Max" | Wajib, min 2 karakter |
+| Jumlah | Number | - | Wajib, min 1 |
+| Box | Select | "Pilih box..." | Wajib, box OPEN/CLOSED |
+| Deskripsi | Textarea | "Deskripsi barang..." | Opsional, max 1000 |
+| Foto Barang | File | - | Opsional, JPG/PNG, max 5MB |
+| Catatan | Textarea | "Catatan..." | Opsional, max 500 |
 
 ### Setelah Submit
 
-- Status invoice berubah: waiting_payment → waiting_verification
-- Pesan: "Bukti transfer berhasil dikirim. Menunggu verifikasi admin."
+- Barang langsung status: **no_tuan**, customer_id: null
+- Barang otomatis muncul di halaman customer /no-tuan
+- Pesan: "Barang '[nama]' berhasil ditambahkan sebagai No Tuan."
 
 ---
 
-## 3.8 Buat Invoice (/create-invoice)
+## LANGKAH 12 — Customer Klaim Barang No Tuan
 
-Halaman untuk membuat invoice fleksibel (Shopee-style). Customer bisa memilih barang mana saja yang ingin dijadikan 1 invoice.
+**Siapa:** Customer
+**Halaman:** /no-tuan
 
-### Komponen
-
-| Komponen | Keterangan |
-|----------|------------|
-| Daftar Barang | Checklist barang yang sudah arrived dan belum ada di invoice |
-| Tombol "Pilih Semua" | Centang/hapus semua |
-| Dimensi Input | Panjang (cm), Lebar (cm), Tinggi (cm) |
-| Preview | Perhitungan otomatis (berat, volume, fee TAX, fee WH, fee packing, total) |
-
-### Form
-
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Checkbox per barang | Checkbox | Min 1 barang | Pilih barang untuk invoice |
-| Panjang (cm) | Number | Ya | Dimensi box |
-| Lebar (cm) | Number | Ya | Dimensi box |
-| Tinggi (cm) | Number | Ya | Dimensi box |
-
-### Tombol
-
-| Tombol | Fungsi |
-|--------|--------|
-| Buat Invoice | Submit → generate invoice dari barang yang dipilih |
-
----
-
-## 3.9 Checkout (/checkout)
-
-Halaman untuk meminta pengiriman barang setelah invoice terverifikasi.
-
-### Komponen
-
-| Komponen | Keterangan |
-|----------|------------|
-| Filter | Invoice Number, Status |
-| Daftar Checkout | List checkout requests + status |
-
-### Status Checkout
-
-| Status | Badge | Arti |
-|--------|-------|------|
-| request | Kuning | Menunggu proses admin |
-| on_process | Biru | Sedang diproses |
-| sent | Hijau | Sudah dikirim |
-
-### Tombol "Request Checkout"
-
-Muncul jika ada invoice verified. Buka modal form checkout:
-
-### Form Checkout
-
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Invoice | Select | Ya | Pilih invoice yang sudah verified |
-| Tipe Alamat | Radio | Ya | Personal / Dropship |
-| Nama Penerima | Text | Ya | Min 3 karakter |
-| No Telepon Penerima | Tel | Ya | Min 10 digit |
-| Alamat Lengkap | Textarea | Ya | Min 10 karakter |
-| Nama Pengirim | Text | Ya (jika dropship) | Nama customer |
-| No Telepon Pengirim | Tel | Ya (jika dropship) | No HP customer |
-| Konfirmasi | Checkbox | Ya | Centang untuk konfirmasi |
-
-### Tombol
-
-| Tombol | Fungsi |
-|--------|--------|
-| Batal | Tutup modal |
-| Request Checkout | Submit |
-
-### Setelah Submit
-
-- Status checkout: request
-- Pesan: "Request checkout berhasil dikirim."
-
----
-
-## 3.10 Komplain (/komplain)
-
-Halaman untuk mengajukan dan melacak komplain.
-
-### Komponen
-
-| Komponen | Keterangan |
-|----------|------------|
-| Tombol "Ajukan Komplain" | Buka modal form komplain |
-| Filter | Status |
-| Daftar Komplain | List komplain + status badge |
-
-### Status Komplain
-
-| Status | Badge | Arti |
-|--------|-------|------|
-| open | Kuning | Baru diajukan |
-| in_review | Biru | Sedang ditinjau |
-| processing | Biru | Sedang diproses |
-| resolved | Hijau | Selesai |
-
-### Form Komplain
-
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Jenis Komplain | Select | Ya | Kurang Barang Ekspedisi, Tidak Arrived China/Indonesia, Kurang China/Indonesia |
-| Resolusi | Radio | Ya | Refund / Penggantian |
-| No Invoice | Text | Tidak | No invoice terkait |
-| No Resi | Text | Tidak | No resi terkait |
-| Deskripsi | Textarea | Ya | Min 10 karakter, max 2000 |
-| Video | File | Tidak | MP4/MOV, max 50MB |
-| Foto | File | Tidak | JPG/PNG, max 5MB |
-
-### Tombol
-
-| Tombol | Fungsi |
-|--------|--------|
-| Batal | Tutup modal |
-| Ajukan Komplain | Submit |
-
-### Setelah Submit
-
-- Status: open
-- Pesan: "Komplain berhasil diajukan."
-
----
-
-## 3.11 Kalkulator (/kalkulator)
-
-Halaman untuk menghitung estimasi biaya pengiriman.
-
-### Form Kalkulator
-
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Metode | Radio | Ya | Air / Sea |
-| Tipe | Radio | Ya | Sharing / Direct |
-| Berat (kg) | Number | Ya | Berat aktual barang |
-| Panjang (cm) | Number | Ya | Dimensi box |
-| Lebar (cm) | Number | Ya | Dimensi box |
-| Tinggi (cm) | Number | Ya | Dimensi box |
-| Barang Sensitive | Checkbox | Tidak | Centang jika sensitive |
-
-### Tombol
-
-| Tombol | Fungsi |
-|--------|--------|
-| Hitung | Hitung estimasi biaya |
-| Reset | Kosongkan form |
-
-### Hasil Perhitungan
-
-| Komponen | Rumus |
-|----------|-------|
-| Volume | (P × L × T) / 6 |
-| Dasar | MAX(berat aktual, volume) |
-| Fee TAX | Dasar × Rate (sesuai metode/tipe/sensitive) |
-| Fee WH | Tiered berdasarkan berat |
-| Fee Packing | Tiered: ≤150gr / ≤1000gr / ≤2000gr / >2000gr |
-| Grand Total | Fee TAX + Fee WH + Fee Packing |
-
----
-
-## 3.12 No Tuan (/no-tuan)
-
-Halaman untuk melihat dan mengklaim barang yang tidak diklaim customer mana pun.
+Customer melihat barang No Tuan dan mengklaim yang merupakan miliknya.
 
 ### Info Box
 
@@ -625,13 +590,12 @@ Pesan kuning: "Klaim barang dikenakan denda Rp 5.000 per barang. Denda ditagih b
 
 | Informasi | Keterangan |
 |-----------|------------|
-| Nama Barang | Nama barang |
-| Nomor Resi | Resi barang (jika ada) |
-| Jumlah | Qty barang |
-| Harga | Harga dalam Yuan |
-| Box | Box tempat barang berada |
-| Badge "Sensitive" | Muncul jika barang sensitive |
-| Badge "No Tuan" | Badge oranye |
+| Nama Barang | Nama item |
+| Nomor Resi | Resi (jika ada) |
+| Jumlah | Qty |
+| Harga | Yuan |
+| Box | Box asal |
+| Badge "Sensitive" | Jika barang sensitive |
 
 ### Tombol per Card
 
@@ -639,283 +603,32 @@ Pesan kuning: "Klaim barang dikenakan denda Rp 5.000 per barang. Denda ditagih b
 |--------|--------|
 | Klaim Barang | Buka modal klaim |
 
-### Modal Klaim Barang
+### Modal Klaim
 
 | Komponen | Keterangan |
 |----------|------------|
 | Info Barang | Nama, Resi, Qty (read-only) |
 | Warning | "Klaim akan dikenakan denda Rp 5.000. Lanjutkan?" |
-| Bukti Pembelian | File upload (JPG/PNG, max 5MB) — foto nota/resi beli |
-| Keterangan | Textarea opsional (max 500 karakter) |
-
-### Tombol Modal
-
-| Tombol | Fungsi |
-|--------|--------|
-| Batal | Tutup modal |
-| Klaim Barang | Submit |
+| Bukti Pembelian | File (JPG/PNG, max 5MB) — foto nota/resi |
+| Keterangan | Textarea opsional (max 500) |
 
 ### Setelah Klaim
 
-- Status barang: no_tuan → claimed
-- customer_id di-update ke customer yang klaim
-- Denda Rp 5.000 dibuat di tabel denda_claims
+- Status: no_tuan → claimed
+- customer_id diisi ke customer yang klaim
+- Denda Rp 5.000 dibuat di sistem
 - Notifikasi: "Barang berhasil diklaim. Denda Rp 5.000 ditambahkan."
-- Denda akan masuk ke invoice berikutnya
-
-### Empty State
-
-"Tidak ada barang No Tuan" — tidak ada barang yang bisa diklaim.
 
 ---
 
-## 3.13 Profile (/profile)
+## LANGKAH 13 — Admin Barang Lelang
 
-Halaman untuk mengelola profil customer.
+**Siapa:** Admin
+**Halaman:** /admin/lelang
 
-| Komponen | Keterangan |
-|----------|------------|
-| Update Profile | Ubah nama, email |
-| Update Password | Ubah password (password lama + baru) |
-| Hapus Akun | Hapus akun permanen (butuh konfirmasi password) |
+Admin melihat dan mengelola barang yang sudah di-klaim WH.
 
----
-
-## 3.14 Notifikasi (/notifications)
-
-Halaman untuk melihat semua notifikasi.
-
-| Komponen | Keterangan |
-|----------|------------|
-| Daftar Notifikasi | List semua notifikasi dengan badge unread/read |
-| Tombol "Tandai Semua Dibaca" | Mark all as read |
-| Klik notifikasi | Mark as read |
-
----
-
-# 4. ADMIN — Lengkap
-
-## Sidebar Admin (7 grup, 15 menu)
-
-| Grup | Menu | URL |
-|------|------|-----|
-| Overview | Dashboard | /admin/dashboard |
-| Barang & Box | Manage Box | /admin/manage-boxes |
-| Barang & Box | Recap | /admin/recap |
-| Barang & Box | Input No Tuan | /admin/no-tuan/create |
-| Barang & Box | Barang Lelang | /admin/lelang |
-| Keuangan | Generate Invoice | /admin/invoices |
-| Keuangan | Verifikasi | /admin/verification |
-| Keuangan | Checkout | /admin/checkouts |
-| Customer | Info Customer | /admin/customers |
-| Customer | Komplain | /admin/complains |
-| Pengaturan | Est Update | /admin/est-update |
-| Pengaturan | Pengaturan Rate | /admin/settings |
-| Pengaturan | History Kurs | /admin/kurs-history |
-
----
-
-## 4.1 Dashboard Admin (/admin/dashboard)
-
-Halaman utama admin. Menampilkan ringkasan operasional.
-
-### Stat Cards
-
-| Kartu | Informasi |
-|-------|-----------|
-| Box Sharing | Jumlah box sharing OPEN / CLOSED |
-| Box Direct | Jumlah box direct OPEN / CLOSED |
-| Customer Aktif | Jumlah customer aktif |
-| Invoice Pending | Invoice menunggu verifikasi |
-
-### Notifikasi
-
-| Komponen | Keterangan |
-|----------|------------|
-| Registrasi Baru | Customer baru mendaftar |
-| Payment Request | Customer upload bukti transfer |
-| Complain Request | Customer ajukan komplain |
-
-### Shortcut
-
-| Menu | Klik ke |
-|------|---------|
-| Est Update | /admin/est-update |
-| Recap | /admin/recap |
-| Verification | /admin/verification |
-| Customer | /admin/customers |
-| Komplain | /admin/complains |
-
----
-
-## 4.2 Manage Box (/admin/manage-boxes)
-
-Halaman untuk mengelola semua box pengiriman.
-
-### Komponen
-
-| Komponen | Keterangan |
-|----------|------------|
-| Search | Cari box berdasarkan tracking/batch |
-| Filter | Tipe (Sharing/Direct/Handcarry), Status, Customer, Tanggal |
-| Tombol "Tambah Box" | Buka modal form buat box baru |
-
-### Form Tambah Box (Modal)
-
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Tipe Box | Select | Ya | Sharing / Direct / Handcarry |
-| Metode | Select | Ya | Air / Sea |
-| Customer | Select | Tidak | Pilih customer atau "Tanpa Customer" |
-| Tracking Number | Text | Tidak | Nomor tracking |
-| Batch Name | Text | Tidak | Nama batch |
-| Catatan | Textarea | Tidak | Catatan opsional |
-
-### Detail Box (klik salah satu box)
-
-| Komponen | Keterangan |
-|----------|------------|
-| Info Box | Status, Tipe, Jenis Kirim, Kode Box |
-| Timeline Status | OPEN → SENT TO CARGO → OTW INA → UP INVOICE → DONE |
-| Tabel Barang | Daftar barang di box dengan status per item |
-| Tombol Status | Update status box (sesuai urutan) |
-| Tombol Close/Open | Tutup/buka box untuk setor resi |
-| Tombol "Tandai No Tuan" | Untuk item status active → no_tuan |
-| Tombol "Klaim WH" | Untuk item status no_tuan → klaim_wh |
-
-### Status Box & Aksi
-
-| Status Saat | Tombol yang Muncul | Aksi |
-|-------------|-------------------|------|
-| OPEN | "Tutup Box", "Sent to Cargo" | Close box atau kirim ke cargo |
-| CLOSED | "Buka Box", "Sent to Cargo" | Buka kembali atau kirim ke cargo |
-| SENT_TO_CARGO | "OTW Indonesia" | Update ke dalam perjalanan |
-| OTW_INA | "UP Invoice" | Generate invoice |
-| UP_INVOICE | "DONE" | Selesai |
-
-### Status Item di Box
-
-| Status | Badge | Tombol Aksi |
-|--------|-------|-------------|
-| active | Tidak ada badge | "No Tuan" (tandai sebagai tidak diklaim) |
-| no_tuan | Oranye "No Tuan" | "Klaim WH" (tandai untuk lelang) |
-| claimed | Hijau "Diklaim" | - |
-| klaim_wh | Merah "Klaim WH" | - |
-| shipped | Biru "Shipped" | - |
-
----
-
-## 4.3 Recap (/admin/recap)
-
-Halaman untuk merekapitulasi barang masuk dari supplier China. Desain 2-panel.
-
-### Summary Stats (6 kartu)
-
-| Kartu | Informasi |
-|-------|-----------|
-| Box | Total box |
-| Barang | Total item |
-| WH China | Total data WH China |
-| Matched | Data yang sudah cocok |
-| Unmatched | Data yang belum cocok |
-| Revenue | Total revenue |
-
-### Tab "Customer"
-
-Menampilkan data barang dari setor resi customer.
-
-| Kolom | Keterangan |
-|-------|------------|
-| No Resi | Nomor resi barang |
-| Nama Barang | Nama barang |
-| Qty | Jumlah |
-| Harga (¥) | Harga dalam Yuan |
-| Box | Box tempat barang |
-| Customer | Nama customer |
-| Status | Matched (hijau) / Unmatched (kuning) |
-
-### Tab "WH China"
-
-Menampilkan data dari gudang China.
-
-| Kolom | Keterangan |
-|-------|------------|
-| No Resi | Nomor resi dari WH China |
-| Berat | Berat barang (kg) |
-| Ukuran | Dimensi box |
-| Biaya Jasa | Biaya jasa WH China (admin only) |
-| Foto | Link foto barang |
-| Match | Nama barang + customer (jika matched) |
-| Status | Matched / Unmatched |
-| Tanggal | Tanggal input |
-| Aksi | Edit / Hapus |
-
-### Tombol
-
-| Tombol | Fungsi |
-|--------|--------|
-| Auto Match | Jalankan auto-matching untuk semua data unmatched |
-| Input Data WH | Buka modal input data WH China |
-
-### Filter
-
-| Filter | Keterangan |
-|--------|------------|
-| Search | Cari resi, nama, customer |
-| Tipe | Sharing / Direct / Handcarry |
-| Metode | Air / Sea |
-| Tanggal | Dari - Sampai |
-
-### Form Input Data WH China (Modal)
-
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Nomor Resi | Text | Ya | Resi dari WH China |
-| Berat (kg) | Number | Ya | Berat barang |
-| Ukuran Box | Text | Ya | Dimensi (contoh: 40x30x25 cm) |
-| Biaya Jasa | Number | Tidak | Tidak terlihat customer |
-| Foto Barang | File | Tidak | Foto dari WH China |
-
----
-
-## 4.4 Input Barang No Tuan (/admin/no-tuan/create)
-
-Halaman untuk admin menginput barang yang tiba di warehouse tanpa ada yang setor resi.
-
-### Info Box
-
-Pesan kuning: "Barang yang tiba di warehouse tanpa ada customer yang setor resi. Barang akan otomatis tampil di halaman 'No Tuan' customer dan bisa diklaim dengan denda Rp 5.000."
-
-### Form Input Barang
-
-| Field | Tipe | Placeholder | Required | Validasi |
-|-------|------|-------------|----------|----------|
-| Nama Barang | Text | "Contoh: Sepatu Nike Air Max" | Ya | Min 2 karakter |
-| Jumlah | Number | - | Ya | Min 1, max 9999 |
-| Box | Select | "Pilih box tempat barang ini berada" | Ya | Hanya box OPEN/CLOSED |
-| Deskripsi Barang | Textarea | "Deskripsi barang, ciri-ciri..." | Tidak | Max 1000 karakter |
-| Foto Barang | File | - | Tidak | JPG/PNG, max 5MB |
-| Catatan | Textarea | "Catatan tambahan untuk admin..." | Tidak | Max 500 karakter |
-
-### Tombol
-
-| Tombol | Fungsi |
-|--------|--------|
-| Batal | Kembali ke Manage Box |
-| Input Barang No Tuan | Submit → barang langsung status no_tuan |
-
-### Setelah Submit
-
-- Barang dibuat dengan status: no_tuan
-- customer_id: null (belum ada pemilik)
-- resi_number: null (tidak ada yang setor)
-- Barang otomatis muncul di halaman customer /no-tuan
-
----
-
-## 4.5 Barang Lelang (/admin/lelang)
-
-Halaman untuk melihat dan mengelola barang yang sudah di-klaim WH untuk dijual/dilelang.
+### Sidebar Admin → "Barang & Box" → "Barang Lelang"
 
 ### Komponen
 
@@ -923,44 +636,64 @@ Halaman untuk melihat dan mengelola barang yang sudah di-klaim WH untuk dijual/d
 |----------|------------|
 | Search | Cari nama barang |
 | Filter Status | Klaim WH / Dijual / Lelang |
-| Filter Customer | Filter per customer |
-| Filter Tanggal | Filter per tanggal |
-| Summary | Total barang, total nilai |
+| Filter Customer | Per customer |
+| Filter Tanggal | Per tanggal |
 
 ### Tabel Barang
 
 | Kolom | Keterangan |
 |-------|------------|
 | Nama Barang | Nama item |
-| No Resi | Resi barang |
+| No Resi | Resi |
 | Box | Box asal |
 | Qty | Jumlah |
-| Customer | Nama customer (jika ada) |
-| Status | Badge status |
+| Customer | Nama customer |
+| Status | Badge |
 | Aksi | Tandai Dijual / Tandai Lelang |
-
-### Aksi per Barang
-
-| Aksi dari | Aksi ke | Tombol |
-|-----------|---------|--------|
-| klaim_wh | dijual | "Tandai Dijual" |
-| klaim_wh | lelang | "Tandai Lelang" |
-| dijual | lelang | "Tandai Lelang" |
 
 ---
 
-## 4.6 Generate Invoice (/admin/invoices)
+## LANGKAH 14 — Admin Update Estimasi (ETD/ETA)
 
-Halaman untuk membuat invoice.
+**Siapa:** Admin
+**Halaman:** /admin/est-update
+
+Admin mengupdate estimasi keberangkatan dan kedatangan box.
+
+### Sidebar Admin → "Pengaturan" → "Est Update"
 
 ### Komponen
 
 | Komponen | Keterangan |
 |----------|------------|
-| Search | Cari invoice |
-| Filter Status | waiting_payment / waiting_verification / verified |
-| Tombol "Buat Invoice" | Buka modal generate invoice |
-| Tabel Invoice | Daftar semua invoice |
+| Search | Cari box |
+| Tabel | Daftar box dengan ETD/ETA saat ini |
+
+### Form Update (klik salah satu box)
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Box | Info | Read-only |
+| ETD | Date | Opsional |
+| ETA | Date | Opsional |
+| Catatan | Textarea | Opsional |
+
+### Setelah Simpan
+
+- ETD/ETA diupdate
+- Notifikasi ke customer
+- Customer bisa lihat di Dashboard dan My Box
+
+---
+
+## LANGKAH 15 — Admin Generate Invoice
+
+**Siapa:** Admin
+**Halaman:** /admin/invoices
+
+Admin membuat invoice setelah box sampai di Indonesia (status OTW_INA).
+
+### Sidebar Admin → "Keuangan" → "Generate Invoice"
 
 ### Tabel Invoice
 
@@ -969,51 +702,132 @@ Halaman untuk membuat invoice.
 | Invoice Number | Nomor invoice |
 | Customer | Nama customer |
 | Box | Box terkait |
-| Berat (kg) | Berat barang |
+| Berat (kg) | Berat |
 | Fee TAX | Biaya tax |
 | Fee WH | Warehouse fee |
 | Fee Packing | Biaya packing |
-| Grand Total | Total keseluruhan |
-| Status | Badge status |
+| Grand Total | Total |
+| Status | Badge |
 
-### Form Generate Invoice (Modal)
+### Form Generate Invoice (Modal — klik "Buat Invoice")
 
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Pilih Box | Select | Ya | Box dengan status OTW_INA |
-| Berat (kg) | Number | Ya | Berat aktual barang |
-| Panjang (cm) | Number | Ya | Dimensi |
-| Lebar (cm) | Number | Ya | Dimensi |
-| Tinggi (cm) | Number | Ya | Dimensi |
-| Biaya Tambahan | Number | Tidak | Add on (default: 0) |
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Pilih Box | Select | Wajib, box OTW_INA |
+| Berat (kg) | Number | Wajib |
+| Panjang (cm) | Number | Wajib |
+| Lebar (cm) | Number | Wajib |
+| Tinggi (cm) | Number | Wajib |
+| Biaya Tambahan | Number | Opsional (default: 0) |
 
-### Preview Invoice
+### Preview Invoice (otomatis saat isi field)
 
-Saat admin mengisi field, preview otomatis muncul menampilkan:
-- Volume = (P × L × T) / 6
-- Dasar = MAX(berat, volume)
-- Fee TAX = Dasar × Rate
-- Fee WH = Tiered
-- Fee Packing = Tiered
-- Denda Total = Total denda pending customer
-- Grand Total = Semua fee + denda
+| Komponen | Rumus |
+|----------|-------|
+| Volume | (P × L × T) / 6 |
+| Dasar | MAX(berat, volume) |
+| Fee TAX | Dasar × Rate |
+| Fee WH | Tiered berdasarkan berat |
+| Fee Packing | Tiered |
+| Denda Total | Denda pending customer |
+| Grand Total | Semua fee + denda |
 
-### Tombol
+### Setelah Generate
 
-| Tombol | Fungsi |
-|--------|--------|
-| Batal | Tutup modal |
-| Generate Invoice | Submit → buat invoice + notifikasi ke customer |
-
-### Detail Invoice (klik salah satu invoice)
-
-Menampilkan rincian lengkap invoice.
+- Invoice dibuat dengan status: **waiting_payment**
+- payment_deadline otomatis: invoice_date + 7 hari
+- Notifikasi ke customer: "Invoice [nomor] sudah tersedia. Total: Rp X"
 
 ---
 
-## 4.7 Verifikasi (/admin/verification)
+## LANGKAH 16 — Customer Membayar Invoice
 
-Halaman untuk memverifikasi pembayaran customer.
+**Siapa:** Customer
+**Halaman:** /invoice lalu /invoice/{id}/pay
+
+Customer melihat invoice dan membayar.
+
+### Halaman Invoice (/invoice)
+
+| Komponen | Keterangan |
+|----------|------------|
+| Filter | Tracking, Box, Status |
+| Tabel Invoice | Daftar invoice customer |
+
+### Tabel Invoice
+
+| Kolom | Keterangan |
+|-------|------------|
+| Invoice Number | Nomor invoice |
+| Box | Box terkait |
+| Weight | Berat |
+| Volume | Volume |
+| Fee TAX | Biaya tax |
+| Fee WH | Warehouse fee |
+| Fee Packing | Biaya packing |
+| Grand Total | Total |
+| Status | Badge |
+
+### Tombol
+
+| Tombol | Muncul Saat | Fungsi |
+|--------|-------------|--------|
+| Bayar | Status waiting_payment | Ke halaman bayar |
+
+### Form Bayar Invoice (/invoice/{id}/pay)
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Metode Pembayaran | Radio | Wajib: Transfer / QRIS |
+| Bukti Transfer | File | Wajib, JPG/PNG, max 5MB |
+
+### Setelah Submit
+
+- Status: waiting_payment → **waiting_verification**
+- Pesan: "Bukti transfer berhasil dikirim. Menunggu verifikasi admin."
+
+---
+
+## LANGKAH 17 — Customer Buat Invoice Fleksibel (Shopee-style)
+
+**Siapa:** Customer
+**Halaman:** /create-invoice
+
+Customer bisa membuat invoice sendiri dengan memilih barang mana saja.
+
+### Komponen
+
+| Komponen | Keterangan |
+|----------|------------|
+| Daftar Barang | Checklist barang yang sudah arrived & belum ada di invoice |
+| Tombol "Pilih Semua" | Centang/hapus semua |
+| Dimensi | Panjang, Lebar, Tinggi (cm) |
+| Preview | Perhitungan otomatis |
+
+### Form
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Checkbox per barang | Checkbox | Min 1 barang |
+| Panjang (cm) | Number | Wajib |
+| Lebar (cm) | Number | Wajib |
+| Tinggi (cm) | Number | Wajib |
+
+### Setelah Submit
+
+- Invoice dibuat dari barang yang dipilih
+- Hitungan biaya otomatis
+
+---
+
+## LANGKAH 18 — Admin Verifikasi Pembayaran
+
+**Siapa:** Admin
+**Halaman:** /admin/verification
+
+Admin memverifikasi bukti transfer customer.
+
+### Sidebar Admin → "Keuangan" → "Verifikasi"
 
 ### Komponen
 
@@ -1028,32 +842,83 @@ Halaman untuk memverifikasi pembayaran customer.
 | Komponen | Keterangan |
 |----------|------------|
 | Info Invoice | Nomor, customer, box, total |
-| Bukti Transfer | Gambar bukti transfer |
+| Bukti Transfer | Gambar bukti |
 | Metode | Transfer / QRIS |
 
 ### Tombol
 
 | Tombol | Fungsi | Konfirmasi |
 |--------|--------|------------|
-| Verifikasi (hijau) | Setujui pembayaran | "Verifikasi pembayaran ini?" |
-| Tolak (merah) | Tolak pembayaran | Buka modal alasan penolakan |
+| Verifikasi (hijau) | Setujui | "Verifikasi pembayaran ini?" |
+| Tolak (merah) | Tolak | Modal: isi alasan penolakan |
 
 ### Setelah Verifikasi
 
-- Status invoice: waiting_verification → verified
-- Notifikasi ke customer: "Pembayaran Anda diverifikasi"
+- Status: waiting_verification → **verified**
 - Denda yang tagged → paid
+- Notifikasi ke customer: "Pembayaran Anda diverifikasi"
 
 ### Setelah Penolakan
 
-- Status invoice: waiting_verification → waiting_payment
+- Status: waiting_verification → **waiting_payment**
 - Notifikasi ke customer: "Pembayaran ditolak. Alasan: [alasan]"
 
 ---
 
-## 4.8 Checkout (/admin/checkouts)
+## LANGKAH 19 — Customer Request Checkout
 
-Halaman untuk memproses request checkout dari customer.
+**Siapa:** Customer
+**Halaman:** /checkout
+
+Customer meminta pengiriman barang setelah invoice terverifikasi.
+
+### Komponen
+
+| Komponen | Keterangan |
+|----------|------------|
+| Filter | Invoice Number, Status |
+| Daftar Checkout | List checkout + status |
+
+### Status Checkout
+
+| Status | Badge | Arti |
+|--------|-------|------|
+| request | Kuning | Menunggu proses admin |
+| on_process | Biru | Sedang diproses |
+| sent | Hijau | Sudah dikirim |
+
+### Tombol "Request Checkout"
+
+Muncul jika ada invoice verified. Buka modal:
+
+### Form Checkout
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Invoice | Select | Wajib, invoice verified |
+| Tipe Alamat | Radio | Wajib: Personal / Dropship |
+| Nama Penerima | Text | Wajib, min 3 karakter |
+| No Telepon Penerima | Tel | Wajib, min 10 digit |
+| Alamat Lengkap | Textarea | Wajib, min 10 karakter |
+| Nama Pengirim | Text | Wajib jika dropship |
+| No Telepon Pengirim | Tel | Wajib jika dropship |
+| Konfirmasi | Checkbox | Wajib |
+
+### Setelah Submit
+
+- Status: request
+- Pesan: "Request checkout berhasil dikirim."
+
+---
+
+## LANGKAH 20 — Admin Proses Checkout
+
+**Siapa:** Admin
+**Halaman:** /admin/checkouts
+
+Admin memproses request checkout dari customer.
+
+### Sidebar Admin → "Keuangan" → "Checkout"
 
 ### Komponen
 
@@ -1068,89 +933,85 @@ Halaman untuk memproses request checkout dari customer.
 | Komponen | Keterangan |
 |----------|------------|
 | Info Invoice | Nomor, customer, total |
-| Alamat | Tipe (Personal/Dropship), Nama, No Telp, Alamat |
+| Alamat | Tipe, Nama, No Telp, Alamat |
 | Pengirim | Nama + No Telp (jika dropship) |
 
 ### Tombol "Proses Checkout"
 
-Buka modal:
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Foto Packing | File | Wajib |
+| Nomor Resi/Tracking | Text | Wajib |
 
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Foto Packing | File | Ya | Foto barang yang sudah dikemas |
-| Nomor Resi/Tracking | Text | Ya | Nomor tracking pengiriman |
+### Setelah Proses
 
-### Status Checkout
+- Status: request → on_process → **sent**
+- Notifikasi ke customer: "Barang Anda sedang diproses. Tracking: [nomor]"
+
+---
+
+## LANGKAH 21 — Customer Ajukan Komplain
+
+**Siapa:** Customer
+**Halaman:** /komplain
+
+Customer mengajukan komplain jika ada masalah dengan barang.
+
+### Komponen
+
+| Komponen | Keterangan |
+|----------|------------|
+| Tombol "Ajukan Komplain" | Buka modal form |
+| Filter | Status |
+| Daftar Komplain | List + status badge |
+
+### Status Komplain
 
 | Status | Badge | Arti |
 |--------|-------|------|
-| request | Kuning | Menunggu proses |
-| on_process | Biru | Sedang diproses |
-| sent | Hijau | Sudah dikirim |
+| open | Kuning | Baru diajukan |
+| in_review | Biru | Sedang ditinjau |
+| processing | Biru | Sedang diproses |
+| resolved | Hijau | Selesai |
+
+### Form Komplain
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Jenis Komplain | Select | Wajib: Kurang Barang Ekspedisi, Tidak Arrived China/Indonesia, Kurang China/Indonesia |
+| Resolusi | Radio | Wajib: Refund / Penggantian |
+| No Invoice | Text | Opsional |
+| No Resi | Text | Opsional |
+| Deskripsi | Textarea | Wajib, min 10 karakter |
+| Video | File | Opsional, MP4/MOV, max 50MB |
+| Foto | File | Opsional, JPG/PNG, max 5MB |
+
+### Setelah Submit
+
+- Status: open
+- Notifikasi ke admin
+- Pesan: "Komplain berhasil diajukan."
 
 ---
 
-## 4.9 Info Customer (/admin/customers)
+## LANGKAH 22 — Admin Tangani Komplain
 
-Halaman untuk melihat dan mengelola data customer.
+**Siapa:** Admin
+**Halaman:** /admin/complains
 
-### Komponen
+Admin menangani komplain customer.
 
-| Komponen | Keterangan |
-|----------|------------|
-| Search | Cari nama/email/customer |
-| Filter Status | Pending / Active / Inactive |
-| Tabel | Daftar customer |
-
-### Tabel Customer
-
-| Kolom | Keterangan |
-|-------|------------|
-| Nama | Nama customer |
-| Email | Alamat email |
-| No Telepon | Nomor HP |
-| Status | Badge status (Pending/Active/Inactive) |
-| Terdaftar | Tanggal registrasi |
-
-### Detail Customer (klik salah satu)
-
-| Komponen | Keterangan |
-|----------|------------|
-| Info Lengkap | Nama, email, telepon, KTP, alamat |
-| Status | Badge status |
-| Aksi | Aktivasi / Nonaktifkan |
-
-### Tombol Aksi
-
-| Tombol | Muncul Saat | Fungsi | Konfirmasi |
-|--------|-------------|--------|------------|
-| Aktivasi | Status PENDING | Aktifkan akun customer | "Aktivasi customer ini?" |
-| Nonaktifkan | Status ACTIVE | Nonaktifkan akun customer | "Customer tidak bisa login setelah dinonaktifkan." |
-
----
-
-## 4.10 Komplain (/admin/complains)
-
-Halaman untuk menangani komplain customer.
-
-### Komponen
-
-| Komponen | Keterangan |
-|----------|------------|
-| Search | Cari customer/resi |
-| Filter Status | open / in_review / processing / resolved |
-| Tabel | Daftar komplain |
+### Sidebar Admin → "Customer" → "Komplain"
 
 ### Detail Komplain (klik salah satu)
 
 | Komponen | Keterangan |
 |----------|------------|
-| Jenis Komplain | Tipe masalah |
+| Jenis | Tipe masalah |
 | Resolusi | Refund / Penggantian |
-| Deskripsi | Detail komplain |
-| Video | Video bukti (jika ada) |
-| Foto | Foto bukti (jika ada) |
-| Status | Badge status |
+| Deskripsi | Detail |
+| Video | Bukti video |
+| Foto | Bukti foto |
 
 ### Tombol Update Status
 
@@ -1160,50 +1021,22 @@ Halaman untuk menangani komplain customer.
 | in_review | "Proses" | processing |
 | processing | "Selesai" | resolved |
 
----
-
-## 4.11 Est Update (/admin/est-update)
-
-Halaman untuk mengupdate estimasi keberangkatan dan kedatangan box.
-
-### Komponen
-
-| Komponen | Keterangan |
-|----------|------------|
-| Search | Cari box |
-| Tabel | Daftar box dengan ETD/ETA saat ini |
-
-### Form Update (klik salah satu box)
-
-| Field | Tipe | Required | Keterangan |
-|-------|------|----------|------------|
-| Box | Info | - | Nama box (read-only) |
-| ETD | Date | Tidak | Estimasi tanggal keberangkatan |
-| ETA | Date | Tidak | Estimasi tanggal tiba |
-| Catatan | Textarea | Tidak | Catatan tambahan |
-
-### Tombol
-
-| Tombol | Fungsi |
-|--------|--------|
-| Batal | Tutup form |
-| Simpan | Update ETD/ETA + notifikasi ke customer |
+Setiap perubahan status → notifikasi ke customer.
 
 ---
 
-## 4.12 Pengaturan Rate (/admin/settings)
+## LANGKAH 23 — Admin Kelola Rate & Kurs
 
-Halaman untuk mengatur 17 parameter rate pengiriman.
+**Siapa:** Admin
+**Halaman:** /admin/settings dan /admin/kurs-history
 
-### Tab
+### Pengaturan Rate (/admin/settings)
 
-| Tab | Isi |
-|-----|-----|
-| Sharing | Rate sharing (air/sea, berat/volume) |
-| Direct | Rate direct (air/sea, berat/volume) |
-| Packing | Fee packing (tiered) |
+**Sidebar Admin → "Pengaturan" → "Pengaturan Rate"**
 
-### Form Rate Sharing
+3 tab: Sharing, Direct, Packing.
+
+**Tab Sharing:**
 
 | Field | Keterangan |
 |-------|------------|
@@ -1216,7 +1049,7 @@ Halaman untuk mengatur 17 parameter rate pengiriman.
 | Rate Sharing Sensitive Sea Berat | Rp/kg |
 | Rate Sharing Sensitive Sea Volume | Rp/kg |
 
-### Form Rate Direct
+**Tab Direct:**
 
 | Field | Keterangan |
 |-------|------------|
@@ -1225,7 +1058,7 @@ Halaman untuk mengatur 17 parameter rate pengiriman.
 | Rate Direct Sea Berat | Rp/kg |
 | Rate Direct Sea Volume | Rp/kg |
 
-### Form Fee Packing
+**Tab Packing:**
 
 | Field | Keterangan |
 |-------|------------|
@@ -1234,87 +1067,87 @@ Halaman untuk mengatur 17 parameter rate pengiriman.
 | Fee Packing ≤2000 gram | Rp |
 | Fee Packing Extra per kg | Rp |
 
-### Tombol per Tab
+### History Kurs (/admin/kurs-history)
 
-| Tombol | Fungsi |
-|--------|--------|
-| Simpan | Update rate + konfirmasi |
-
----
-
-## 4.13 History Kurs (/admin/kurs-history)
-
-Halaman untuk mengelola kurs Yuan → Rupiah.
-
-### Komponen
+**Sidebar Admin → "Pengaturan" → "History Kurs"**
 
 | Komponen | Keterangan |
 |----------|------------|
-| Tombol "Input Kurs Baru" | Buka form input |
-| Tabel History | Daftar kurs dengan tanggal |
+| Tombol "Input Kurs Baru" | Buka form |
+| Tabel History | Daftar kurs + tanggal |
 
-### Tabel History Kurs
+**Tabel:**
 
 | Kolom | Keterangan |
 |-------|------------|
-| Kurs | Nilai kurs (contoh: 2660) |
-| Tanggal Berlaku | Tanggal kurs berlaku |
+| Kurs | Nilai (contoh: 2660) |
+| Tanggal Berlaku | Tanggal |
 | Diinput Oleh | Nama admin/owner |
 | Tanggal Input | Kapan diinput |
 
-### Form Input Kurs
+**Form Input Kurs:**
 
-| Field | Tipe | Required | Validasi |
-|-------|------|----------|----------|
-| Nilai Kurs | Number | Ya | Harus angka |
-| Tanggal Berlaku | Date | Ya | Tidak boleh di masa depan |
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Nilai Kurs | Number | Wajib |
+| Tanggal Berlaku | Date | Wajib, tidak boleh masa depan |
+
+---
+
+## LANGKAH 24 — Customer Kalkulator Biaya
+
+**Siapa:** Customer
+**Halaman:** /kalkulator
+
+Customer menghitung estimasi biaya pengiriman.
+
+### Form Kalkulator
+
+| Field | Tipe | Aturan |
+|-------|------|--------|
+| Metode | Radio | Air / Sea |
+| Tipe | Radio | Sharing / Direct |
+| Berat (kg) | Number | Wajib |
+| Panjang (cm) | Number | Wajib |
+| Lebar (cm) | Number | Wajib |
+| Tinggi (cm) | Number | Wajib |
+| Barang Sensitive | Checkbox | Opsional |
 
 ### Tombol
 
 | Tombol | Fungsi |
 |--------|--------|
-| Batal | Tutup form |
-| Simpan | Simpan kurs baru |
+| Hitung | Hitung estimasi |
+| Reset | Kosongkan form |
 
-### Aturan
+### Hasil
 
-- Kurs terbaru otomatis jadi default untuk transaksi baru
-- Invoice lama tetap pakai kurs saat invoice dibuat
-- Tidak bisa input kurs dengan tanggal yang sama (unik)
-
----
-
-# 5. OWNER — Lengkap
-
-## Sidebar Owner (7 grup + 2 grup owner = 9 grup, 21 menu)
-
-Owner memiliki akses ke SEMUA halaman admin + halaman owner khusus.
-
-### Grup Owner
-
-| Grup | Menu | URL |
-|------|------|-----|
-| Owner | Owner Dashboard | /owner/dashboard |
-| Owner | Laporan Keuangan | /owner/finance |
-| Manajemen | Manage Admin | /owner/manage-admin |
-| Manajemen | Manage Users | /owner/users |
-| Manajemen | All Data | /owner/data |
-| Manajemen | Audit Log | /owner/audit-log |
+| Komponen | Rumus |
+|----------|-------|
+| Volume | (P × L × T) / 6 |
+| Dasar | MAX(berat, volume) |
+| Fee TAX | Dasar × Rate |
+| Fee WH | Tiered |
+| Fee Packing | Tiered |
+| Grand Total | Fee TAX + Fee WH + Fee Packing |
 
 ---
 
-## 5.1 Owner Dashboard (/owner/dashboard)
+## LANGKAH 25 — Owner Dashboard
 
-Halaman utama owner. Menampilkan statistik bisnis.
+**Siapa:** Owner
+**Halaman:** /owner/dashboard
+
+Owner login → sidebar "Owner" → "Owner Dashboard".
 
 ### Stat Cards
 
 | Kartu | Informasi |
 |-------|-----------|
-| Revenue Bulan Ini | Total revenue bulan ini + growth % |
-| Customer Aktif | Jumlah customer aktif + baru bulan ini |
-| Box Aktif | Jumlah box aktif + selesai bulan ini |
-| Invoice Pending | Invoice menunggu pembayaran + verifikasi |
+| Revenue Bulan Ini | Total + growth % |
+| Customer Aktif | Jumlah + baru bulan ini |
+| Box Aktif | Jumlah + selesai bulan ini |
+| Invoice Pending | Belum bayar + belum verif |
 
 ### Grafik Revenue
 
@@ -1326,43 +1159,36 @@ Grafik batang revenue per bulan (6 bulan terakhir).
 |-------|------------|
 | Nama | Nama customer |
 | Total Transaksi | Jumlah invoice |
-| Total Revenue | Nominal total |
+| Total Revenue | Nominal |
 
 ### Recent Invoices
 
 | Kolom | Keterangan |
 |-------|------------|
-| Invoice | Nomor invoice |
-| Customer | Nama customer |
+| Invoice | Nomor |
+| Customer | Nama |
 | Total | Nominal |
-| Status | Badge status |
+| Status | Badge |
 
 ### Recent Activity
 
-| Komponen | Keterangan |
-|----------|------------|
-| Aktivitas | Log aktivitas terbaru (audit trail) |
-| Waktu | Kapan terjadi |
-
-### Notifikasi
-
-| Komponen | Keterangan |
-|----------|------------|
-| Deadline | Invoice mendekati deadline |
-| Komplain Baru | Komplain baru masuk |
+Log aktivitas terbaru (audit trail).
 
 ---
 
-## 5.2 Laporan Keuangan (/owner/finance)
+## LANGKAH 26 — Owner Laporan Keuangan
 
-Halaman untuk melihat laporan keuangan lengkap.
+**Siapa:** Owner
+**Halaman:** /owner/finance
+
+### Sidebar Owner → "Owner" → "Laporan Keuangan"
 
 ### Summary Cards
 
 | Kartu | Informasi |
 |-------|-----------|
-| Total Revenue | Total semua revenue |
-| Outstanding | Total belum dibayar |
+| Total Revenue | Semua revenue |
+| Outstanding | Belum dibayar |
 | Profit | Revenue - Outstanding |
 | Cash In | Total masuk |
 | Cash Out | Total keluar |
@@ -1372,75 +1198,71 @@ Halaman untuk melihat laporan keuangan lengkap.
 
 | Filter | Keterangan |
 |--------|------------|
-| Tanggal Dari | Tanggal mulai |
-| Tanggal Sampai | Tanggal akhir |
-| Bulan | Filter per bulan |
-| Tahun | Filter per tahun |
-| Customer | Filter per customer |
-| Status | Filter per status invoice |
-| Search | Cari invoice/customer |
+| Tanggal Dari/Sampai | Range tanggal |
+| Bulan | Per bulan |
+| Tahun | Per tahun |
+| Customer | Per customer |
+| Status | Per status |
+| Search | Cari |
 
 ### Tabel Invoice
 
 | Kolom | Keterangan |
 |-------|------------|
-| Invoice | Nomor invoice |
-| Customer | Nama customer |
-| Box | Box terkait |
-| Grand Total | Total nominal |
-| Status | Badge status |
-| Tanggal | Tanggal invoice |
+| Invoice | Nomor |
+| Customer | Nama |
+| Box | Box |
+| Grand Total | Total |
+| Status | Badge |
+| Tanggal | Tanggal |
 
-### Tombol Export
+### Export
 
-| Tombol | Format | Fungsi |
-|--------|--------|--------|
-| Export CSV | .csv | Download data keuangan CSV |
-| Export Excel | .xlsx | Download data keuangan Excel |
+| Tombol | Format |
+|--------|--------|
+| Export CSV | .csv |
+| Export Excel | .xlsx |
 
 ---
 
-## 5.3 Manage Admin (/owner/manage-admin)
+## LANGKAH 27 — Owner Manage Admin
 
-Halaman untuk mengelola akun admin.
+**Siapa:** Owner
+**Halaman:** /owner/manage-admin
+
+### Sidebar Owner → "Manajemen" → "Manage Admin"
 
 ### Komponen
 
 | Komponen | Keterangan |
 |----------|------------|
-| Search | Cari nama/email admin |
+| Search | Cari nama/email |
 | Filter Status | Active / Inactive / Pending |
 | Tabel | Daftar admin |
-
-### Tabel Admin
-
-| Kolom | Keterangan |
-|-------|------------|
-| Nama | Nama admin |
-| Email | Alamat email |
-| Status | Badge status |
-| Terdaftar | Tanggal registrasi |
 
 ### Detail Admin (klik salah satu)
 
 | Komponen | Keterangan |
 |----------|------------|
 | Info Lengkap | Nama, email, telepon, KTP, alamat |
-| Status | Badge status |
-| Activity History | Log aktivitas admin |
+| Status | Badge |
+| Activity History | Log aktivitas |
 
-### Tombol Aksi
+### Tombol
 
-| Tombol | Fungsi | Konfirmasi |
-|--------|--------|------------|
-| Aktivasi | Aktifkan admin | "Aktivasi admin ini?" |
-| Nonaktifkan | Nonaktifkan admin | "Admin tidak bisa login setelah dinonaktifkan." |
+| Tombol | Fungsi |
+|--------|--------|
+| Aktivasi | Aktifkan admin |
+| Nonaktifkan | Nonaktifkan admin |
 
 ---
 
-## 5.4 Manage Users (/owner/users)
+## LANGKAH 28 — Owner Manage Users
 
-Halaman untuk mengelola semua pengguna (customer, admin, owner).
+**Siapa:** Owner
+**Halaman:** /owner/users
+
+### Sidebar Owner → "Manajemen" → "Manage Users"
 
 ### Komponen
 
@@ -1449,163 +1271,191 @@ Halaman untuk mengelola semua pengguna (customer, admin, owner).
 | Search | Cari nama/email |
 | Filter Role | Customer / Admin / Owner |
 | Filter Status | Active / Inactive / Pending |
-| Tabel | Daftar semua user |
+| Tabel | Semua user |
 
-### Tabel Users
+### Tabel
 
 | Kolom | Keterangan |
 |-------|------------|
 | Nama | Nama user |
-| Email | Alamat email |
+| Email | Email |
 | Role | Badge role |
 | Status | Badge status |
-| Terdaftar | Tanggal registrasi |
-
-### Detail User (klik salah satu)
-
-| Komponen | Keterangan |
-|----------|------------|
-| Info Lengkap | Semua data user |
-| Ubah Role | Ganti role user |
+| Terdaftar | Tanggal |
 
 ### Modal Ubah Role
 
-| Field | Tipe | Keterangan |
-|-------|------|------------|
-| Role Baru | Select | Customer / Admin / Owner |
+| Field | Tipe |
+|-------|------|
+| Role Baru | Select: Customer / Admin / Owner |
 
 ---
 
-## 5.5 All Data (/owner/data)
+## LANGKAH 29 — Owner All Data
 
-Halaman untuk melihat semua data dalam satu tempat.
+**Siapa:** Owner
+**Halaman:** /owner/data
+
+### Sidebar Owner → "Manajemen" → "All Data"
 
 ### Tab
 
 | Tab | Isi |
 |-----|-----|
-| Customers | Semua data customer |
-| Boxes | Semua data box |
-| Invoices | Semua data invoice |
-| Items | Semua data barang |
-| Checkouts | Semua data checkout |
-| Complains | Semua data komplain |
+| Customers | Semua customer |
+| Boxes | Semua box |
+| Invoices | Semua invoice |
+| Items | Semua barang |
+| Checkouts | Semua checkout |
+| Complains | Semua komplain |
 
 ### Komponen per Tab
 
 | Komponen | Keterangan |
 |----------|------------|
 | Search | Cari data |
-| Tabel | Daftar data sesuai tab |
+| Tabel | Daftar data |
 | Pagination | Navigasi halaman |
 
 ---
 
-## 5.6 Audit Log (/owner/audit-log)
+## LANGKAH 30 — Owner Audit Log
 
-Halaman untuk melihat log semua aktivitas di sistem.
+**Siapa:** Owner
+**Halaman:** /owner/audit-log
+
+### Sidebar Owner → "Manajemen" → "Audit Log"
 
 ### Komponen
 
 | Komponen | Keterangan |
 |----------|------------|
 | Search | Cari aktivitas/user |
-| Filter Event | Filter berdasarkan jenis event |
-| Tabel | Daftar log aktivitas |
+| Filter Event | Jenis event |
+| Tabel | Daftar log |
 
-### Tabel Audit Log
+### Tabel
 
 | Kolom | Keterangan |
 |-------|------------|
-| User | Siapa yang melakukan |
-| Event | Jenis aktivitas (created, updated, deleted, custom) |
-| Subject | Model yang diubah (Box, Invoice, Item, dll) |
-| Perubahan | Detail perubahan (old → new values) |
-| Waktu | Kapan terjadi |
-
-### Detail Log (klik salah satu)
-
-| Komponen | Keterangan |
-|----------|------------|
-| User Info | Siapa yang melakukan |
-| Event Detail | Jenis + deskripsi |
-| Old Values | Data sebelum diubah |
-| New Values | Data setelah diubah |
+| User | Siapa |
+| Event | Jenis (created, updated, deleted) |
+| Subject | Model (Box, Invoice, Item) |
+| Perubahan | Detail old → new |
+| Waktu | Kapan |
 
 ---
 
-# 6. Status Barang & Box — Referensi Cepat
+## LANGKAH 31 — Notifikasi & Profile
 
-## 6.1 Status Box
+### Notifikasi (/notifications)
 
-| Status | Badge | Arti | Urutan |
-|--------|-------|------|--------|
-| OPEN | Hijau "Terbuka" | Box dibuka, bisa setor resi | 1 |
-| CLOSED | Abu-abu | Box ditutup, tidak bisa setor | (bisa kapan saja) |
-| SENT_TO_CARGO | Biru "Dikirim ke Cargo" | Sudah dikirim dari China | 2 |
-| OTW_INA | Kuning "Dalam Perjalanan" | Dalam perjalanan ke Indonesia | 3 |
-| UP_INVOICE | Biru "Invoice Dibuat" | Invoice sudah digenerate | 4 |
-| DONE | Hijau "Selesai" | Proses selesai | 5 |
+**Akses:** Semua role (sidebar → bell icon)
 
-## 6.2 Status Item
+| Komponen | Keterangan |
+|----------|------------|
+| Daftar | Semua notifikasi |
+| Tombol "Tandai Semua Dibaca" | Mark all as read |
+| Badge unread | Jumlah belum dibaca |
+
+### Profile (/profile)
+
+**Akses:** Semua role (sidebar → avatar → Profil Saya)
+
+| Komponen | Keterangan |
+|----------|------------|
+| Update Profile | Ubah nama, email |
+| Update Password | Password lama + baru |
+| Hapus Akun | Hapus permanen (konfirmasi password) |
+
+---
+
+## LANGKAH 32 — Admin Kelola Customer (Lanjutan)
+
+**Siapa:** Admin
+**Halaman:** /admin/customers
+
+Selain aktivasi (Langkah 2), admin juga bisa:
+
+### Tombol Aksi di Info Customer
+
+| Tombol | Fungsi | Konfirmasi |
+|--------|--------|------------|
+| Nonaktifkan | Customer tidak bisa login | "Customer tidak bisa login setelah dinonaktifkan." |
+| Aktivasi (kembali) | Aktifkan ulang | "Aktivasi customer ini?" |
+
+---
+
+# 3. Status — Referensi Cepat
+
+## 3.1 Status Box
+
+| Status | Badge | Arti |
+|--------|-------|------|
+| OPEN | Hijau "Terbuka" | Bisa setor resi |
+| CLOSED | Abu-abu | Tidak bisa setor |
+| SENT_TO_CARGO | Biru "Dikirim ke Cargo" | Dikirim dari China |
+| OTW_INA | Kuning "Dalam Perjalanan" | Menuju Indonesia |
+| UP_INVOICE | Biru "Invoice Dibuat" | Invoice digenerate |
+| DONE | Hijau "Selesai" | Selesai |
+
+## 3.2 Status Item
 
 | Status | Badge | Arti | Bisa Diklaim? |
 |--------|-------|------|---------------|
-| active | - | Barang aktif, menunggu diambil | - |
-| no_tuan | Oranye "No Tuan" | Tidak ada pemilik | Ya (denda Rp 5.000) |
-| claimed | Hijau "Diklaim" | Sudah diklaim customer | Tidak |
-| klaim_wh | Merah "Klaim WH" | WH ambil untuk jual/lelang | Tidak |
+| active | - | Barang aktif | - |
+| no_tuan | Oranye | Tidak ada pemilik | Ya (denda Rp 5.000) |
+| claimed | Hijau "Diklaim" | Sudah diklaim | Tidak |
+| klaim_wh | Merah "Klaim WH" | WH ambil untuk lelang | Tidak |
 | shipped | Biru "Shipped" | Sudah dikirim | Tidak |
-| hold | Abu-abu | Ditahan (deadline lewat) | Tidak |
-| dijual | - | Dijual WH | Tidak |
-| lelang | - | Dilelang WH | Tidak |
+| hold | Abu-abu | Ditahan (deadline) | Tidak |
 
-## 6.3 Status Invoice
+## 3.3 Status Invoice
 
 | Status | Badge | Arti |
 |--------|-------|------|
-| waiting_payment | Kuning "Menunggu Pembayaran" | Customer belum bayar |
-| waiting_verification | Biru "Menunggu Verifikasi" | Sudah bayar, admin belum verif |
-| verified | Hijau "Terverifikasi" | Pembayaran terverifikasi |
+| waiting_payment | Kuning | Belum bayar |
+| waiting_verification | Biru | Sudah bayar, belum verif |
+| verified | Hijau | Terverifikasi |
 
-## 6.4 Status Checkout
-
-| Status | Badge | Arti |
-|--------|-------|------|
-| request | Kuning "Menunggu Proses" | Customer request checkout |
-| on_process | Biru "Sedang Diproses" | Admin sedang proses |
-| sent | Hijau "Terkirim" | Barang sudah dikirim |
-
-## 6.5 Status Komplain
+## 3.4 Status Checkout
 
 | Status | Badge | Arti |
 |--------|-------|------|
-| open | Kuning | Komplain baru |
-| in_review | Biru | Sedang ditinjau |
-| processing | Biru | Sedang diproses |
+| request | Kuning | Menunggu proses |
+| on_process | Biru | Sedang diproses |
+| sent | Hijau | Sudah dikirim |
+
+## 3.5 Status Komplain
+
+| Status | Badge | Arti |
+|--------|-------|------|
+| open | Kuning | Baru |
+| in_review | Biru | Ditinjau |
+| processing | Biru | Diproses |
 | resolved | Hijau | Selesai |
 
-## 6.6 Status Customer
+## 3.6 Status Customer
 
 | Status | Arti |
 |--------|------|
 | PENDING | Baru daftar, belum bisa login |
-| ACTIVE | Sudah diaktivasi, bisa login |
-| INACTIVE | Dinonaktifkan, tidak bisa login |
+| ACTIVE | Sudah aktivasi, bisa login |
+| INACTIVE | Dinonaktifkan |
 
-## 6.7 Status Denda
+## 3.7 Status Denda
 
 | Status | Arti |
 |--------|------|
-| pending | Denda belum ditagih |
-| tagged | Denda sudah masuk ke invoice |
-| paid | Denda sudah dibayar |
+| pending | Belum ditagih |
+| tagged | Sudah masuk invoice |
+| paid | Sudah dibayar |
 
 ---
 
-# 7. Pesan Error & Sukses
+# 4. Pesan Error & Sukses
 
-## 7.1 Pesan Error
+## 4.1 Pesan Error
 
 | Kondisi | Pesan |
 |---------|-------|
@@ -1617,27 +1467,24 @@ Halaman untuk melihat log semua aktivitas di sistem.
 | Resi duplikat | "Nomor resi sudah terdaftar di box ini" |
 | Box ditutup | "Box sudah ditutup. Tidak bisa menambah barang." |
 | File salah format | "Format file harus jpg, png, atau webp" |
-| File terlalu besar | "Ukuran file maksimal 5MB" |
-| Invoice sudah dibayar | "Invoice sudah dibayar" |
-| Checkout belum verif | "Invoice belum terverifikasi" |
-| Barang sudah diklaim | "Barang sudah diklaim oleh customer lain." |
-| Box tidak ditemukan | "Box tidak ditemukan" |
+| File besar | "Ukuran file maksimal 5MB" |
+| Barang diklaim | "Barang sudah diklaim oleh customer lain." |
 
-## 7.2 Pesan Sukses
+## 4.2 Pesan Sukses
 
 | Aksi | Pesan |
 |------|-------|
 | Register | "Registrasi berhasil! Menunggu aktivasi dari admin." |
 | Login | "Selamat datang, [nama]!" |
+| Aktivasi | "Akun [nama] berhasil diaktivasi." |
 | Setor Resi | "Barang berhasil didaftarkan." |
-| Bayar Invoice | "Bukti transfer berhasil dikirim. Menunggu verifikasi admin." |
+| Bayar Invoice | "Bukti transfer berhasil dikirim." |
+| Verifikasi | "Pembayaran berhasil diverifikasi." |
 | Checkout | "Request checkout berhasil dikirim." |
 | Komplain | "Komplain berhasil diajukan." |
-| Aktivasi | "Akun [nama] berhasil diaktivasi." |
 | Generate Invoice | "Invoice [nomor] berhasil dibuat." |
-| Verifikasi | "Pembayaran berhasil diverifikasi." |
 | Klaim No Tuan | "Barang berhasil diklaim. Denda Rp 5.000 ditambahkan." |
-| Input No Tuan | "Barang '[nama]' berhasil ditambahkan sebagai No Tuan." |
+| Input No Tuan | "Barang berhasil ditambahkan sebagai No Tuan." |
 | Update Rate | "Rate berhasil diupdate." |
 | Input Kurs | "Kurs berhasil diupdate." |
 | Close Box | "Box berhasil ditutup." |
@@ -1646,6 +1493,6 @@ Halaman untuk melihat log semua aktivitas di sistem.
 
 # END OF USER GUIDE
 
-Dokumen ini mencakup SELURUH fitur, halaman, dan modul yang ada di Ting Warehouse Management System v2.1.
+Dokumen ini mencakup SELURUH 38 halaman, 15+ modul, dan semua fitur di Ting Warehouse Management System v2.1.
 
 Terakhir diperbarui: Juli 2026
