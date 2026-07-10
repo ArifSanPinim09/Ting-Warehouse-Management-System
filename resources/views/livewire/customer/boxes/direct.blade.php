@@ -7,11 +7,9 @@
                     <h1 class="text-display text-primary">My Box</h1>
                     <p class="text-body text-gray-500 mt-1">Kelola box sharing dan direct Anda</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center bg-gray-100 rounded-button p-1">
-                        <a href="{{ route('customer.box.sharing') }}" wire:navigate class="px-4 py-2.5 min-h-[44px] flex items-center rounded-button text-body font-medium transition-colors text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-accent/40">Sharing</a>
-                        <a href="{{ route('customer.box.direct') }}" wire:navigate class="px-4 py-2.5 min-h-[44px] flex items-center rounded-button text-body font-medium transition-colors bg-white text-primary shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/40">Direct</a>
-                    </div>
+                <div class="flex items-center bg-gray-100 rounded-button p-1" wire:loading.class="pointer-events-none opacity-50">
+                    <a href="{{ route('customer.box.sharing') }}" wire:navigate class="px-4 py-2.5 min-h-[44px] flex items-center rounded-button text-body font-medium transition-colors text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-accent/40">Sharing</a>
+                    <a href="{{ route('customer.box.direct') }}" wire:navigate class="px-4 py-2.5 min-h-[44px] flex items-center rounded-button text-body font-medium transition-colors bg-white text-primary shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/40">Direct</a>
                 </div>
             </div>
         </div>
@@ -27,15 +25,20 @@
                         type="text"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Cari tracking number atau batch..."
+                        aria-label="Cari box berdasarkan tracking number atau batch"
                         class="w-full pl-10 pr-4 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors placeholder:text-gray-400"
+                        wire:loading.class="opacity-50"
                     />
                 </div>
-                <select wire:model.live="filterStatus" class="py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600 sm:w-48">
-                    <option value="">Semua Status</option>
-                    @foreach(\App\Models\Box::getValidStatuses() as $status)
-                        <option value="{{ $status }}">{{ $status }}</option>
-                    @endforeach
-                </select>
+                <div class="relative sm:w-48">
+                    <select wire:model.live="filterStatus" class="w-full py-2.5 px-3 pr-8 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600 appearance-none" wire:loading.class="opacity-50">
+                        <option value="">Semua Status</option>
+                        @foreach(\App\Models\Box::getValidStatuses() as $status)
+                            <option value="{{ $status }}">{{ $status }}</option>
+                        @endforeach
+                    </select>
+                    <svg wire:loading class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                </div>
             </div>
         </div>
 
@@ -55,12 +58,45 @@
                     </div>
                     <h3 class="text-body font-semibold text-gray-700 mb-1">Belum ada box direct</h3>
                     <p class="text-body text-gray-500 mb-4">Anda belum memiliki box direct. Hubungi admin untuk membuat box direct baru.</p>
-                    <a href="#" class="inline-flex items-center gap-2 px-5 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
+                    <a href="https://wa.me/6281234567890?text=Halo%20admin%2C%20saya%20ingin%20membuat%20box%20direct%20baru" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                         Hubungi Admin
                     </a>
                 </div>
             @else
-                <div class="overflow-x-auto">
+                {{-- Mobile Cards --}}
+                <div class="space-y-3 p-4 lg:hidden" wire:loading.class="opacity-50">
+                    @foreach($boxes as $box)
+                        <div wire:click="openBoxDetail({{ $box->id }})" class="bg-gray-50 rounded-[10px] p-4 space-y-2 cursor-pointer hover:bg-gray-100/70 transition-colors active:scale-[0.99]">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-body font-semibold text-primary truncate">{{ $box->tracking_number ?? 'Box #' . $box->id }}</p>
+                                    <p class="text-caption text-gray-500 mt-0.5">{{ $box->batch_name ?? '-' }} · {{ $box->items_count }} item</p>
+                                </div>
+                                <span class="shrink-0 text-caption font-medium px-2 py-0.5 rounded-full {{ $box->method === 'air' ? 'bg-blue-50 text-blue-700' : 'bg-cyan-50 text-cyan-700' }}">{{ strtoupper($box->method) }}</span>
+                            </div>
+
+                            @if($box->etd || $box->eta)
+                                <div class="flex flex-wrap gap-x-4 gap-y-1 text-caption">
+                                    @if($box->etd)
+                                        <span><span class="text-gray-400">ETD:</span> <span class="text-gray-700">{{ $box->etd->format('d M Y') }}</span></span>
+                                    @endif
+                                    @if($box->eta)
+                                        <span><span class="text-gray-400">ETA:</span> <span class="text-gray-700">{{ $box->eta->format('d M Y') }}</span></span>
+                                    @endif
+                                </div>
+                            @endif
+
+                            <div class="flex items-center justify-between pt-1">
+                                <x-status-badge :status="$box->status" />
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- Desktop Table --}}
+                <div class="hidden lg:block overflow-x-auto" wire:loading.class="opacity-50">
                     <table class="w-full text-left">
                         <thead>
                             <tr class="border-b border-gray-100 bg-gray-50/50">
@@ -201,7 +237,7 @@
                             </div>
                         @endif
 
-                        {{-- Items Table --}}
+                        {{-- Items --}}
                         <div>
                             <h4 class="text-body font-semibold text-gray-900 mb-3">Daftar Barang ({{ $detailBox->items->count() }})</h4>
                             @if($detailBox->items->isEmpty())
@@ -210,7 +246,66 @@
                                     <p class="text-body text-gray-500">Belum ada barang di box ini</p>
                                 </div>
                             @else
-                                <div class="overflow-x-auto border border-gray-200 rounded-[8px]">
+                                {{-- Mobile Item Cards --}}
+                                <div class="space-y-3 md:hidden">
+                                    @foreach($detailBox->items as $item)
+                                        <div class="bg-gray-50 rounded-[8px] p-3 space-y-2">
+                                            <div class="flex items-start gap-3">
+                                                @if($item->proof_co)
+                                                    <div class="w-14 h-14 shrink-0 rounded-[8px] overflow-hidden bg-gray-100 border border-gray-200">
+                                                        <img src="{{ Storage::url($item->proof_co) }}" alt="{{ $item->name }}" class="w-full h-full object-cover" loading="lazy">
+                                                    </div>
+                                                @else
+                                                    <div class="w-14 h-14 shrink-0 rounded-[8px] bg-gray-100 flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                    </div>
+                                                @endif
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-start justify-between gap-2">
+                                                        <p class="text-body font-medium text-gray-900 truncate">{{ $item->name }}</p>
+                                                        @if($item->is_sensitive)
+                                                            <span class="shrink-0 text-caption font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">Sensitive</span>
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-caption text-gray-600 mt-0.5">¥{{ number_format($item->price_yuan, 2) }} × {{ $item->quantity }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-caption">
+                                                @if($item->whChinaData)
+                                                    <span><span class="text-gray-400">Berat:</span> <span class="text-gray-700">{{ number_format($item->whChinaData->berat, 1) }} kg</span></span>
+                                                    @if($item->whChinaData->ukuran_box)
+                                                        <span><span class="text-gray-400">Ukuran:</span> <span class="text-gray-700">{{ $item->whChinaData->ukuran_box }}</span></span>
+                                                    @endif
+                                                @endif
+                                                @if($item->resi_number)
+                                                    <span><span class="text-gray-400">Resi:</span> <span class="text-gray-700 font-mono">{{ $item->resi_number }}</span></span>
+                                                @endif
+                                            </div>
+                                            @if($item->status !== 'active')
+                                                @php
+                                                    $statusColors = [
+                                                        'no_tuan' => 'bg-orange-100 text-orange-700',
+                                                        'claimed' => 'bg-emerald-100 text-emerald-700',
+                                                        'klaim_wh' => 'bg-red-100 text-red-700',
+                                                        'shipped' => 'bg-blue-100 text-blue-700',
+                                                    ];
+                                                    $statusLabels = [
+                                                        'no_tuan' => 'No Tuan',
+                                                        'claimed' => 'Diklaim',
+                                                        'klaim_wh' => 'Klaim WH',
+                                                        'shipped' => 'Shipped',
+                                                    ];
+                                                @endphp
+                                                <span class="text-caption font-medium {{ $statusColors[$item->status] ?? 'bg-gray-100 text-gray-700' }} px-1.5 py-0.5 rounded-full">
+                                                    {{ $statusLabels[$item->status] ?? $item->status }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                {{-- Desktop Item Table --}}
+                                <div class="hidden md:block overflow-x-auto border border-gray-200 rounded-[8px]">
                                     <table class="w-full text-left">
                                         <thead>
                                             <tr class="bg-gray-50">
@@ -244,7 +339,7 @@
                                                         <div class="flex items-center gap-2">
                                                             <span class="text-body font-medium text-gray-900">{{ $item->name }}</span>
                                                             @if($item->is_sensitive)
-                                                                <span class="text-caption font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">Sensitive</span>
+                                                                <span class="text-caption font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">Sensitive</span>
                                                             @endif
                                                         </div>
                                                     </td>
@@ -275,7 +370,7 @@
                                                                     'shipped' => 'Shipped',
                                                                 ];
                                                             @endphp
-                                                            <span class="text-caption font-bold {{ $statusColors[$item->status] ?? 'bg-gray-100 text-gray-700' }} px-1.5 py-0.5 rounded-full">
+                                                            <span class="text-caption font-medium {{ $statusColors[$item->status] ?? 'bg-gray-100 text-gray-700' }} px-1.5 py-0.5 rounded-full">
                                                                 {{ $statusLabels[$item->status] ?? $item->status }}
                                                             </span>
                                                         @else

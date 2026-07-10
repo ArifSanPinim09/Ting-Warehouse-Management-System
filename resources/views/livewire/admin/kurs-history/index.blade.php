@@ -74,15 +74,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end gap-3">
-                        @if($editingId)
-                            <button
-                                wire:click="toggleForm"
-                                class="px-5 py-2.5 text-body font-medium text-gray-700 bg-gray-100 rounded-[8px] hover:bg-gray-200 transition-colors"
-                            >
-                                Batal
-                            </button>
-                        @endif
+                    <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end">
                         <button
                             wire:click="saveKurs"
                             class="px-5 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors"

@@ -101,8 +101,11 @@ class NoTuanClaimService
                 'status' => DendaClaim::STATUS_PENDING,
             ]);
 
+            // Assign customer to item (item sekarang punya pemilik)
+            $lockedItem->customer_id = $customer->id;
+            $lockedItem->save();
+
             // Revisi §2.11.2: Notify customer klaim berhasil
-            $lockedItem->customer_id = $customer->id; // temporary for notification
             $this->notifService->claimSuccessful($lockedItem);
 
             return $dendaClaim;

@@ -333,6 +333,145 @@ class NoTuanTest extends TestCase
             ->assertDispatched('toast');
     }
 
+    // ─── Admin Input Barang No Tuan Langsung (Client Flow Fix) ─────
+
+    public function test_admin_can_input_no_tuan_item_directly(): void
+    {
+        $this->actingAs($this->admin);
+
+        Livewire::test(\App\Livewire\Admin\CreateNoTuanItem::class)
+            ->set('name', 'Sepatu Nike Air Max')
+            ->set('quantity', 5)
+            ->set('boxId', $this->box->id)
+            ->set('description', 'Barang tanpa resi, tiba di warehouse')
+            ->call('submit')
+            ->assertDispatched('toast');
+
+        $item = Item::where('name', 'Sepatu Nike Air Max')->first();
+        $this->assertNotNull($item);
+        $this->assertEquals(Item::STATUS_NO_TUAN, $item->status);
+        $this->assertNull($item->customer_id);
+        $this->assertNull($item->resi_number);
+        $this->assertNull($item->price_yuan);
+        $this->assertEquals(5, $item->quantity);
+        $this->assertEquals($this->box->id, $item->box_id);
+    }
+
+    public function test_admin_input_no_tuan_item_appears_for_customer(): void
+    {
+        // Step 1: Admin input barang No Tuan
+        $this->actingAs($this->admin);
+
+        Livewire::test(\App\Livewire\Admin\CreateNoTuanItem::class)
+            ->set('name', 'Tas Gucci')
+            ->set('quantity', 2)
+            ->set('boxId', $this->box->id)
+            ->call('submit');
+
+        $noTuanItem = Item::where('name', 'Tas Gucci')->first();
+        $this->assertNotNull($noTuanItem);
+        $this->assertEquals(Item::STATUS_NO_TUAN, $noTuanItem->status);
+
+        // Step 2: Customer can see the item on No Tuan page
+        $this->actingAs($this->customer);
+
+        Livewire::test(NoTuanIndex::class)
+            ->assertViewHas('noTuanItems', function ($items) use ($noTuanItem) {
+                return $items->contains('id', $noTuanItem->id);
+            });
+    }
+
+    public function test_admin_input_no_tuan_full_flow(): void
+    {
+        // Step 1: Admin input barang No Tuan
+        $this->actingAs($this->admin);
+
+        Livewire::test(\App\Livewire\Admin\CreateNoTuanItem::class)
+            ->set('name', 'Jam Rolex')
+            ->set('quantity', 1)
+            ->set('boxId', $this->box->id)
+            ->call('submit');
+
+        $item = Item::where('name', 'Jam Rolex')->first();
+        $this->assertNotNull($item);
+        $this->assertEquals(Item::STATUS_NO_TUAN, $item->status);
+        $this->assertNull($item->customer_id);
+
+        // Step 2: Customer claims the item
+        $this->actingAs($this->customer);
+        Storage::fake('public');
+
+        $proof = UploadedFile::fake()->image('proof.jpg', 100, 100)->size(1024);
+
+        Livewire::test(NoTuanIndex::class)
+            ->set('selectedItemId', $item->id)
+            ->set('proofPembelian', $proof)
+            ->call('submitClaim');
+
+        // Step 3: Verify item is claimed
+        $item->refresh();
+        $this->assertEquals(Item::STATUS_CLAIMED, $item->status);
+        $this->assertEquals($this->customer->id, $item->customer_id);
+
+        // Step 4: Verify denda created
+        $denda = DendaClaim::where('item_id', $item->id)->first();
+        $this->assertNotNull($denda);
+        $this->assertEquals(5000, $denda->jumlah_denda);
+        $this->assertEquals($this->customer->id, $denda->customer_id);
+        $this->assertEquals(DendaClaim::STATUS_PENDING, $denda->status);
+    }
+
+    public function test_admin_input_no_tuan_requires_name(): void
+    {
+        $this->actingAs($this->admin);
+
+        Livewire::test(\App\Livewire\Admin\CreateNoTuanItem::class)
+            ->set('name', '')
+            ->set('quantity', 1)
+            ->set('boxId', $this->box->id)
+            ->call('submit')
+            ->assertHasErrors(['name']);
+    }
+
+    public function test_admin_input_no_tuan_requires_box(): void
+    {
+        $this->actingAs($this->admin);
+
+        Livewire::test(\App\Livewire\Admin\CreateNoTuanItem::class)
+            ->set('name', 'Test Item')
+            ->set('quantity', 1)
+            ->set('boxId', '')
+            ->call('submit')
+            ->assertHasErrors(['boxId']);
+    }
+
+    public function test_customer_cannot_access_admin_input_no_tuan(): void
+    {
+        $this->actingAs($this->customer);
+
+        $this->get('/admin/no-tuan/create')->assertForbidden();
+    }
+
+    public function test_admin_input_no_tuan_with_photo(): void
+    {
+        $this->actingAs($this->admin);
+        Storage::fake('public');
+
+        $photo = UploadedFile::fake()->image('item.jpg', 100, 100)->size(1024);
+
+        Livewire::test(\App\Livewire\Admin\CreateNoTuanItem::class)
+            ->set('name', 'Barang dengan Foto')
+            ->set('quantity', 3)
+            ->set('boxId', $this->box->id)
+            ->set('photo', $photo)
+            ->call('submit');
+
+        $item = Item::where('name', 'Barang dengan Foto')->first();
+        $this->assertNotNull($item);
+        $this->assertNotNull($item->proof_co);
+        Storage::disk('public')->assertExists($item->proof_co);
+    }
+
     // ─── Customer Cannot Access ManageBox ───────────────────────────
 
     public function test_customer_cannot_access_manage_box(): void

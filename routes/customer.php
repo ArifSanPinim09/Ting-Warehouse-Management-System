@@ -10,6 +10,7 @@ use App\Livewire\Customer\Kalkulator;
 use App\Livewire\Customer\KomplainIndex;
 use App\Livewire\Customer\NoTuanIndex;
 use App\Livewire\Customer\SetorResi;
+use App\Livewire\Customer\UnmatchedResi;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -50,6 +51,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // No Tuan (Revisi §2.1, §4.1)
     Route::get('/no-tuan', NoTuanIndex::class)->name('customer.no-tuan');
+
+    // Resi Belum Dikenali — customer klaim unmatched WH China data
+    Route::get('/unmatched-resi', UnmatchedResi::class)->name('customer.unmatched-resi');
 
     // Profile
     Route::view('/profile', 'profile')->name('profile');

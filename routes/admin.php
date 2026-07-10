@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\CreateNoTuanItem;
 use App\Livewire\Admin\CustomerIndex;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\EstUpdate;
@@ -61,4 +62,7 @@ Route::middleware(['auth', 'verified', 'role:admin,owner'])->prefix('admin')->na
 
     // Barang Lelang (Revisi §2.9, §4.1)
     Route::get('/lelang', LelangIndex::class)->name('lelang');
+
+    // Input Barang No Tuan (Revisi §2.1 — admin input barang tanpa resi)
+    Route::get('/no-tuan/create', CreateNoTuanItem::class)->name('no-tuan.create');
 });

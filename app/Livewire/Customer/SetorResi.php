@@ -5,7 +5,9 @@ namespace App\Livewire\Customer;
 use App\Http\Requests\Customer\SetorResiRequest;
 use App\Models\Box;
 use App\Models\Item;
+use App\Models\WhChinaData;
 use App\Services\NotificationService;
+use App\Services\RecapMatchingService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -111,6 +113,14 @@ class SetorResi extends Component
         // Update last_setor_date on box (Revisi §2.3)
         $box->last_setor_date = now();
         $box->save();
+
+        // Auto-match: if WH China data already exists for this resi, link it now
+        $whData = WhChinaData::where('resi_number', $this->resiNumber)
+            ->whereNull('item_id')
+            ->first();
+        if ($whData) {
+            app(RecapMatchingService::class)->matchByResi($whData);
+        }
 
         // Trigger notification to admin
         $notifService->customerRegister(auth()->user());
