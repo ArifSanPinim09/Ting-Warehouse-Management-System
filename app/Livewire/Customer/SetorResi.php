@@ -31,9 +31,12 @@ class SetorResi extends Component
     public $proofCo = null;
     public bool $isSensitive = false;
     public ?string $sensitiveType = null;
-
+    // ─── UI State ───────────────────────────────────────────────
     public bool $showSuccess = false;
     public bool $submitting = false;
+
+    // ─── WH China Match Indicator ──────────────────────────────
+    public ?array $whMatchInfo = null;
 
     protected function rules(): array
     {
@@ -69,6 +72,29 @@ class SetorResi extends Component
             'proofCo.max' => 'Ukuran foto maksimal 5MB',
             'sensitiveType.required_if' => 'Pilih jenis sensitive item',
         ];
+    }
+
+    // ─── Real-time WH China Match Check ────────────────────────
+    public function updatedResiNumber(): void
+    {
+        $this->whMatchInfo = null;
+
+        if (strlen($this->resiNumber) < 3) {
+            return;
+        }
+
+        $wh = \App\Models\WhChinaData::where('resi_number', $this->resiNumber)
+            ->whereNull('item_id')
+            ->first();
+
+        if ($wh) {
+            $this->whMatchInfo = [
+                'berat' => $wh->berat,
+                'ukuran' => $wh->ukuran_box,
+                'foto' => $wh->foto_barang ? \Illuminate\Support\Facades\Storage::url($wh->foto_barang) : null,
+                'tanggal' => $wh->created_at->format('d M Y'),
+            ];
+        }
     }
 
     public function submit(NotificationService $notifService): void

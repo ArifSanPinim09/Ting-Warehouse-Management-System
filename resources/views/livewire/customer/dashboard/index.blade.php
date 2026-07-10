@@ -85,6 +85,27 @@
             </a>
         </div>
 
+        {{-- Unmatched WH China Alert Banner --}}
+        @if($unmatchedWhCount > 0)
+            <a href="{{ route('customer.unmatched-resi') }}" wire:navigate
+                class="block bg-blue-50 border border-blue-200 rounded-[12px] p-4 hover:bg-blue-100/50 transition-colors group">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-body font-semibold text-blue-800">Ada {{ $unmatchedWhCount }} resi dari gudang China yang belum dikenali</p>
+                        <p class="text-caption text-blue-600 mt-0.5">Klik di sini untuk melihat dan mengklaim resi yang mungkin milik Anda.</p>
+                    </div>
+                    <svg class="w-5 h-5 text-blue-400 flex-shrink-0 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </a>
+        @endif
+
         {{-- R4: Status Box — Moved to top (most-viewed content) --}}
         <div class="ds-card overflow-hidden" role="region" aria-label="Daftar box Anda">
             <div class="px-6 py-5 border-b border-gray-100">

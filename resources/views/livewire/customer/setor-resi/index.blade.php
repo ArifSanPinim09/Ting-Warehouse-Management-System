@@ -76,8 +76,42 @@
 
                     <div>
                         <label class="ds-label">Nomor Resi <span class="text-red-500">*</span></label>
-                        <input type="text" wire:model="resiNumber" placeholder="Nomor resi dari supplier China" class="ds-input @error('resiNumber') ds-input-error @enderror" />
+                        <input type="text" wire:model.live.debounce.500ms="resiNumber" placeholder="Nomor resi dari supplier China" class="ds-input @error('resiNumber') ds-input-error @enderror" />
                         @error('resiNumber') <p class="ds-error">{{ $message }}</p> @enderror
+
+                        {{-- WH China Match Indicator --}}
+                        @if($whMatchInfo)
+                            <div class="mt-2 p-3 bg-emerald-50 border border-emerald-200 rounded-[8px] animate-fade-in">
+                                <div class="flex items-start gap-2.5">
+                                    <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <div class="flex-1">
+                                        <p class="text-body font-semibold text-emerald-800">Resi ditemukan di data gudang China!</p>
+                                        <p class="text-caption text-emerald-700 mt-1">Data akan otomatis terhubung saat Anda submit.</p>
+                                        <div class="mt-2 grid grid-cols-2 gap-2 text-caption">
+                                            <div>
+                                                <span class="text-emerald-600">Berat:</span>
+                                                <span class="font-medium text-emerald-800">{{ number_format($whMatchInfo['berat'], 2) }} kg</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-emerald-600">Ukuran:</span>
+                                                <span class="font-medium text-emerald-800">{{ $whMatchInfo['ukuran'] }}</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-emerald-600">Tanggal:</span>
+                                                <span class="font-medium text-emerald-800">{{ $whMatchInfo['tanggal'] }}</span>
+                                            </div>
+                                        </div>
+                                        @if($whMatchInfo['foto'])
+                                            <div class="mt-2">
+                                                <img src="{{ $whMatchInfo['foto'] }}" alt="Foto barang dari WH China" class="w-20 h-20 object-cover rounded-[6px] border border-emerald-200">
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
 

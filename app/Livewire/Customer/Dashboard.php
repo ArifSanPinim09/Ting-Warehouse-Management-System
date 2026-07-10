@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Item;
 use App\Models\Notification;
 use App\Models\Setting;
+use App\Models\WhChinaData;
 use App\Services\FeeCalculationService;
 use Livewire\Component;
 
@@ -14,7 +15,7 @@ use Livewire\Component;
  * Customer Dashboard — §4.2, §8.4
  *
  * Komponen: Rate Card, Invoice Unpaid Card, Goods Card, Receipt Card,
- * Status Box Table, Notifikasi, Shortcuts
+ * Status Box Table, Notifikasi, Shortcuts, Unmatched WH Alert
  */
 class Dashboard extends Component
 {
@@ -98,11 +99,14 @@ class Dashboard extends Component
         }
 
         // Recent notifications
-        $notifications = Notification::where('notifiable_type', 'App\Models\User')
+        $notifications = Notification::where('notifiable_type', 'App\\Models\\User')
             ->where('notifiable_id', $user->id)
             ->latest()
             ->limit(5)
             ->get();
+
+        // Unmatched WH China data count (for alert banner)
+        $unmatchedWhCount = WhChinaData::whereNull('item_id')->count();
 
         return view('livewire.customer.dashboard.index', compact(
             'activeBoxes',
@@ -116,6 +120,7 @@ class Dashboard extends Component
             'boxes',
             'detailBox',
             'notifications',
+            'unmatchedWhCount',
         ))->layout('layouts.app');
     }
 }
