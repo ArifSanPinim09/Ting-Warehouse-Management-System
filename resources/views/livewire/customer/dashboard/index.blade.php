@@ -325,14 +325,14 @@
                             <div class="w-2 h-2 rounded-full bg-blue-400"></div>
                             <span class="text-body text-gray-500">Rate Air</span>
                         </div>
-                        <span class="text-body font-semibold text-primary">Rp {{ number_format($rateAir, 0, ',', '.') }}/kg</span>
+                        <span class="text-body font-semibold text-primary">Rp {{ number_format($rateAir, 0, ',', '.') }}/gram</span>
                     </div>
                     <div class="flex items-center justify-between py-2">
                         <div class="flex items-center gap-2">
                             <div class="w-2 h-2 rounded-full bg-cyan-400"></div>
                             <span class="text-body text-gray-500">Rate Sea</span>
                         </div>
-                        <span class="text-body font-semibold text-primary">Rp {{ number_format($rateSea, 0, ',', '.') }}/kg</span>
+                        <span class="text-body font-semibold text-primary">Rp {{ number_format($rateSea, 0, ',', '.') }}/gram</span>
                     </div>
                 </div>
                 <a href="{{ route('customer.kalkulator') }}" wire:navigate class="ds-btn-ghost ds-btn-sm w-full mt-4 justify-center">

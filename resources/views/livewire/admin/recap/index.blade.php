@@ -504,7 +504,7 @@
                         {{-- Row 2: Weight + Dimensions (optional) --}}
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Weight (kg) <span class="text-gray-400 font-normal">(optional)</span></label>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Weight (gram) <span class="text-gray-400 font-normal">(optional)</span></label>
                                 <input type="number" wire:model="berat" step="0.01" min="0.01" placeholder="0.00"
                                     class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
                                 @error('berat') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -525,7 +525,7 @@
 
                             <div class="grid grid-cols-2 gap-3 mb-3">
                                 <div>
-                                    <label class="block text-[12px] font-medium text-gray-600 mb-1">Berat INA (kg) <span class="text-gray-400 font-normal">(optional)</span></label>
+                                    <label class="block text-[12px] font-medium text-gray-600 mb-1">Berat INA (gram) <span class="text-gray-400 font-normal">(optional)</span></label>
                                     <input type="number" wire:model="beratIna" step="0.01" min="0.01" placeholder="0.00"
                                         class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
                                     @error('beratIna') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror

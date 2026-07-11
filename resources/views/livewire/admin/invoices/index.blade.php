@@ -255,8 +255,8 @@
                         {{-- Weight & Dimensions --}}
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Berat (kg) <span class="text-red-500">*</span></label>
-                                <input type="number" wire:model.live="weight" step="0.1" min="0.1" max="99999" placeholder="Berat (kg)" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Berat (gram) <span class="text-red-500">*</span></label>
+                                <input type="number" wire:model.live="weight" step="0.1" min="0.1" max="99999" placeholder="Berat (gram)" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                                 @error('weight') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>

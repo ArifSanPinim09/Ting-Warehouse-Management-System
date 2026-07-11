@@ -154,7 +154,7 @@
                                 <p class="text-caption font-semibold text-gray-500 uppercase tracking-wide mb-3">Rincian Biaya</p>
                                 <div class="space-y-2">
                                     <div class="flex justify-between text-body">
-                                        <span class="text-gray-500">Fee TAX ({{ $selectedInvoice->weight }}kg)</span>
+                                        <span class="text-gray-500">Fee TAX ({{ $selectedInvoice->weight }}gram)</span>
                                         <span class="text-gray-800">Rp {{ number_format($selectedInvoice->fee_tax, 0, ',', '.') }}</span>
                                     </div>
                                     <div class="flex justify-between text-body">

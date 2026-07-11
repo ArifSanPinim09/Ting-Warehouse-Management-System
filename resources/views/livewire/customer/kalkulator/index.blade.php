@@ -56,7 +56,7 @@
                     <h3 class="ds-section-subtitle">Berat & Dimensi</h3>
 
                     <div>
-                        <label class="ds-label">Berat Aktual (kg) <span class="text-red-500">*</span></label>
+                        <label class="ds-label">Berat Aktual (gram) <span class="text-red-500">*</span></label>
                         <input type="number" wire:model.live="weight" min="0.1" step="0.1" placeholder="0.0" class="ds-input @error('weight') ds-input-error @enderror" />
                         @error('weight') <p class="ds-error">{{ $message }}</p> @enderror
                     </div>

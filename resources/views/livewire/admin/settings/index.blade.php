@@ -44,7 +44,7 @@
             <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-[15px] font-semibold text-gray-900">Rate Sharing</h3>
-                    <p class="text-body text-gray-500 mt-0.5">Rate per kg untuk pengiriman sharing (normal & sensitive)</p>
+                    <p class="text-body text-gray-500 mt-0.5">Rate per gram untuk pengiriman sharing (normal & sensitive)</p>
                 </div>
                 <div class="p-6 space-y-8">
                     {{-- Normal Sharing --}}
@@ -68,7 +68,7 @@
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">Rp</span>
                                         <input type="number" wire:model="{{ $field['key'] }}" min="1" max="99999" class="w-full pl-10 pr-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">/kg</span>
+                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">/gram</span>
                                     </div>
                                     @error($field['key']) <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                                 </div>
@@ -97,7 +97,7 @@
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">Rp</span>
                                         <input type="number" wire:model="{{ $field['key'] }}" min="1" max="99999" class="w-full pl-10 pr-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">/kg</span>
+                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">/gram</span>
                                     </div>
                                     @error($field['key']) <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                                 </div>
@@ -121,7 +121,7 @@
             <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-[15px] font-semibold text-gray-900">Rate Direct</h3>
-                    <p class="text-body text-gray-500 mt-0.5">Rate per kg untuk pengiriman direct (tanpa sensitive)</p>
+                    <p class="text-body text-gray-500 mt-0.5">Rate per gram untuk pengiriman direct (tanpa sensitive)</p>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -139,7 +139,7 @@
                                 <div class="relative">
                                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">Rp</span>
                                     <input type="number" wire:model="{{ $field['key'] }}" min="1" max="99999" class="w-full pl-10 pr-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">/kg</span>
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">/gram</span>
                                 </div>
                                 @error($field['key']) <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
@@ -171,23 +171,23 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div class="text-center">
                                 <div class="w-full h-2 bg-emerald-200 rounded-full mb-2"></div>
-                                <p class="text-caption font-semibold text-gray-700">0 — 150 kg</p>
+                                <p class="text-caption font-semibold text-gray-700">0 — 150 gram</p>
                                 <p class="text-caption text-gray-500">Flat rate</p>
                             </div>
                             <div class="text-center">
                                 <div class="w-full h-2 bg-blue-200 rounded-full mb-2"></div>
-                                <p class="text-caption font-semibold text-gray-700">151 — 1.000 kg</p>
+                                <p class="text-caption font-semibold text-gray-700">151 — 1.000 gram</p>
                                 <p class="text-caption text-gray-500">Flat rate</p>
                             </div>
                             <div class="text-center">
                                 <div class="w-full h-2 bg-amber-200 rounded-full mb-2"></div>
-                                <p class="text-caption font-semibold text-gray-700">1.001 — 2.000 kg</p>
+                                <p class="text-caption font-semibold text-gray-700">1.001 — 2.000 gram</p
                                 <p class="text-caption text-gray-500">Flat rate</p>
                             </div>
                             <div class="text-center">
                                 <div class="w-full h-2 bg-red-200 rounded-full mb-2"></div>
-                                <p class="text-caption font-semibold text-gray-700">&gt; 2.000 kg</p>
-                                <p class="text-caption text-gray-500">+ Extra per kg</p>
+                                <p class="text-caption font-semibold text-gray-700">&gt; 2.000 gram</p>
+                                <p class="text-caption text-gray-500">+ Extra per gram</p>
                             </div>
                         </div>
                     </div>
@@ -196,10 +196,10 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         @php
                             $packingFields = [
-                                ['key' => 'fee_packing_150', 'label' => 'Fee 0—150 kg', 'desc' => 'Flat rate untuk berat sampai 150 kg'],
-                                ['key' => 'fee_packing_1000', 'label' => 'Fee 151—1.000 kg', 'desc' => 'Flat rate untuk berat 151–1000 kg'],
-                                ['key' => 'fee_packing_2000', 'label' => 'Fee 1.001—2.000 kg', 'desc' => 'Flat rate untuk berat 1001–2000 kg'],
-                                ['key' => 'fee_packing_extra_per_kg', 'label' => 'Extra per kg', 'desc' => 'Biaya per kg untuk kelebihan di atas 2000 kg'],
+                                ['key' => 'fee_packing_150', 'label' => 'Fee 0—150 gram', 'desc' => 'Flat rate untuk berat sampai 150 gram'],
+                                ['key' => 'fee_packing_1000', 'label' => 'Fee 151—1.000 gram', 'desc' => 'Flat rate untuk berat 151–1000 gram'],
+                                ['key' => 'fee_packing_2000', 'label' => 'Fee 1.001—2.000 gram', 'desc' => 'Flat rate untuk berat 1001–2000 gram'],
+                                ['key' => 'fee_packing_extra_per_kg', 'label' => 'Extra per gram', 'desc' => 'Biaya per gram untuk kelebihan di atas 2000 gram'],
                             ];
                         @endphp
                         @foreach($packingFields as $field)
