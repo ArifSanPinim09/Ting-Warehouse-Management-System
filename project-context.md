@@ -86,3 +86,15 @@
 - Example: 60×40×50 → 20 (was 20,000)
 - Updated in: FeeCalculationService, WhChinaData, RecapIndex, blade view, CLAUDE.md
 - All 487 tests passing with recalculated expected values
+
+### Client Revision Batch 2 (7772d3f, a6dd312, 285399b)
+- Per-customer rates: custom_rate_air, custom_rate_sea on users table
+- FeeCalculationService: added customRate parameter to calculate()
+- Customer detail panel: shows Rate Air/Sea (Global or custom value)
+- Edit Customer modal: Custom Rate section with Air/Sea inputs
+- Biaya Tax: new field in wh_china_data table
+- WH China table: new BIAYA TAX column
+- WH China modal: Biaya Tax input field
+- Customer Dashboard: shows arrived INA data per resi (P×L×T, Volume, Biaya Tax, Foto INA)
+- Invoice format: shows Add On (tax tambahan) column
+- All 487 tests passing
