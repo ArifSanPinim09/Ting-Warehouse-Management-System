@@ -64,6 +64,11 @@ class RecapIndex extends Component
     // ─── WH China Form (§7.4) ──────────────────────────────────
     public string $resiNumber = '';
     public string $berat = '';
+    public string $beratIna = '';
+    public string $panjang = '';
+    public string $lebar = '';
+    public string $tinggi = '';
+    public string $volume = '';
     public string $ukuranBox = '';
     public string $hurufBox = '';
     public string $biayaJasa = '';
@@ -72,6 +77,25 @@ class RecapIndex extends Component
     public $fotoArrivedIna = null;
     public string $tanggalSetor = '';
     public ?int $editingWhId = null;
+
+    /**
+     * Auto-calculate volume when dimensions change.
+     */
+    public function updatedPanjang(): void { $this->calculateVolume(); }
+    public function updatedLebar(): void { $this->calculateVolume(); }
+    public function updatedTinggi(): void { $this->calculateVolume(); }
+
+    private function calculateVolume(): void
+    {
+        if ($this->panjang && $this->lebar && $this->tinggi) {
+            $this->volume = (string) round(
+                ((float) $this->panjang * (float) $this->lebar * (float) $this->tinggi) / 6,
+                4
+            );
+        } else {
+            $this->volume = '';
+        }
+    }
 
     public function mount(): void
     {
@@ -162,6 +186,10 @@ class RecapIndex extends Component
         $this->validate([
             'resiNumber' => 'required|string|max:100',
             'berat' => 'nullable|numeric|min:0.01',
+            'beratIna' => 'nullable|numeric|min:0.01',
+            'panjang' => 'nullable|numeric|min:0.01',
+            'lebar' => 'nullable|numeric|min:0.01',
+            'tinggi' => 'nullable|numeric|min:0.01',
             'ukuranBox' => 'nullable|string|max:100',
             'hurufBox' => 'nullable|string|max:10',
             'biayaJasa' => 'required|numeric|min:0',
@@ -173,6 +201,14 @@ class RecapIndex extends Component
             'resiNumber.required' => 'Resi number is required',
             'berat.numeric' => 'Weight must be a number',
             'berat.min' => 'Weight must be at least 0.01 kg',
+            'beratIna.numeric' => 'Weight must be a number',
+            'beratIna.min' => 'Weight must be at least 0.01 kg',
+            'panjang.numeric' => 'Length must be a number',
+            'panjang.min' => 'Length must be at least 0.01',
+            'lebar.numeric' => 'Width must be a number',
+            'lebar.min' => 'Width must be at least 0.01',
+            'tinggi.numeric' => 'Height must be a number',
+            'tinggi.min' => 'Height must be at least 0.01',
             'hurufBox.max' => 'Huruf box max 10 characters',
             'biayaJasa.required' => 'Service fee is required',
             'biayaJasa.numeric' => 'Service fee must be a number',
@@ -200,6 +236,15 @@ class RecapIndex extends Component
             $fotoInaPath = $this->fotoArrivedIna->store('wh-arrived-ina', 'public');
         }
 
+        // Calculate volume from dimensions
+        $calculatedVolume = null;
+        if ($this->panjang && $this->lebar && $this->tinggi) {
+            $calculatedVolume = round(
+                ((float) $this->panjang * (float) $this->lebar * (float) $this->tinggi) / 6,
+                4
+            );
+        }
+
         if ($this->editingWhId) {
             $whData = WhChinaData::findOrFail($this->editingWhId);
 
@@ -223,6 +268,11 @@ class RecapIndex extends Component
             $whData->update([
                 'resi_number' => $this->resiNumber,
                 'berat' => (float) $this->berat,
+                'berat_ina' => $this->beratIna !== '' ? (float) $this->beratIna : $whData->berat_ina,
+                'panjang' => $this->panjang !== '' ? (float) $this->panjang : $whData->panjang,
+                'lebar' => $this->lebar !== '' ? (float) $this->lebar : $whData->lebar,
+                'tinggi' => $this->tinggi !== '' ? (float) $this->tinggi : $whData->tinggi,
+                'volume' => $calculatedVolume ?? $whData->volume,
                 'ukuran_box' => $this->ukuranBox,
                 'huruf_box' => $this->hurufBox ?: null,
                 'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
@@ -237,6 +287,11 @@ class RecapIndex extends Component
             $whData = WhChinaData::create([
                 'resi_number' => $this->resiNumber,
                 'berat' => (float) $this->berat,
+                'berat_ina' => $this->beratIna !== '' ? (float) $this->beratIna : null,
+                'panjang' => $this->panjang !== '' ? (float) $this->panjang : null,
+                'lebar' => $this->lebar !== '' ? (float) $this->lebar : null,
+                'tinggi' => $this->tinggi !== '' ? (float) $this->tinggi : null,
+                'volume' => $calculatedVolume,
                 'ukuran_box' => $this->ukuranBox,
                 'huruf_box' => $this->hurufBox ?: null,
                 'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
@@ -267,6 +322,11 @@ class RecapIndex extends Component
         $this->editingWhId = $whData->id;
         $this->resiNumber = $whData->resi_number;
         $this->berat = (string) $whData->berat;
+        $this->beratIna = $whData->berat_ina !== null ? (string) $whData->berat_ina : '';
+        $this->panjang = $whData->panjang !== null ? (string) $whData->panjang : '';
+        $this->lebar = $whData->lebar !== null ? (string) $whData->lebar : '';
+        $this->tinggi = $whData->tinggi !== null ? (string) $whData->tinggi : '';
+        $this->volume = $whData->volume !== null ? (string) $whData->volume : '';
         $this->ukuranBox = $whData->ukuran_box;
         $this->hurufBox = $whData->huruf_box ?? '';
         $this->biayaJasa = $whData->biaya_jasa !== null ? (string) $whData->biaya_jasa : '';
@@ -315,6 +375,11 @@ class RecapIndex extends Component
     {
         $this->resiNumber = '';
         $this->berat = '';
+        $this->beratIna = '';
+        $this->panjang = '';
+        $this->lebar = '';
+        $this->tinggi = '';
+        $this->volume = '';
         $this->ukuranBox = '';
         $this->hurufBox = '';
         $this->biayaJasa = '';

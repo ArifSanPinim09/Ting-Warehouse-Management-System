@@ -12,6 +12,11 @@ class WhChinaData extends Model
     protected $fillable = [
         'resi_number',
         'berat',
+        'berat_ina',
+        'panjang',
+        'lebar',
+        'tinggi',
+        'volume',
         'ukuran_box',
         'huruf_box',
         'biaya_jasa',
@@ -26,10 +31,42 @@ class WhChinaData extends Model
 
     protected $casts = [
         'berat' => 'decimal:2',
+        'berat_ina' => 'decimal:2',
+        'panjang' => 'decimal:2',
+        'lebar' => 'decimal:2',
+        'tinggi' => 'decimal:2',
+        'volume' => 'decimal:4',
         'biaya_jasa' => 'decimal:2',
         'matched_at' => 'datetime',
         'tanggal_setor' => 'datetime',
     ];
+
+    /**
+     * Calculate volume from dimensions: (P × L × T) / 6
+     */
+    public function calculateVolume(): ?float
+    {
+        if ($this->panjang && $this->lebar && $this->tinggi) {
+            return round(($this->panjang * $this->lebar * $this->tinggi) / 6, 4);
+        }
+        return null;
+    }
+
+    /**
+     * Get effective weight for fee calculation: MAX(berat_ina, volume)
+     * Falls back to berat (China) if berat_ina not set.
+     */
+    public function getEffectiveWeight(): ?float
+    {
+        $weight = $this->berat_ina ?? $this->berat;
+        $vol = $this->volume;
+
+        if ($weight && $vol) {
+            return max($weight, $vol);
+        }
+
+        return $weight ?? $vol;
+    }
 
     /** @var list<string> Exclude biaya_jasa from serialization (sensitive, admin-only) */
     protected $hidden = ['biaya_jasa'];

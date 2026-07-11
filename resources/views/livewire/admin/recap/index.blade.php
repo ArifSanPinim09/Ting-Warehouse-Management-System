@@ -261,8 +261,10 @@
                                 <tr class="border-b border-gray-100 bg-gray-50/60">
                                     <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">No Resi</th>
                                     <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Huruf Box</th>
-                                    <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Berat</th>
-                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Ukuran</th>
+                                    <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Berat CN</th>
+                                    <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Berat INA</th>
+                                    <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Volume</th>
+                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">P×L×T</th>
                                     <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Biaya Jasa</th>
                                     <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Foto</th>
                                     <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Arrived China</th>
@@ -290,8 +292,26 @@
                                         <td class="px-5 py-2.5 text-right">
                                             <span class="text-[13px] text-gray-600 tabular-nums">{{ number_format($wh->berat, 2) }} kg</span>
                                         </td>
+                                        <td class="px-5 py-2.5 text-right">
+                                            @if($wh->berat_ina)
+                                                <span class="text-[13px] text-gray-700 font-semibold tabular-nums">{{ number_format($wh->berat_ina, 2) }} kg</span>
+                                            @else
+                                                <span class="text-[13px] text-gray-300">—</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-5 py-2.5 text-right">
+                                            @if($wh->volume)
+                                                <span class="text-[13px] text-gray-700 font-semibold tabular-nums">{{ number_format($wh->volume, 4) }} m³</span>
+                                            @else
+                                                <span class="text-[13px] text-gray-300">—</span>
+                                            @endif
+                                        </td>
                                         <td class="px-5 py-2.5">
-                                            <span class="text-[13px] text-gray-600">{{ $wh->ukuran_box }}</span>
+                                            @if($wh->panjang && $wh->lebar && $wh->tinggi)
+                                                <span class="text-[13px] text-gray-600 tabular-nums">{{ number_format($wh->panjang, 0) }}×{{ number_format($wh->lebar, 0) }}×{{ number_format($wh->tinggi, 0) }}</span>
+                                            @else
+                                                <span class="text-[13px] text-gray-600">{{ $wh->ukuran_box ?: '—' }}</span>
+                                            @endif
                                         </td>
                                         <td class="px-5 py-2.5 text-right">
                                             @if($wh->biaya_jasa !== null)
@@ -490,6 +510,52 @@
                         </div>
 
                         <p class="text-[11px] text-gray-400">Weight & dimensions can be filled later when goods arrive in Indonesia.</p>
+
+                        {{-- Indonesia Measurements (when goods arrive) --}}
+                        <div class="border-t border-gray-100 pt-4">
+                            <p class="text-[12px] font-semibold text-gray-700 mb-3">📦 Indonesia Measurements (saat barang tiba)</p>
+
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block text-[12px] font-medium text-gray-600 mb-1">Berat INA (kg) <span class="text-gray-400 font-normal">(optional)</span></label>
+                                    <input type="number" wire:model="beratIna" step="0.01" min="0.01" placeholder="0.00"
+                                        class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                                    @error('beratIna') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] font-medium text-gray-600 mb-1">Volume (m³) <span class="text-gray-400 font-normal">(auto)</span></label>
+                                    <input type="text" wire:model="volume" readonly
+                                        class="w-full px-3 py-2 text-[13px] bg-gray-50 border border-gray-200 rounded-[8px] text-gray-600 tabular-nums">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-[12px] font-medium text-gray-600 mb-1">Panjang (cm)</label>
+                                    <input type="number" wire:model="panjang" step="0.01" min="0.01" placeholder="0"
+                                        class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                                    @error('panjang') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] font-medium text-gray-600 mb-1">Lebar (cm)</label>
+                                    <input type="number" wire:model="lebar" step="0.01" min="0.01" placeholder="0"
+                                        class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                                    @error('lebar') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] font-medium text-gray-600 mb-1">Tinggi (cm)</label>
+                                    <input type="number" wire:model="tinggi" step="0.01" min="0.01" placeholder="0"
+                                        class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                                    @error('tinggi') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                </div>
+                            </div>
+
+                            @if($volume)
+                                <p class="text-[11px] text-emerald-600 mt-2 font-medium">
+                                    Volume: {{ $volume }} m³ — Formula: ({{ $panjang }}×{{ $lebar }}×{{ $tinggi }}) / 6
+                                </p>
+                            @endif
+                        </div>
 
                         {{-- Huruf Box (optional) --}}
                         <div>
