@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\User;
 use App\Services\AuditLogService;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -21,6 +22,19 @@ class CustomerIndex extends Component
 
     public ?int $selectedId = null;
     public bool $showDetail = false;
+
+    // ─── Edit Modal ────────────────────────────────────────────
+    public bool $showEditModal = false;
+    public string $editName = '';
+    public string $editEmail = '';
+    public string $editPhone = '';
+    public string $editKtpNumber = '';
+    public string $editAddress = '';
+    public string $editLineId = '';
+    public string $editStatus = '';
+
+    // ─── Delete Confirmation ───────────────────────────────────
+    public bool $showDeleteConfirm = false;
 
     public function selectCustomer(int $id): void
     {
@@ -67,6 +81,119 @@ class CustomerIndex extends Component
         $auditService->logCustom($customer, 'deactivated', "Customer {$customer->name} dinonaktifkan");
 
         $this->dispatch('toast', type: 'warning', title: 'Berhasil', message: "Akun {$customer->name} dinonaktifkan.");
+    }
+
+    // ─── Edit Customer ─────────────────────────────────────────
+
+    public function openEditModal(): void
+    {
+        $customer = User::findOrFail($this->selectedId);
+        $this->editName = $customer->name;
+        $this->editEmail = $customer->email;
+        $this->editPhone = $customer->phone ?? '';
+        $this->editKtpNumber = $customer->ktp_number ?? '';
+        $this->editAddress = $customer->address ?? '';
+        $this->editLineId = $customer->line_id ?? '';
+        $this->editStatus = $customer->status;
+        $this->showEditModal = true;
+    }
+
+    public function closeEditModal(): void
+    {
+        $this->showEditModal = false;
+    }
+
+    public function saveCustomer(AuditLogService $auditService): void
+    {
+        $customer = User::findOrFail($this->selectedId);
+
+        $this->validate([
+            'editName' => 'required|string|max:255',
+            'editEmail' => 'required|email|max:255|unique:users,email,' . $customer->id,
+            'editPhone' => 'nullable|string|max:20',
+            'editKtpNumber' => 'nullable|string|max:30',
+            'editAddress' => 'nullable|string|max:500',
+            'editLineId' => 'nullable|string|max:50',
+            'editStatus' => 'required|in:pending,active,inactive',
+        ], [
+            'editName.required' => 'Nama wajib diisi',
+            'editEmail.required' => 'Email wajib diisi',
+            'editEmail.email' => 'Format email tidak valid',
+            'editEmail.unique' => 'Email sudah digunakan',
+            'editStatus.required' => 'Status wajib dipilih',
+        ]);
+
+        $oldValues = [
+            'name' => $customer->name,
+            'email' => $customer->email,
+            'phone' => $customer->phone,
+            'status' => $customer->status,
+        ];
+
+        $customer->update([
+            'name' => $this->editName,
+            'email' => $this->editEmail,
+            'phone' => $this->editPhone ?: null,
+            'ktp_number' => $this->editKtpNumber ?: null,
+            'address' => $this->editAddress ?: null,
+            'line_id' => $this->editLineId ?: null,
+            'status' => $this->editStatus,
+        ]);
+
+        $newValues = [
+            'name' => $customer->name,
+            'email' => $customer->email,
+            'phone' => $customer->phone,
+            'status' => $customer->status,
+        ];
+
+        $auditService->log('updated', $customer, $oldValues, $newValues);
+
+        $this->showEditModal = false;
+
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "Data customer {$customer->name} berhasil diupdate.");
+    }
+
+    // ─── Delete Customer ───────────────────────────────────────
+
+    public function openDeleteConfirm(): void
+    {
+        $this->showDeleteConfirm = true;
+    }
+
+    public function closeDeleteConfirm(): void
+    {
+        $this->showDeleteConfirm = false;
+    }
+
+    public function deleteCustomer(AuditLogService $auditService): void
+    {
+        $customer = User::findOrFail($this->selectedId);
+
+        // Safety: check for active data
+        $activeBoxes = $customer->boxes()->whereIn('status', ['OPEN', 'SENT_TO_CARGO', 'OTW_INA', 'UP_INVOICE'])->count();
+        $activeInvoices = $customer->invoices()->whereIn('status', ['waiting_payment', 'waiting_verification'])->count();
+
+        if ($activeBoxes > 0 || $activeInvoices > 0) {
+            $this->dispatch('toast',
+                type: 'error',
+                title: 'Tidak Bisa Dihapus',
+                message: "Customer memiliki {$activeBoxes} box aktif dan {$activeInvoices} invoice aktif. Selesaikan dulu sebelum menghapus.",
+            );
+            $this->showDeleteConfirm = false;
+            return;
+        }
+
+        $name = $customer->name;
+        $auditService->logCustom($customer, 'deleted', "Customer {$name} dihapus oleh admin");
+
+        $customer->delete();
+
+        $this->showDeleteConfirm = false;
+        $this->showDetail = false;
+        $this->selectedId = null;
+
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "Customer {$name} berhasil dihapus.");
     }
 
     public function getSelectedCustomerProperty(): ?User

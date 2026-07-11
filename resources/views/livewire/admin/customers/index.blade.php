@@ -207,7 +207,7 @@
                                         @foreach($activeBoxes as $box)
                                             <div class="flex items-center justify-between p-2.5 rounded-[8px] bg-gray-50">
                                                 <div class="min-w-0">
-                                                    <p class="text-body font-medium text-gray-800 truncate">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}</p>
+                                                    <p class="text-body font-medium text-gray-800 truncate">{{ $box->display_name }}</p>
                                                     <p class="text-caption text-gray-500 capitalize">{{ $box->type }} · {{ strtoupper($box->method) }}</p>
                                                 </div>
                                                 <x-status-badge :status="$box->status" />
@@ -238,6 +238,15 @@
 
                             {{-- Action Buttons --}}
                             <div class="border-t border-gray-100 pt-4 space-y-2">
+                                {{-- Edit Button --}}
+                                <button
+                                    wire:click="openEditModal"
+                                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-body font-medium rounded-[8px] hover:bg-primary-light transition-colors"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    Edit Customer
+                                </button>
+
                                 @if($selectedCustomer->status === 'pending')
                                     <button
                                         wire:click="activateCustomer"
@@ -255,6 +264,15 @@
                                         Nonaktifkan Customer
                                     </button>
                                 @endif
+
+                                {{-- Delete Button --}}
+                                <button
+                                    wire:click="openDeleteConfirm"
+                                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-red-600 text-body font-medium rounded-[8px] border border-red-200 hover:bg-red-50 transition-colors"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    Hapus Customer
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -262,4 +280,132 @@
             @endif
         </div>
     </div>
+
+    {{-- Edit Customer Modal --}}
+    @if($showEditModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeEditModal">
+            <div class="fixed inset-0 bg-black/30 transition-opacity"></div>
+            <div class="flex min-h-full items-end sm:items-center justify-center p-4">
+                <div class="relative bg-white rounded-[16px] shadow-lg w-full max-w-lg transform transition-all" @click.stop>
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-[10px] bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            </div>
+                            <h3 class="text-[15px] font-semibold text-gray-900">Edit Customer</h3>
+                        </div>
+                        <button wire:click="closeEditModal" class="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-[8px] text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <form wire:submit.prevent="saveCustomer" class="p-6 space-y-4">
+                        {{-- Name + Email --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Nama <span class="text-red-500">*</span></label>
+                                <input type="text" wire:model="editName" maxlength="255" placeholder="Nama customer"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('editName') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Email <span class="text-red-500">*</span></label>
+                                <input type="email" wire:model="editEmail" maxlength="255" placeholder="email@example.com"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('editEmail') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        {{-- Phone + KTP --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Telepon</label>
+                                <input type="text" wire:model="editPhone" maxlength="20" placeholder="08xxxxxxxxxx"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('editPhone') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">No KTP</label>
+                                <input type="text" wire:model="editKtpNumber" maxlength="30" placeholder="Opsional"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('editKtpNumber') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        {{-- Address --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Alamat</label>
+                            <textarea wire:model="editAddress" rows="2" maxlength="500" placeholder="Alamat customer"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 resize-none"></textarea>
+                            @error('editAddress') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- LINE ID + Status --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">LINE ID</label>
+                                <input type="text" wire:model="editLineId" maxlength="50" placeholder="Opsional"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Status <span class="text-red-500">*</span></label>
+                                <select wire:model="editStatus" class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                    <option value="pending">Pending</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                                @error('editStatus') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        {{-- Actions --}}
+                        <div class="flex items-center justify-end gap-3 pt-2">
+                            <button type="button" wire:click="closeEditModal"
+                                class="px-4 py-2 text-[13px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="inline-flex items-center gap-2 px-5 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Delete Confirmation Modal --}}
+    @if($showDeleteConfirm)
+        <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeDeleteConfirm">
+            <div class="fixed inset-0 bg-black/30 transition-opacity"></div>
+            <div class="flex min-h-full items-end sm:items-center justify-center p-4">
+                <div class="relative bg-white rounded-[16px] shadow-modal w-full max-w-md p-6 transform transition-all" @click.stop>
+                    <div class="flex items-start gap-4 mb-5">
+                        <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-[16px] font-semibold text-gray-900">Hapus Customer</h3>
+                            <p class="text-body text-gray-500 mt-1">
+                                Anda yakin ingin menghapus customer
+                                <span class="font-semibold text-gray-700">{{ $selectedCustomer->name ?? '' }}</span>?
+                                Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 justify-end">
+                        <button wire:click="closeDeleteConfirm" class="px-4 py-2 text-body font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
+                            Batal
+                        </button>
+                        <button wire:click="deleteCustomer" class="px-4 py-2 text-body font-medium text-white bg-red-600 rounded-[8px] hover:bg-red-700 transition-colors">
+                            Hapus
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
