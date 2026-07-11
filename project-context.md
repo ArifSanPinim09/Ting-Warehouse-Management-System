@@ -72,3 +72,10 @@
 - Table: Berat CN, Berat INA, Volume, P×L×T columns
 - Modal: Indonesia Measurements section with auto-volume
 - All 479 tests passing
+
+### Revisi 4: CRUD Customer (7f9c8a7)
+- Edit modal: name, email, phone, ktp_number, address, line_id, status
+- Delete with confirmation + safety check (blocks if active boxes/invoices)
+- Validation: required fields, unique email
+- Audit log for all changes
+- 8 new tests, all 487 tests passing
