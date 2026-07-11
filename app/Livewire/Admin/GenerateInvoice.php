@@ -284,6 +284,7 @@ class GenerateInvoice extends Component
             'invoices' => $invoices,
             'availableBoxes' => $this->available_boxes,
             'selectedInvoice' => $this->selected_invoice,
+            'pending_denda_info' => $this->pending_denda_info,
         ]);
     }
 }
