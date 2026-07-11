@@ -64,3 +64,11 @@
 - RecapIndex: form fields + validation + save logic
 - Recap blade: table columns + modal form fields
 - All 479 tests passing
+
+### Revisi 3: Indonesia Measurements (def5522)
+- New columns: berat_ina (decimal), panjang, lebar, tinggi, volume
+- Volume auto-calculated: (P×L×T) / 6
+- WhChinaData model: calculateVolume() + getEffectiveWeight()
+- Table: Berat CN, Berat INA, Volume, P×L×T columns
+- Modal: Indonesia Measurements section with auto-volume
+- All 479 tests passing
