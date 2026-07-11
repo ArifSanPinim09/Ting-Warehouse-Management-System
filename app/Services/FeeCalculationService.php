@@ -94,13 +94,16 @@ class FeeCalculationService
         bool $isSensitive = false,
         float $addOn = 0.0,
         float $dendaTotal = 0.0,
+        ?float $customRate = null,
     ): array {
         $this->loadRates();
 
         $volume = $this->calculateVolume($length, $width, $height);
         $basis = $this->calculateBasis($weight, $volume);
         $rateKey = $this->getRateKey($type, $method, $isSensitive, $weight, $volume);
-        $rate = $this->rates[$rateKey] ?? 0;
+
+        // Per-customer rate override: if customRate is set, use it instead of global rate
+        $rate = $customRate ?? ($this->rates[$rateKey] ?? 0);
 
         $feeTax = $this->calculateFeeTax($basis, $rate);
         $feeWh = $this->calculateFeeWh($weight);

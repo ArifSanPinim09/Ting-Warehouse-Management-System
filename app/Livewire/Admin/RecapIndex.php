@@ -72,6 +72,7 @@ class RecapIndex extends Component
     public string $ukuranBox = '';
     public string $hurufBox = '';
     public string $biayaJasa = '';
+    public string $biayaTax = '';
     public $fotoBarang = null;
     public $fotoArrivedChina = null;
     public $fotoArrivedIna = null;
@@ -276,6 +277,7 @@ class RecapIndex extends Component
                 'ukuran_box' => $this->ukuranBox,
                 'huruf_box' => $this->hurufBox ?: null,
                 'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
+                'biaya_tax' => $this->biayaTax !== '' ? (float) $this->biayaTax : $whData->biaya_tax,
                 'foto_barang' => $fotoPath ?? $whData->foto_barang,
                 'foto_arrived_china' => $fotoChinaPath ?? $whData->foto_arrived_china,
                 'foto_arrived_ina' => $fotoInaPath ?? $whData->foto_arrived_ina,
@@ -295,6 +297,7 @@ class RecapIndex extends Component
                 'ukuran_box' => $this->ukuranBox,
                 'huruf_box' => $this->hurufBox ?: null,
                 'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
+                'biaya_tax' => $this->biayaTax !== '' ? (float) $this->biayaTax : null,
                 'foto_barang' => $fotoPath,
                 'foto_arrived_china' => $fotoChinaPath,
                 'foto_arrived_ina' => $fotoInaPath,

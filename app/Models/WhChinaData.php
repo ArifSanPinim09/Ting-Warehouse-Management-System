@@ -20,6 +20,7 @@ class WhChinaData extends Model
         'ukuran_box',
         'huruf_box',
         'biaya_jasa',
+        'biaya_tax',
         'foto_barang',
         'foto_arrived_china',
         'foto_arrived_ina',
@@ -37,6 +38,7 @@ class WhChinaData extends Model
         'tinggi' => 'decimal:2',
         'volume' => 'decimal:4',
         'biaya_jasa' => 'decimal:2',
+        'biaya_tax' => 'decimal:2',
         'matched_at' => 'datetime',
         'tanggal_setor' => 'datetime',
     ];

@@ -266,6 +266,7 @@
                                     <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Volume</th>
                                     <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">P×L×T</th>
                                     <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Biaya Jasa</th>
+                                    <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Biaya Tax</th>
                                     <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Foto</th>
                                     <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Arrived China</th>
                                     <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Arrived INA</th>
@@ -316,6 +317,13 @@
                                         <td class="px-5 py-2.5 text-right">
                                             @if($wh->biaya_jasa !== null)
                                                 <span class="text-[13px] text-gray-700 font-medium tabular-nums">Rp {{ number_format($wh->biaya_jasa, 0, ',', '.') }}</span>
+                                            @else
+                                                <span class="text-[13px] text-gray-300">—</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-5 py-2.5 text-right">
+                                            @if($wh->biaya_tax !== null)
+                                                <span class="text-[13px] text-gray-700 font-medium tabular-nums">Rp {{ number_format($wh->biaya_tax, 0, ',', '.') }}</span>
                                             @else
                                                 <span class="text-[13px] text-gray-300">—</span>
                                             @endif
@@ -552,9 +560,17 @@
 
                             @if($volume)
                                 <p class="text-[11px] text-emerald-600 mt-2 font-medium">
-                                    Volume: {{ $volume }} m³ — Formula: ({{ $panjang }}×{{ $lebar }}×{{ $tinggi }}) / 6000
+                                    Volume: {{ $volume }} — Formula: ({{ $panjang }}×{{ $lebar }}×{{ $tinggi }}) / 6000
                                 </p>
                             @endif
+                        </div>
+
+                        {{-- Biaya Tax (auto-calculated or manual) --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Biaya Tax <span class="text-gray-400 font-normal">(Rp)</span></label>
+                            <input type="number" wire:model="biayaTax" step="1" min="0" placeholder="Auto atau manual"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                            <p class="text-[11px] text-gray-400 mt-1">Diisi otomatis saat generate invoice, atau input manual.</p>
                         </div>
 
                         {{-- Huruf Box (optional) --}}

@@ -32,6 +32,8 @@ class CustomerIndex extends Component
     public string $editAddress = '';
     public string $editLineId = '';
     public string $editStatus = '';
+    public string $editCustomRateAir = '';
+    public string $editCustomRateSea = '';
 
     // ─── Delete Confirmation ───────────────────────────────────
     public bool $showDeleteConfirm = false;
@@ -95,6 +97,8 @@ class CustomerIndex extends Component
         $this->editAddress = $customer->address ?? '';
         $this->editLineId = $customer->line_id ?? '';
         $this->editStatus = $customer->status;
+        $this->editCustomRateAir = $customer->custom_rate_air !== null ? (string) $customer->custom_rate_air : '';
+        $this->editCustomRateSea = $customer->custom_rate_sea !== null ? (string) $customer->custom_rate_sea : '';
         $this->showEditModal = true;
     }
 
@@ -115,6 +119,8 @@ class CustomerIndex extends Component
             'editAddress' => 'nullable|string|max:500',
             'editLineId' => 'nullable|string|max:50',
             'editStatus' => 'required|in:pending,active,inactive',
+            'editCustomRateAir' => 'nullable|numeric|min:0',
+            'editCustomRateSea' => 'nullable|numeric|min:0',
         ], [
             'editName.required' => 'Nama wajib diisi',
             'editEmail.required' => 'Email wajib diisi',
@@ -138,6 +144,8 @@ class CustomerIndex extends Component
             'address' => $this->editAddress ?: null,
             'line_id' => $this->editLineId ?: null,
             'status' => $this->editStatus,
+            'custom_rate_air' => $this->editCustomRateAir !== '' ? (float) $this->editCustomRateAir : null,
+            'custom_rate_sea' => $this->editCustomRateSea !== '' ? (float) $this->editCustomRateSea : null,
         ]);
 
         $newValues = [

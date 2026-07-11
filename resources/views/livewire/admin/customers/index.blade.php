@@ -170,6 +170,14 @@
                                     <span class="text-gray-500">LINE ID</span>
                                     <span class="font-medium text-gray-800">{{ $selectedCustomer->line_id ?? '-' }}</span>
                                 </div>
+                                <div class="flex justify-between text-body">
+                                    <span class="text-gray-500">Rate Air</span>
+                                    <span class="font-medium text-gray-800">{{ $selectedCustomer->custom_rate_air ?? 'Global' }}</span>
+                                </div>
+                                <div class="flex justify-between text-body">
+                                    <span class="text-gray-500">Rate Sea</span>
+                                    <span class="font-medium text-gray-800">{{ $selectedCustomer->custom_rate_sea ?? 'Global' }}</span>
+                                </div>
                                 @if($selectedCustomer->address)
                                     <div>
                                         <span class="text-caption text-gray-500">Alamat</span>
@@ -355,6 +363,26 @@
                                     <option value="inactive">Inactive</option>
                                 </select>
                                 @error('editStatus') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        {{-- Custom Rates --}}
+                        <div class="border-t border-gray-100 pt-4">
+                            <p class="text-[12px] font-semibold text-gray-700 mb-3">💰 Custom Rate (Opsional)</p>
+                            <p class="text-[11px] text-gray-500 mb-3">Kosongkan jika menggunakan rate global. Isi jika customer punya rate khusus.</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[12px] font-medium text-gray-600 mb-1">Rate Air</label>
+                                    <input type="number" wire:model="editCustomRateAir" min="0" step="0.01" placeholder="Kosong = global"
+                                        class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                    @error('editCustomRateAir') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] font-medium text-gray-600 mb-1">Rate Sea</label>
+                                    <input type="number" wire:model="editCustomRateSea" min="0" step="0.01" placeholder="Kosong = global"
+                                        class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                    @error('editCustomRateSea') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                </div>
                             </div>
                         </div>
 
