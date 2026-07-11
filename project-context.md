@@ -79,3 +79,10 @@
 - Validation: required fields, unique email
 - Audit log for all changes
 - 8 new tests, all 487 tests passing
+
+### Volume Formula Fix (8af27e3)
+- Changed from P×L×T/6 to P×L×T/6000 (client-verified)
+- Standard shipping volume weight formula
+- Example: 60×40×50 → 20 (was 20,000)
+- Updated in: FeeCalculationService, WhChinaData, RecapIndex, blade view, CLAUDE.md
+- All 487 tests passing with recalculated expected values
