@@ -152,9 +152,9 @@ class UnmatchedResi extends Component
 
         // PRD §4.3: Sharing box (customer_id NULL) + direct box milik customer
         $openBoxes = Box::where('status', Box::STATUS_OPEN)
-            ->where(function ($query) use ($userId) {
+            ->where(function ($query) {
                 $query->whereNull('customer_id')
-                    ->orWhere('customer_id', $userId);
+                    ->orWhere('customer_id', auth()->id());
             })
             ->orderByDesc('last_setor_date')
             ->get();
