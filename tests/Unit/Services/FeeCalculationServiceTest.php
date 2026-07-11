@@ -15,6 +15,8 @@ use Tests\TestCase;
  * non-sensitive, dan 1 kasus volume > berat), tulis sebagai test case dengan
  * hasil manual di komentar, baru assert service menghasilkan angka yang sama."
  *
+ * Volume formula (client-verified): (P × L × T) / 6000
+ *
  * Default rates (PRD §4.12):
  * - kurs_yuan_idr: 2460
  * - rate_sharing_air_berat: 255
@@ -51,21 +53,21 @@ class FeeCalculationServiceTest extends TestCase
     }
 
     /**
-     * Skenario 1: Sharing, Air, Non-Sensitive, Berat < Volume
+     * Skenario 1: Sharing, Air, Non-Sensitive, Weight > Volume
      *
      * Input:
      * - type: sharing, method: air, sensitive: false
      * - weight: 100 kg, P: 50cm, L: 40cm, T: 30cm
      *
      * Manual calculation:
-     * - Volume = (50 × 40 × 30) / 6 = 10000 cm³ → 10000 (unit m³ equivalent)
-     * - Basis = max(100, 10000) = 10000
-     * - Rate key = rate_sharing_air_volume (karena volume > berat)
-     * - Rate = 230
-     * - Fee TAX = 10000 × 230 = 2300000
+     * - Volume = (50 × 40 × 30) / 6000 = 10
+     * - Basis = max(100, 10) = 100 (weight wins)
+     * - Rate key = rate_sharing_air_berat (berat > volume)
+     * - Rate = 255
+     * - Fee TAX = 100 × 255 = 25500
      * - Fee WH = 5000 (100 kg → tier 0-150)
      * - Fee Packing = 5000 (same tier)
-     * - Grand Total = 2300000 + 5000 + 5000 = 2310000
+     * - Grand Total = 25500 + 5000 + 5000 = 35500
      */
     public function test_scenario_1_sharing_air_non_sensitive(): void
     {
@@ -79,32 +81,32 @@ class FeeCalculationServiceTest extends TestCase
             isSensitive: false,
         );
 
-        $this->assertEquals(10000.0, $result['volume']);
-        $this->assertEquals(10000.0, $result['basis']);
-        $this->assertEquals('rate_sharing_air_volume', $result['rate_key']);
-        $this->assertEquals(230, $result['rate_used']);
-        $this->assertEquals(2300000, $result['fee_tax']);
+        $this->assertEquals(10.0, $result['volume']);
+        $this->assertEquals(100.0, $result['basis']);
+        $this->assertEquals('rate_sharing_air_berat', $result['rate_key']);
+        $this->assertEquals(255, $result['rate_used']);
+        $this->assertEquals(25500, $result['fee_tax']);
         $this->assertEquals(5000, $result['fee_wh']);
         $this->assertEquals(5000, $result['fee_packing']);
-        $this->assertEquals(2310000, $result['grand_total']);
+        $this->assertEquals(35500, $result['grand_total']);
     }
 
     /**
-     * Skenario 2: Direct, Sea, Non-Sensitive, Berat < Volume
+     * Skenario 2: Direct, Sea, Non-Sensitive, Volume > Weight
      *
      * Input:
      * - type: direct, method: sea, sensitive: false
      * - weight: 50 kg, P: 100cm, L: 80cm, T: 60cm
      *
      * Manual calculation:
-     * - Volume = (100 × 80 × 60) / 6 = 80000 cm³ → 80000
-     * - Basis = max(50, 80000) = 80000
-     * - Rate key = rate_direct_sea_volume (karena volume > berat)
+     * - Volume = (100 × 80 × 60) / 6000 = 80
+     * - Basis = max(50, 80) = 80 (volume wins)
+     * - Rate key = rate_direct_sea_volume
      * - Rate = 90
-     * - Fee TAX = 80000 × 90 = 7200000
+     * - Fee TAX = 80 × 90 = 7200
      * - Fee WH = 5000 (50 kg → tier 0-150)
      * - Fee Packing = 5000 (same)
-     * - Grand Total = 7200000 + 5000 + 5000 = 7210000
+     * - Grand Total = 7200 + 5000 + 5000 = 17200
      */
     public function test_scenario_2_direct_sea_non_sensitive(): void
     {
@@ -118,32 +120,32 @@ class FeeCalculationServiceTest extends TestCase
             isSensitive: false,
         );
 
-        $this->assertEquals(80000.0, $result['volume']);
-        $this->assertEquals(80000.0, $result['basis']);
+        $this->assertEquals(80.0, $result['volume']);
+        $this->assertEquals(80.0, $result['basis']);
         $this->assertEquals('rate_direct_sea_volume', $result['rate_key']);
         $this->assertEquals(90, $result['rate_used']);
-        $this->assertEquals(7200000, $result['fee_tax']);
+        $this->assertEquals(7200, $result['fee_tax']);
         $this->assertEquals(5000, $result['fee_wh']);
         $this->assertEquals(5000, $result['fee_packing']);
-        $this->assertEquals(7210000, $result['grand_total']);
+        $this->assertEquals(17200, $result['grand_total']);
     }
 
     /**
-     * Skenario 3: Sharing, Air, Sensitive, Berat > Volume
+     * Skenario 3: Sharing, Air, Sensitive, Weight > Volume
      *
      * Input:
      * - type: sharing, method: air, sensitive: true
      * - weight: 200 kg, P: 60cm, L: 50cm, T: 40cm
      *
      * Manual calculation:
-     * - Volume = (60 × 50 × 40) / 6 = 20000 cm³ → 20000
-     * - Basis = max(200, 20000) = 20000
-     * - Rate key = rate_sharing_sensitive_air_volume (karena volume > berat)
+     * - Volume = (60 × 50 × 40) / 6000 = 20
+     * - Basis = max(200, 20) = 200 (weight wins)
+     * - Rate key = rate_sharing_sensitive_air_berat
      * - Rate = 315
-     * - Fee TAX = 20000 × 315 = 6300000
+     * - Fee TAX = 200 × 315 = 63000
      * - Fee WH = 6500 (200 kg → tier 151-1000)
      * - Fee Packing = 6500 (same)
-     * - Grand Total = 6300000 + 6500 + 6500 = 6313000
+     * - Grand Total = 63000 + 6500 + 6500 = 76000
      */
     public function test_scenario_3_sharing_air_sensitive(): void
     {
@@ -157,18 +159,18 @@ class FeeCalculationServiceTest extends TestCase
             isSensitive: true,
         );
 
-        $this->assertEquals(20000.0, $result['volume']);
-        $this->assertEquals(20000.0, $result['basis']);
-        $this->assertEquals('rate_sharing_sensitive_air_volume', $result['rate_key']);
+        $this->assertEquals(20.0, $result['volume']);
+        $this->assertEquals(200.0, $result['basis']);
+        $this->assertEquals('rate_sharing_sensitive_air_berat', $result['rate_key']);
         $this->assertEquals(315, $result['rate_used']);
-        $this->assertEquals(6300000, $result['fee_tax']);
+        $this->assertEquals(63000, $result['fee_tax']);
         $this->assertEquals(6500, $result['fee_wh']);
         $this->assertEquals(6500, $result['fee_packing']);
-        $this->assertEquals(6313000, $result['grand_total']);
+        $this->assertEquals(76000, $result['grand_total']);
     }
 
     /**
-     * Skenario 4: Direct, Sea, Sensitive, Volume > Berat
+     * Skenario 4: Direct, Sea, Sensitive, Volume > Weight
      *
      * PRD §4.12: Direct TIDAK punya sensitive rate. Direct sensitive → gunakan rate_direct_sea_volume.
      *
@@ -177,14 +179,14 @@ class FeeCalculationServiceTest extends TestCase
      * - weight: 30 kg, P: 120cm, L: 100cm, T: 80cm
      *
      * Manual calculation:
-     * - Volume = (120 × 100 × 80) / 6 = 160000 cm³ → 160000
-     * - Basis = max(30, 160000) = 160000
+     * - Volume = (120 × 100 × 80) / 6000 = 160
+     * - Basis = max(30, 160) = 160 (volume wins)
      * - Rate key = rate_direct_sea_volume (direct tidak punya sensitive variant)
      * - Rate = 90
-     * - Fee TAX = 160000 × 90 = 14400000
+     * - Fee TAX = 160 × 90 = 14400
      * - Fee WH = 5000 (30 kg → tier 0-150)
      * - Fee Packing = 5000 (same)
-     * - Grand Total = 14400000 + 5000 + 5000 = 14410000
+     * - Grand Total = 14400 + 5000 + 5000 = 24400
      */
     public function test_scenario_4_direct_sea_sensitive(): void
     {
@@ -198,32 +200,32 @@ class FeeCalculationServiceTest extends TestCase
             isSensitive: true,
         );
 
-        $this->assertEquals(160000.0, $result['volume']);
-        $this->assertEquals(160000.0, $result['basis']);
+        $this->assertEquals(160.0, $result['volume']);
+        $this->assertEquals(160.0, $result['basis']);
         $this->assertEquals('rate_direct_sea_volume', $result['rate_key']);
         $this->assertEquals(90, $result['rate_used']);
-        $this->assertEquals(14400000, $result['fee_tax']);
+        $this->assertEquals(14400, $result['fee_tax']);
         $this->assertEquals(5000, $result['fee_wh']);
         $this->assertEquals(5000, $result['fee_packing']);
-        $this->assertEquals(14410000, $result['grand_total']);
+        $this->assertEquals(24400, $result['grand_total']);
     }
 
     /**
-     * Skenario 5: Sharing, Air, Non-Sensitive, Volume > Berat (kasus khusus)
+     * Skenario 5: Sharing, Air, Non-Sensitive, Volume > Weight
      *
      * Input:
      * - type: sharing, method: air, sensitive: false
      * - weight: 10 kg, P: 200cm, L: 150cm, T: 100cm
      *
      * Manual calculation:
-     * - Volume = (200 × 150 × 100) / 6 = 500000 cm³ → 500000
-     * - Basis = max(10, 500000) = 500000
-     * - Rate key = rate_sharing_air_volume (karena volume > berat)
+     * - Volume = (200 × 150 × 100) / 6000 = 500
+     * - Basis = max(10, 500) = 500 (volume wins)
+     * - Rate key = rate_sharing_air_volume
      * - Rate = 230
-     * - Fee TAX = 500000 × 230 = 115000000
+     * - Fee TAX = 500 × 230 = 115000
      * - Fee WH = 5000 (10 kg → tier 0-150)
      * - Fee Packing = 5000 (same)
-     * - Grand Total = 115000000 + 5000 + 5000 = 115010000
+     * - Grand Total = 115000 + 5000 + 5000 = 125000
      */
     public function test_scenario_5_volume_greater_than_weight(): void
     {
@@ -237,14 +239,14 @@ class FeeCalculationServiceTest extends TestCase
             isSensitive: false,
         );
 
-        $this->assertEquals(500000.0, $result['volume']);
-        $this->assertEquals(500000.0, $result['basis']);
+        $this->assertEquals(500.0, $result['volume']);
+        $this->assertEquals(500.0, $result['basis']);
         $this->assertEquals('rate_sharing_air_volume', $result['rate_key']);
         $this->assertEquals(230, $result['rate_used']);
-        $this->assertEquals(115000000, $result['fee_tax']);
+        $this->assertEquals(115000, $result['fee_tax']);
         $this->assertEquals(5000, $result['fee_wh']);
         $this->assertEquals(5000, $result['fee_packing']);
-        $this->assertEquals(115010000, $result['grand_total']);
+        $this->assertEquals(125000, $result['grand_total']);
     }
 
     /**
@@ -255,8 +257,8 @@ class FeeCalculationServiceTest extends TestCase
      * - weight: 2500 kg, P: 10cm, L: 10cm, T: 10cm (kecil, biar berat domine)
      *
      * Manual calculation:
-     * - Volume = (10 × 10 × 10) / 6 = 166.67
-     * - Basis = max(2500, 166.67) = 2500
+     * - Volume = (10 × 10 × 10) / 6000 = 0.1667
+     * - Basis = max(2500, 0.1667) = 2500
      * - Rate key = rate_sharing_sea_berat (berat > volume)
      * - Rate = 70
      * - Fee TAX = 2500 × 70 = 175000
@@ -276,7 +278,7 @@ class FeeCalculationServiceTest extends TestCase
             isSensitive: false,
         );
 
-        $this->assertEqualsWithDelta(166.67, $result['volume'], 0.01);
+        $this->assertEqualsWithDelta(0.17, $result['volume'], 0.01);
         $this->assertEquals(2500.0, $result['basis']);
         $this->assertEquals('rate_sharing_sea_berat', $result['rate_key']);
         $this->assertEquals(70, $result['rate_used']);
@@ -295,14 +297,14 @@ class FeeCalculationServiceTest extends TestCase
      * - addOn: 50000
      *
      * Manual calculation:
-     * - Volume = (10 × 10 × 10) / 6 = 166.67
-     * - Basis = max(50, 166.67) = 166.67
-     * - Rate key = rate_direct_air_volume (volume > berat)
-     * - Rate = 160
-     * - Fee TAX = 166.67 × 160 = 26667.2 → 26667
+     * - Volume = (10 × 10 × 10) / 6000 = 0.1667
+     * - Basis = max(50, 0.1667) = 50 (weight wins)
+     * - Rate key = rate_direct_air_berat
+     * - Rate = 230
+     * - Fee TAX = 50 × 230 = 11500
      * - Fee WH = 5000 (50 kg → tier 0-150)
      * - Fee Packing = 5000 (same)
-     * - Grand Total = 26667 + 5000 + 5000 + 50000 = 86667
+     * - Grand Total = 11500 + 5000 + 5000 + 50000 = 71500
      */
     public function test_scenario_7_with_add_on(): void
     {
@@ -317,22 +319,22 @@ class FeeCalculationServiceTest extends TestCase
             addOn: 50000,
         );
 
-        $this->assertEqualsWithDelta(166.67, $result['volume'], 0.01);
-        $this->assertEqualsWithDelta(166.67, $result['basis'], 0.01);
-        $this->assertEquals('rate_direct_air_volume', $result['rate_key']);
-        $this->assertEquals(160, $result['rate_used']);
-        $this->assertEquals(26667, $result['fee_tax']);
+        $this->assertEqualsWithDelta(0.17, $result['volume'], 0.01);
+        $this->assertEquals(50.0, $result['basis']);
+        $this->assertEquals('rate_direct_air_berat', $result['rate_key']);
+        $this->assertEquals(230, $result['rate_used']);
+        $this->assertEquals(11500, $result['fee_tax']);
         $this->assertEquals(5000, $result['fee_wh']);
         $this->assertEquals(5000, $result['fee_packing']);
         $this->assertEquals(50000, $result['add_on']);
-        $this->assertEquals(86667, $result['grand_total']);
+        $this->assertEquals(71500, $result['grand_total']);
     }
 
     /**
      * Skenario 8: With denda_total (Revisi §2.4.4)
      *
      * Same as scenario 7 but with dendaTotal = 10000
-     * Grand Total = fee_tax + fee_wh + fee_packing + add_on + denda_total
+     * Grand Total = fee_tax(11500) + fee_wh(5000) + fee_packing(5000) + add_on(50000) + denda(10000) = 81500
      */
     public function test_scenario_8_with_denda_total(): void
     {
@@ -350,8 +352,7 @@ class FeeCalculationServiceTest extends TestCase
 
         $this->assertEquals(50000, $result['add_on']);
         $this->assertEquals(10000, $result['denda_total']);
-        // fee_tax(26667) + fee_wh(5000) + fee_packing(5000) + add_on(50000) + denda(10000) = 96667
-        $this->assertEquals(96667, $result['grand_total']);
+        $this->assertEquals(81500, $result['grand_total']);
     }
 
     /**
@@ -374,17 +375,19 @@ class FeeCalculationServiceTest extends TestCase
 
     /**
      * Test volume calculation standalone.
+     *
+     * Volume formula: (P × L × T) / 6000
      */
     public function test_volume_calculation(): void
     {
-        // (100 × 80 × 60) / 6 = 80000
-        $this->assertEquals(80000.0, $this->service->calculateVolume(100, 80, 60));
+        // (100 × 80 × 60) / 6000 = 80
+        $this->assertEquals(80.0, $this->service->calculateVolume(100, 80, 60));
 
-        // (50 × 40 × 30) / 6 = 10000
-        $this->assertEquals(10000.0, $this->service->calculateVolume(50, 40, 30));
+        // (50 × 40 × 30) / 6000 = 10
+        $this->assertEquals(10.0, $this->service->calculateVolume(50, 40, 30));
 
-        // (10 × 10 × 10) / 6 = 166.67
-        $this->assertEqualsWithDelta(166.67, $this->service->calculateVolume(10, 10, 10), 0.01);
+        // (10 × 10 × 10) / 6000 = 0.1667
+        $this->assertEqualsWithDelta(0.1667, $this->service->calculateVolume(10, 10, 10), 0.001);
     }
 
     /**

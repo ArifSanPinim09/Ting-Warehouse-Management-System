@@ -95,7 +95,7 @@ Semua file upload (proof_co, payment_proof, packing_photo, video/photo komplain)
 ## 4. Fee Calculation — Referensi Cepat (PRD §4.8, §4.12)
 
 ```
-Volume (m³ equivalent) = (Panjang × Lebar × Tinggi) / 6
+Volume (m³ equivalent) = (Panjang × Lebar × Tinggi) / 6000
 Dasar Perhitungan      = MAX(berat_aktual, volume)
 Fee TAX                = Dasar × rate (pilih dari 12 varian berdasarkan: 
                           sharing/direct × air/sea × sensitive/non-sensitive)

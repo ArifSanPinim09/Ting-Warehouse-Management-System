@@ -552,7 +552,7 @@
 
                             @if($volume)
                                 <p class="text-[11px] text-emerald-600 mt-2 font-medium">
-                                    Volume: {{ $volume }} m³ — Formula: ({{ $panjang }}×{{ $lebar }}×{{ $tinggi }}) / 6
+                                    Volume: {{ $volume }} m³ — Formula: ({{ $panjang }}×{{ $lebar }}×{{ $tinggi }}) / 6000
                                 </p>
                             @endif
                         </div>

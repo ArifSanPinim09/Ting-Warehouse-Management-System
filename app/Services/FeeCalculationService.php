@@ -13,7 +13,7 @@ use App\Models\Setting;
  * (CLAUDE.md §3.2)
  *
  * PRD §4.8: Kalkulator Biaya
- * - Volume = (P × L × T) / 6
+ * - Volume = (P × L × T) / 6000
  * - Dasar  = max(berat_aktual, volume)
  * - Fee TAX = Dasar × Rate
  * - Fee WH  = Tiered berdasarkan berat
@@ -124,8 +124,8 @@ class FeeCalculationService
     /**
      * Calculate volume in m³ equivalent.
      *
-     * PRD §4.8: Volume = (P × L × T) / 6
-     * Input in cm, output in m³ equivalent (for weight comparison).
+     * PRD §4.8: Volume = (P × L × T) / 6000
+     * Input in cm, output in kg equivalent (for weight comparison).
      *
      * @param  float  $length  Panjang (cm)
      * @param  float  $width   Lebar (cm)
@@ -134,7 +134,7 @@ class FeeCalculationService
      */
     public function calculateVolume(float $length, float $width, float $height): float
     {
-        return ($length * $width * $height) / 6;
+        return ($length * $width * $height) / 6000;
     }
 
     /**

@@ -89,7 +89,7 @@ class RecapIndex extends Component
     {
         if ($this->panjang && $this->lebar && $this->tinggi) {
             $this->volume = (string) round(
-                ((float) $this->panjang * (float) $this->lebar * (float) $this->tinggi) / 6,
+                ((float) $this->panjang * (float) $this->lebar * (float) $this->tinggi) / 6000,
                 4
             );
         } else {
@@ -240,7 +240,7 @@ class RecapIndex extends Component
         $calculatedVolume = null;
         if ($this->panjang && $this->lebar && $this->tinggi) {
             $calculatedVolume = round(
-                ((float) $this->panjang * (float) $this->lebar * (float) $this->tinggi) / 6,
+                ((float) $this->panjang * (float) $this->lebar * (float) $this->tinggi) / 6000,
                 4
             );
         }

@@ -42,12 +42,12 @@ class WhChinaData extends Model
     ];
 
     /**
-     * Calculate volume from dimensions: (P × L × T) / 6
+     * Calculate volume from dimensions: (P × L × T) / 6000
      */
     public function calculateVolume(): ?float
     {
         if ($this->panjang && $this->lebar && $this->tinggi) {
-            return round(($this->panjang * $this->lebar * $this->tinggi) / 6, 4);
+            return round(($this->panjang * $this->lebar * $this->tinggi) / 6000, 4);
         }
         return null;
     }

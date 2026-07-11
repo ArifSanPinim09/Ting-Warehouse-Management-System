@@ -20,6 +20,8 @@ use Tests\TestCase;
  * membaca 16 rate keys dari tabel settings. Kurs hanya dipakai untuk
  * tampilan (dashboard) dan generate invoice (Yuan→IDR conversion).
  *
+ * Volume formula (client-verified): (P × L × T) / 6000
+ *
  * Test ini membuktikan bahwa:
  * 1. calculate() menghasilkan angka yang sama meski kurs_history ada
  * 2. Invoice yang sudah dibuat tidak berubah (snapshot)
@@ -45,11 +47,10 @@ class SnapshotRuleTest extends TestCase
      * Pre-R1 snapshot: Invoice #1 — Sharing, Air, Non-Sensitive
      *
      * Dibuat SEBELUM kurs_history diperkenalkan.
-     * Nilai-nilai ini adalah "frozen" — tidak boleh berubah.
+     * Volume = (50×40×30)/6000 = 10, basis = max(100,10) = 100
      */
     public function test_pre_r1_invoice_1_sharing_air_unchanged(): void
     {
-        // Pre-R1 snapshot values (what the invoice was created with)
         $snapshot = [
             'type' => 'sharing',
             'method' => 'air',
@@ -61,12 +62,12 @@ class SnapshotRuleTest extends TestCase
             'add_on' => 0.0,
         ];
         $expectedFees = [
-            'volume' => 10000.0,
-            'basis' => 10000.0,
-            'fee_tax' => 2300000,
+            'volume' => 10.0,
+            'basis' => 100.0,
+            'fee_tax' => 25500,
             'fee_wh' => 5000,
             'fee_packing' => 5000,
-            'grand_total' => 2310000,
+            'grand_total' => 35500,
         ];
 
         // Introduce kurs_history — should NOT affect fee calculation
@@ -105,6 +106,7 @@ class SnapshotRuleTest extends TestCase
 
     /**
      * Pre-R1 snapshot: Invoice #2 — Direct, Sea, Non-Sensitive
+     * Volume = (100×80×60)/6000 = 80, basis = max(50,80) = 80
      */
     public function test_pre_r1_invoice_2_direct_sea_unchanged(): void
     {
@@ -119,12 +121,12 @@ class SnapshotRuleTest extends TestCase
             'add_on' => 0.0,
         ];
         $expectedFees = [
-            'volume' => 80000.0,
-            'basis' => 80000.0,
-            'fee_tax' => 7200000,
+            'volume' => 80.0,
+            'basis' => 80.0,
+            'fee_tax' => 7200,
             'fee_wh' => 5000,
             'fee_packing' => 5000,
-            'grand_total' => 7210000,
+            'grand_total' => 17200,
         ];
 
         // Introduce kurs_history
@@ -156,6 +158,7 @@ class SnapshotRuleTest extends TestCase
 
     /**
      * Pre-R1 snapshot: Invoice #3 — Sharing, Air, Sensitive
+     * Volume = (60×50×40)/6000 = 20, basis = max(200,20) = 200
      */
     public function test_pre_r1_invoice_3_sharing_air_sensitive_unchanged(): void
     {
@@ -170,12 +173,12 @@ class SnapshotRuleTest extends TestCase
             'add_on' => 0.0,
         ];
         $expectedFees = [
-            'volume' => 20000.0,
-            'basis' => 20000.0,
-            'fee_tax' => 6300000,
+            'volume' => 20.0,
+            'basis' => 200.0,
+            'fee_tax' => 63000,
             'fee_wh' => 6500,
             'fee_packing' => 6500,
-            'grand_total' => 6313000,
+            'grand_total' => 76000,
         ];
 
         // Introduce kurs_history with different kurs values
@@ -212,6 +215,7 @@ class SnapshotRuleTest extends TestCase
 
     /**
      * Pre-R1 snapshot: Invoice #4 — Direct, Sea, Sensitive
+     * Volume = (120×100×80)/6000 = 160, basis = max(30,160) = 160
      */
     public function test_pre_r1_invoice_4_direct_sea_sensitive_unchanged(): void
     {
@@ -226,12 +230,12 @@ class SnapshotRuleTest extends TestCase
             'add_on' => 0.0,
         ];
         $expectedFees = [
-            'volume' => 160000.0,
-            'basis' => 160000.0,
-            'fee_tax' => 14400000,
+            'volume' => 160.0,
+            'basis' => 160.0,
+            'fee_tax' => 14400,
             'fee_wh' => 5000,
             'fee_packing' => 5000,
-            'grand_total' => 14410000,
+            'grand_total' => 24400,
         ];
 
         $admin = User::factory()->create(['role' => 'admin']);
@@ -262,6 +266,7 @@ class SnapshotRuleTest extends TestCase
 
     /**
      * Pre-R1 snapshot: Invoice #5 — Volume > Weight, with Add On
+     * Volume = (200×150×100)/6000 = 500, basis = max(10,500) = 500
      */
     public function test_pre_r1_invoice_5_volume_weight_with_addon_unchanged(): void
     {
@@ -276,13 +281,13 @@ class SnapshotRuleTest extends TestCase
             'add_on' => 50000.0,
         ];
         $expectedFees = [
-            'volume' => 500000.0,
-            'basis' => 500000.0,
-            'fee_tax' => 115000000,
+            'volume' => 500.0,
+            'basis' => 500.0,
+            'fee_tax' => 115000,
             'fee_wh' => 5000,
             'fee_packing' => 5000,
             'add_on' => 50000,
-            'grand_total' => 115060000,
+            'grand_total' => 175000,
         ];
 
         $admin = User::factory()->create(['role' => 'admin']);
@@ -314,6 +319,7 @@ class SnapshotRuleTest extends TestCase
 
     /**
      * Pre-R1 snapshot: Invoice #6 — Tiered extra per kg (>2000kg)
+     * Volume = (10×10×10)/6000 = 0.17, basis = max(2500,0.17) = 2500
      */
     public function test_pre_r1_invoice_6_tiered_extra_unchanged(): void
     {
@@ -372,11 +378,11 @@ class SnapshotRuleTest extends TestCase
         $invoice = Invoice::factory()->create([
             'customer_id' => $customer->id,
             'box_id' => $box->id,
-            'fee_tax' => 2300000,
+            'fee_tax' => 25500,
             'fee_wh' => 5000,
             'fee_packing' => 5000,
             'add_on' => 0,
-            'grand_total' => 2310000,
+            'grand_total' => 35500,
             'status' => Invoice::STATUS_VERIFIED,
         ]);
 

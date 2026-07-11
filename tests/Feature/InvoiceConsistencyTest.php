@@ -52,7 +52,7 @@ class InvoiceConsistencyTest extends TestCase
      * - Item A: WH China berat = 3.0 kg, from sharing/air box
      * - Item B: WH China berat = 5.0 kg, from direct/sea box
      * - Total weight = 8.0 kg
-     * - Dimensions: 60x40x50 → volume = (60*40*50)/6 = 20000
+     * - Dimensions: 60x40x50 → volume = (60*40*50)/6000 = 20
      * - Basis = max(8.0, 20000) = 20000
      * - Rate key = rate_sharing_air_volume (first box is sharing/air, volume > weight)
      * - Rate = 230
@@ -163,7 +163,7 @@ class InvoiceConsistencyTest extends TestCase
         WhChinaData::create(['resi_number' => 'SENS-002', 'berat' => 3.0, 'ukuran_box' => '30x30x30', 'input_by' => $this->admin->id, 'item_id' => $itemB->id, 'matched_at' => now()]);
 
         // Manual: total weight = 5.0, isSensitive = true (one item is sensitive)
-        // Volume = (60*40*50)/6 = 20000, basis = 20000
+        // Volume = (60*40*50)/6000 = 20, basis = 20
         // Rate key = rate_sharing_sensitive_air_volume = 315
         $expected = $this->feeService->calculate(
             type: 'sharing',
