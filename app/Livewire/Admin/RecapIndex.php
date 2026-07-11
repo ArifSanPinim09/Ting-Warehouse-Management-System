@@ -65,8 +65,12 @@ class RecapIndex extends Component
     public string $resiNumber = '';
     public string $berat = '';
     public string $ukuranBox = '';
+    public string $hurufBox = '';
     public string $biayaJasa = '';
     public $fotoBarang = null;
+    public $fotoArrivedChina = null;
+    public $fotoArrivedIna = null;
+    public string $tanggalSetor = '';
     public ?int $editingWhId = null;
 
     public function mount(): void
@@ -159,22 +163,41 @@ class RecapIndex extends Component
             'resiNumber' => 'required|string|max:100',
             'berat' => 'nullable|numeric|min:0.01',
             'ukuranBox' => 'nullable|string|max:100',
+            'hurufBox' => 'nullable|string|max:10',
             'biayaJasa' => 'required|numeric|min:0',
             'fotoBarang' => 'required_if:editingWhId,null|nullable|image|max:5120',
+            'fotoArrivedChina' => 'nullable|image|max:5120',
+            'fotoArrivedIna' => 'nullable|image|max:5120',
+            'tanggalSetor' => 'nullable|date',
         ], [
             'resiNumber.required' => 'Resi number is required',
             'berat.numeric' => 'Weight must be a number',
             'berat.min' => 'Weight must be at least 0.01 kg',
+            'hurufBox.max' => 'Huruf box max 10 characters',
             'biayaJasa.required' => 'Service fee is required',
             'biayaJasa.numeric' => 'Service fee must be a number',
             'fotoBarang.required_if' => 'Photo is required',
             'fotoBarang.image' => 'File must be an image',
             'fotoBarang.max' => 'Photo max 5MB',
+            'fotoArrivedChina.image' => 'File must be an image',
+            'fotoArrivedChina.max' => 'Photo max 5MB',
+            'fotoArrivedIna.image' => 'File must be an image',
+            'fotoArrivedIna.max' => 'Photo max 5MB',
         ]);
 
         $fotoPath = null;
         if ($this->fotoBarang) {
             $fotoPath = $this->fotoBarang->store('wh-china-photos', 'public');
+        }
+
+        $fotoChinaPath = null;
+        if ($this->fotoArrivedChina) {
+            $fotoChinaPath = $this->fotoArrivedChina->store('wh-arrived-china', 'public');
+        }
+
+        $fotoInaPath = null;
+        if ($this->fotoArrivedIna) {
+            $fotoInaPath = $this->fotoArrivedIna->store('wh-arrived-ina', 'public');
         }
 
         if ($this->editingWhId) {
@@ -186,17 +209,27 @@ class RecapIndex extends Component
                 $whData->matched_at = null;
             }
 
-            // Delete old photo if replaced
+            // Delete old photos if replaced
             if ($fotoPath && $whData->foto_barang) {
                 Storage::disk('public')->delete($whData->foto_barang);
+            }
+            if ($fotoChinaPath && $whData->foto_arrived_china) {
+                Storage::disk('public')->delete($whData->foto_arrived_china);
+            }
+            if ($fotoInaPath && $whData->foto_arrived_ina) {
+                Storage::disk('public')->delete($whData->foto_arrived_ina);
             }
 
             $whData->update([
                 'resi_number' => $this->resiNumber,
                 'berat' => (float) $this->berat,
                 'ukuran_box' => $this->ukuranBox,
+                'huruf_box' => $this->hurufBox ?: null,
                 'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
                 'foto_barang' => $fotoPath ?? $whData->foto_barang,
+                'foto_arrived_china' => $fotoChinaPath ?? $whData->foto_arrived_china,
+                'foto_arrived_ina' => $fotoInaPath ?? $whData->foto_arrived_ina,
+                'tanggal_setor' => $this->tanggalSetor ?: $whData->tanggal_setor,
             ]);
 
             $matching->matchByResi($whData);
@@ -205,8 +238,12 @@ class RecapIndex extends Component
                 'resi_number' => $this->resiNumber,
                 'berat' => (float) $this->berat,
                 'ukuran_box' => $this->ukuranBox,
+                'huruf_box' => $this->hurufBox ?: null,
                 'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
                 'foto_barang' => $fotoPath,
+                'foto_arrived_china' => $fotoChinaPath,
+                'foto_arrived_ina' => $fotoInaPath,
+                'tanggal_setor' => $this->tanggalSetor ?: null,
                 'input_by' => auth()->id(),
             ]);
 
@@ -231,7 +268,9 @@ class RecapIndex extends Component
         $this->resiNumber = $whData->resi_number;
         $this->berat = (string) $whData->berat;
         $this->ukuranBox = $whData->ukuran_box;
+        $this->hurufBox = $whData->huruf_box ?? '';
         $this->biayaJasa = $whData->biaya_jasa !== null ? (string) $whData->biaya_jasa : '';
+        $this->tanggalSetor = $whData->tanggal_setor ? $whData->tanggal_setor->format('Y-m-d') : '';
         $this->showWhModal = true;
     }
 
@@ -277,8 +316,12 @@ class RecapIndex extends Component
         $this->resiNumber = '';
         $this->berat = '';
         $this->ukuranBox = '';
+        $this->hurufBox = '';
         $this->biayaJasa = '';
         $this->fotoBarang = null;
+        $this->fotoArrivedChina = null;
+        $this->fotoArrivedIna = null;
+        $this->tanggalSetor = '';
         $this->editingWhId = null;
     }
 

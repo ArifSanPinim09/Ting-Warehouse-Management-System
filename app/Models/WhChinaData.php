@@ -13,8 +13,12 @@ class WhChinaData extends Model
         'resi_number',
         'berat',
         'ukuran_box',
+        'huruf_box',
         'biaya_jasa',
         'foto_barang',
+        'foto_arrived_china',
+        'foto_arrived_ina',
+        'tanggal_setor',
         'item_id',
         'matched_at',
         'input_by',
@@ -24,6 +28,7 @@ class WhChinaData extends Model
         'berat' => 'decimal:2',
         'biaya_jasa' => 'decimal:2',
         'matched_at' => 'datetime',
+        'tanggal_setor' => 'datetime',
     ];
 
     /** @var list<string> Exclude biaya_jasa from serialization (sensitive, admin-only) */

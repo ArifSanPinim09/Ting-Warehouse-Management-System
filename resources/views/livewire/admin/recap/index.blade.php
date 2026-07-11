@@ -260,13 +260,17 @@
                             <thead>
                                 <tr class="border-b border-gray-100 bg-gray-50/60">
                                     <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">No Resi</th>
+                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Huruf Box</th>
                                     <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Berat</th>
                                     <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Ukuran</th>
                                     <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Biaya Jasa</th>
                                     <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Foto</th>
+                                    <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Arrived China</th>
+                                    <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Arrived INA</th>
                                     <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Match</th>
                                     <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Tgl Setor</th>
+                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Tgl Input</th>
                                     <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider"></th>
                                 </tr>
                             </thead>
@@ -275,6 +279,13 @@
                                     <tr class="hover:bg-gray-50/50 transition-colors">
                                         <td class="px-5 py-2.5">
                                             <span class="text-[13px] font-mono font-semibold text-gray-900">{{ $wh->resi_number }}</span>
+                                        </td>
+                                        <td class="px-5 py-2.5">
+                                            @if($wh->huruf_box)
+                                                <span class="text-[13px] font-semibold text-gray-700 bg-gray-100 px-2 py-0.5 rounded">{{ $wh->huruf_box }}</span>
+                                            @else
+                                                <span class="text-[13px] text-gray-300">—</span>
+                                            @endif
                                         </td>
                                         <td class="px-5 py-2.5 text-right">
                                             <span class="text-[13px] text-gray-600 tabular-nums">{{ number_format($wh->berat, 2) }} kg</span>
@@ -299,6 +310,26 @@
                                                 <span class="text-[13px] text-gray-300">—</span>
                                             @endif
                                         </td>
+                                        <td class="px-5 py-2.5 text-center">
+                                            @if($wh->foto_arrived_china)
+                                                <a href="{{ Storage::url($wh->foto_arrived_china) }}" target="_blank" class="inline-flex items-center gap-1 text-[12px] text-blue-600 hover:underline font-medium">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                    Foto
+                                                </a>
+                                            @else
+                                                <span class="text-[12px] text-gray-300">—</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-5 py-2.5 text-center">
+                                            @if($wh->foto_arrived_ina)
+                                                <a href="{{ Storage::url($wh->foto_arrived_ina) }}" target="_blank" class="inline-flex items-center gap-1 text-[12px] text-green-600 hover:underline font-medium">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                    Foto
+                                                </a>
+                                            @else
+                                                <span class="text-[12px] text-gray-300">—</span>
+                                            @endif
+                                        </td>
                                         <td class="px-5 py-2.5">
                                             @if($wh->item)
                                                 <div>
@@ -320,6 +351,13 @@
                                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                                     Unmatched
                                                 </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-5 py-2.5">
+                                            @if($wh->tanggal_setor)
+                                                <span class="text-[12px] text-gray-600">{{ $wh->tanggal_setor->format('d M Y') }}</span>
+                                            @else
+                                                <span class="text-[12px] text-gray-300">—</span>
                                             @endif
                                         </td>
                                         <td class="px-5 py-2.5">
@@ -453,6 +491,15 @@
 
                         <p class="text-[11px] text-gray-400">Weight & dimensions can be filled later when goods arrive in Indonesia.</p>
 
+                        {{-- Huruf Box (optional) --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Huruf Box <span class="text-gray-400 font-normal">(optional)</span></label>
+                            <input type="text" wire:model="hurufBox" maxlength="10" placeholder="e.g. H, A, B"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                            <p class="text-[11px] text-gray-400 mt-1">Kode huruf box dari China</p>
+                            @error('hurufBox') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
                         {{-- Photo (required) --}}
                         <div>
                             <label class="block text-[12px] font-medium text-gray-600 mb-1">Photo <span class="text-red-500">*</span></label>
@@ -462,6 +509,36 @@
                             @if($editingWhId && $fotoBarang === null)
                                 <p class="text-[11px] text-gray-400 mt-1">Leave empty to keep current photo.</p>
                             @endif
+                        </div>
+
+                        {{-- Foto Arrived China (optional) --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Foto Arrived China <span class="text-gray-400 font-normal">(optional)</span></label>
+                            <input type="file" wire:model="fotoArrivedChina" accept="image/*"
+                                class="w-full text-[13px] text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-[6px] file:border-0 file:text-[12px] file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 transition-colors file:cursor-pointer">
+                            @error('fotoArrivedChina') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            @if($editingWhId && $fotoArrivedChina === null)
+                                <p class="text-[11px] text-gray-400 mt-1">Leave empty to keep current photo.</p>
+                            @endif
+                        </div>
+
+                        {{-- Foto Arrived INA (optional) --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Foto Arrived INA <span class="text-gray-400 font-normal">(optional)</span></label>
+                            <input type="file" wire:model="fotoArrivedIna" accept="image/*"
+                                class="w-full text-[13px] text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-[6px] file:border-0 file:text-[12px] file:font-medium file:bg-green-50 file:text-green-600 hover:file:bg-green-100 transition-colors file:cursor-pointer">
+                            @error('fotoArrivedIna') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            @if($editingWhId && $fotoArrivedIna === null)
+                                <p class="text-[11px] text-gray-400 mt-1">Leave empty to keep current photo.</p>
+                            @endif
+                        </div>
+
+                        {{-- Tanggal Setor (optional) --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Tanggal Customer Setor <span class="text-gray-400 font-normal">(optional)</span></label>
+                            <input type="date" wire:model="tanggalSetor"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                            @error('tanggalSetor') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Actions --}}
