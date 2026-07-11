@@ -439,7 +439,10 @@
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Nama Barang</th>
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Qty</th>
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Berat</th>
+                                                <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">P×L×T</th>
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Volume</th>
+                                                <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Biaya Tax</th>
+                                                <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Foto INA</th>
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Keterangan</th>
                                             </tr>
                                         </thead>
@@ -461,7 +464,27 @@
                                                         {{ $item->whChinaData ? number_format($item->whChinaData->berat, 1) . ' kg' : '-' }}
                                                     </td>
                                                     <td class="px-4 py-2.5 text-body text-gray-700">
-                                                        {{ $item->whChinaData->ukuran_box ?? '-' }}
+                                                        @if($item->whChinaData && $item->whChinaData->panjang && $item->whChinaData->lebar && $item->whChinaData->tinggi)
+                                                            {{ $item->whChinaData->panjang }}×{{ $item->whChinaData->lebar }}×{{ $item->whChinaData->tinggi }} cm
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-4 py-2.5 text-body text-gray-700">
+                                                        {{ $item->whChinaData && $item->whChinaData->volume ? number_format($item->whChinaData->volume, 4) : '-' }}
+                                                    </td>
+                                                    <td class="px-4 py-2.5 text-body text-gray-700">
+                                                        {{ $item->whChinaData && $item->whChinaData->biaya_tax ? 'Rp ' . number_format($item->whChinaData->biaya_tax, 0, ',', '.') : '-' }}
+                                                    </td>
+                                                    <td class="px-4 py-2.5">
+                                                        @if($item->whChinaData && $item->whChinaData->foto_arrived_ina)
+                                                            <a href="{{ Storage::url($item->whChinaData->foto_arrived_ina) }}" target="_blank" class="inline-flex items-center gap-1 text-[12px] text-accent hover:underline font-medium">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                                Foto
+                                                            </a>
+                                                        @else
+                                                            -
+                                                        @endif
                                                     </td>
                                                     <td class="px-4 py-2.5">
                                                         @if($item->status !== 'active')
