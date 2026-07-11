@@ -45,12 +45,9 @@
                 {{-- Status Filter --}}
                 <select wire:model.live="filterStatus" class="py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600">
                     <option value="">Semua Status</option>
-                    <option value="OPEN">Open</option>
-                    <option value="CLOSED">Closed</option>
-                    <option value="SENT_TO_CARGO">Sent to Cargo</option>
-                    <option value="OTW_INA">OTW Indonesia</option>
-                    <option value="UP_INVOICE">Invoice Dibuat</option>
-                    <option value="DONE">Selesai</option>
+                    @foreach(\App\Models\Box::getValidStatuses() as $status)
+                        <option value="{{ $status }}">{{ str_replace('_', ' ', Str::title(Str::lower($status))) }}</option>
+                    @endforeach
                 </select>
 
                 {{-- Customer Filter --}}

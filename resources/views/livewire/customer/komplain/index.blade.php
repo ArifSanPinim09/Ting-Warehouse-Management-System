@@ -19,7 +19,7 @@
             <select wire:model.live="filterStatus" class="ds-input sm:w-48">
                 <option value="">Semua Status</option>
                 @foreach(\App\Models\Complain::getValidStatuses() as $status)
-                    <option value="{{ $status }}">{{ $status }}</option>
+                    <option value="{{ $status }}">{{ str_replace('_', ' ', Str::title($status)) }}</option>
                 @endforeach
             </select>
         </div>

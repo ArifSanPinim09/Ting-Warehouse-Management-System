@@ -35,7 +35,7 @@
                     <select wire:model.live="filterStatus" class="w-full py-2.5 px-3 pr-8 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600 appearance-none" wire:loading.class="opacity-50">
                         <option value="">Semua Status</option>
                         @foreach(\App\Models\Box::getValidStatuses() as $status)
-                            <option value="{{ $status }}">{{ $status }}</option>
+                            <option value="{{ $status }}">{{ str_replace('_', ' ', Str::title(Str::lower($status))) }}</option>
                         @endforeach
                     </select>
                     <svg wire:loading class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
