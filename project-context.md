@@ -50,3 +50,17 @@
 - Admin: admin1@tingwarehouse.com / password
 - Customer: budi@gmail.com / password
 - Owner: owner@tingwarehouse.com / password
+
+## Updated: 2026-07-11 — Revisi 1 & 2
+
+### Revisi 1: Box Huruf Box (bd70ee5)
+- New huruf_box column on boxes table
+- Display format: batch_name-huruf_box (e.g., 126-H)
+- Box model: box_code + display_name accessors
+- 10 new tests, all 479 tests passing
+
+### Revisi 2: WH China New Columns (58ba0db)
+- New columns: huruf_box, foto_arrived_china, foto_arrived_ina, tanggal_setor
+- RecapIndex: form fields + validation + save logic
+- Recap blade: table columns + modal form fields
+- All 479 tests passing
