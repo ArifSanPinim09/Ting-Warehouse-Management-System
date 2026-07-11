@@ -100,7 +100,7 @@
                                                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                                     </div>
                                                     <div>
-                                                        <p class="text-body font-semibold text-gray-900">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}</p>
+                                                        <p class="text-body font-semibold text-gray-900">{{ $box->display_name }}</p>
                                                         <p class="text-caption text-gray-400">{{ $box->created_at->format('d M Y') }}</p>
                                                     </div>
                                                 </div>
@@ -194,6 +194,12 @@
                                     <span class="text-caption text-gray-500">Batch</span>
                                     <span class="text-body text-gray-700">{{ $selectedBox->batch_name ?? '-' }}</span>
                                 </div>
+                                @if($selectedBox->huruf_box)
+                                <div class="flex items-center justify-between">
+                                    <span class="text-caption text-gray-500">Huruf Box</span>
+                                    <span class="text-body text-gray-700 font-semibold">{{ $selectedBox->huruf_box }}</span>
+                                </div>
+                                @endif
                                 <div class="flex items-center justify-between">
                                     <span class="text-caption text-gray-500">Customer</span>
                                     <span class="text-body text-gray-700">{{ $selectedBox->customer->name ?? '-' }}</span>
@@ -246,7 +252,7 @@
                             <button wire:click="openEditModal"
                                 class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-[12px] font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-[8px] hover:bg-gray-100 transition-colors">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                Edit Tracking & ETA
+                                Edit Tracking, Huruf Box & ETA
                             </button>
 
                             {{-- Notes --}}
@@ -540,7 +546,7 @@
                         </div>
 
                         {{-- Tracking & Batch --}}
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-3 gap-3">
                             <div>
                                 <label class="block text-caption font-medium text-gray-700 mb-1.5">Tracking Number</label>
                                 <input type="text" wire:model="newTrackingNumber" placeholder="Opsional" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
@@ -548,6 +554,10 @@
                             <div>
                                 <label class="block text-caption font-medium text-gray-700 mb-1.5">Batch Name</label>
                                 <input type="text" wire:model="newBatchName" placeholder="Opsional" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                            </div>
+                            <div>
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Huruf Box</label>
+                                <input type="text" wire:model="newHurufBox" maxlength="10" placeholder="e.g. H, A" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                             </div>
                         </div>
 
@@ -572,7 +582,7 @@
     @endif
 
     {{-- ═══════════════════════════════════════════════════════════ --}}
-    {{-- MODAL: Edit Tracking Number + ETA                         --}}
+    {{-- MODAL: Edit Box (Tracking + Huruf Box + ETA)                 --}}
     {{-- ═══════════════════════════════════════════════════════════ --}}
     @if($showEditModal)
         <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeEditModal">
@@ -591,6 +601,13 @@
                             <input type="text" wire:model="editTrackingNumber" maxlength="100" placeholder="Enter tracking number"
                                 class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                             @error('editTrackingNumber') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Huruf Box</label>
+                            <input type="text" wire:model="editHurufBox" maxlength="10" placeholder="e.g. H, A, B"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                            <p class="text-[11px] text-gray-400 mt-1">Kode huruf box dari China (contoh: H, A, B)</p>
+                            @error('editHurufBox') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label class="block text-[12px] font-medium text-gray-600 mb-1">ETA</label>

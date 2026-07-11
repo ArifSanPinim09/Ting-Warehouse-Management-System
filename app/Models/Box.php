@@ -20,6 +20,7 @@ class Box extends Model
         'type',
         'tracking_number',
         'batch_name',
+        'huruf_box',
         'status',
         'method',
         'customer_id',
@@ -30,6 +31,30 @@ class Box extends Model
         'close_date',
         'last_setor_date',
     ];
+
+    /**
+     * Get box display name: batch_name + huruf_box.
+     * Contoh: "126-H"
+     */
+    public function getBoxCodeAttribute(): string
+    {
+        $parts = array_filter([
+            $this->batch_name,
+            $this->huruf_box,
+        ]);
+        return $parts ? implode('-', $parts) : ('Box #' . $this->id);
+    }
+
+    /**
+     * Get display name (tracking_number > batch_name + huruf_box > Box #id).
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        if ($this->tracking_number) {
+            return $this->tracking_number;
+        }
+        return $this->box_code;
+    }
 
     /**
      * Get the attributes that should be cast.

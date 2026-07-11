@@ -39,6 +39,7 @@ class ManageBox extends Component
     // ─── Box Edit (Tracking + ETA) ──────────────────────────────
     public bool $showEditModal = false;
     public string $editTrackingNumber = '';
+    public string $editHurufBox = '';
     public string $editEta = '';
 
     // ─── Box Creation ───────────────────────────────────────────
@@ -47,6 +48,7 @@ class ManageBox extends Component
     public string $newMethod = 'air';
     public string $newTrackingNumber = '';
     public string $newBatchName = '';
+    public string $newHurufBox = '';
     public ?int $newCustomerId = null;
     public string $newNotes = '';
 
@@ -89,6 +91,7 @@ class ManageBox extends Component
     {
         $box = Box::findOrFail($this->selectedBoxId);
         $this->editTrackingNumber = $box->tracking_number ?? '';
+        $this->editHurufBox = $box->huruf_box ?? '';
         $this->editEta = $box->eta ? $box->eta->format('Y-m-d') : '';
         $this->showEditModal = true;
     }
@@ -97,6 +100,7 @@ class ManageBox extends Component
     {
         $this->showEditModal = false;
         $this->editTrackingNumber = '';
+        $this->editHurufBox = '';
         $this->editEta = '';
     }
 
@@ -106,23 +110,28 @@ class ManageBox extends Component
 
         $this->validate([
             'editTrackingNumber' => 'nullable|string|max:100',
+            'editHurufBox' => 'nullable|string|max:10',
             'editEta' => 'nullable|date',
         ], [
             'editTrackingNumber.max' => 'Tracking number max 100 characters',
+            'editHurufBox.max' => 'Huruf box max 10 characters',
             'editEta.date' => 'ETA must be a valid date',
         ]);
 
         $oldValues = [
             'tracking_number' => $box->tracking_number,
+            'huruf_box' => $box->huruf_box,
             'eta' => $box->eta?->format('Y-m-d'),
         ];
 
         $box->tracking_number = $this->editTrackingNumber ?: null;
+        $box->huruf_box = $this->editHurufBox ?: null;
         $box->eta = $this->editEta ?: null;
         $box->save();
 
         $newValues = [
             'tracking_number' => $box->tracking_number,
+            'huruf_box' => $box->huruf_box,
             'eta' => $box->eta?->format('Y-m-d'),
         ];
 
@@ -130,6 +139,7 @@ class ManageBox extends Component
 
         $this->showEditModal = false;
         $this->editTrackingNumber = '';
+        $this->editHurufBox = '';
         $this->editEta = '';
 
         $this->dispatch('toast', type: 'success', title: 'Success', message: 'Box updated successfully.');
@@ -307,6 +317,7 @@ class ManageBox extends Component
             'newMethod' => 'required|in:air,sea',
             'newTrackingNumber' => 'nullable|string|max:100',
             'newBatchName' => 'nullable|string|max:100',
+            'newHurufBox' => 'nullable|string|max:10',
             'newCustomerId' => 'nullable|exists:users,id',
             'newNotes' => 'nullable|string|max:1000',
         ]);
@@ -316,6 +327,7 @@ class ManageBox extends Component
             'method' => $this->newMethod,
             'tracking_number' => $this->newTrackingNumber ?: null,
             'batch_name' => $this->newBatchName ?: null,
+            'huruf_box' => $this->newHurufBox ?: null,
             'customer_id' => $this->newCustomerId,
             'notes' => $this->newNotes ?: null,
             'status' => Box::STATUS_OPEN,
@@ -336,6 +348,7 @@ class ManageBox extends Component
         $this->newMethod = 'air';
         $this->newTrackingNumber = '';
         $this->newBatchName = '';
+        $this->newHurufBox = '';
         $this->newCustomerId = null;
         $this->newNotes = '';
     }
@@ -371,6 +384,7 @@ class ManageBox extends Component
             $query->where(function ($q) {
                 $q->where('tracking_number', 'like', "%{$this->search}%")
                   ->orWhere('batch_name', 'like', "%{$this->search}%")
+                  ->orWhere('huruf_box', 'like', "%{$this->search}%")
                   ->orWhereHas('customer', function ($cq) {
                       $cq->where('name', 'like', "%{$this->search}%");
                   });
