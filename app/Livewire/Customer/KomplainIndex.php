@@ -69,8 +69,21 @@ class KomplainIndex extends Component
 
         $this->submitting = true;
 
-        $videoPath = $this->videoFile?->store('complaints/video', 'public');
-        $photoPath = $this->photoFile?->store('complaints/photo', 'public');
+        $videoPath = null;
+        $photoPath = null;
+
+        try {
+            if ($this->videoFile) {
+                $videoPath = $this->videoFile->store('complaints/video', 'public');
+            }
+            if ($this->photoFile) {
+                $photoPath = $this->photoFile->store('complaints/photo', 'public');
+            }
+        } catch (\Exception $e) {
+            $this->submitting = false;
+            $this->dispatch('toast', type: 'error', title: 'Error', message: 'Gagal upload file: ' . $e->getMessage());
+            return;
+        }
 
         $complaint = Complain::create([
             'customer_id' => auth()->id(),

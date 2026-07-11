@@ -198,9 +198,13 @@
                                     @endif
                                     @if($selectedComplain->video_url)
                                         <div>
-                                            <a href="{{ Storage::url($selectedComplain->video_url) }}" target="_blank" class="inline-flex items-center gap-2 text-body text-accent hover:text-primary transition-colors">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                Lihat Video
+                                            <video controls class="w-full rounded-[8px] border border-gray-100" preload="metadata">
+                                                <source src="{{ Storage::url($selectedComplain->video_url) }}" type="video/mp4">
+                                                Browser tidak mendukung video player.
+                                            </video>
+                                            <a href="{{ Storage::url($selectedComplain->video_url) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-accent hover:text-primary transition-colors mt-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                                Download Video
                                             </a>
                                         </div>
                                     @endif

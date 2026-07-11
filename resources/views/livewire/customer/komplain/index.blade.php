@@ -57,12 +57,21 @@
                             <span class="text-gray-400">{{ $complaint->created_at->format('d M Y H:i') }}</span>
                         </div>
                         @if($complaint->photo_url || $complaint->video_url)
-                            <div class="flex items-center gap-2 pt-2">
+                            <div class="mt-3 space-y-2">
                                 @if($complaint->photo_url)
-                                    <span class="ds-badge-neutral text-micro">📷 Foto terlampir</span>
+                                    <div>
+                                        <a href="{{ Storage::url($complaint->photo_url) }}" target="_blank">
+                                            <img src="{{ Storage::url($complaint->photo_url) }}" alt="Foto komplain" class="w-full max-w-[200px] rounded-[8px] border border-gray-200 object-cover">
+                                        </a>
+                                    </div>
                                 @endif
                                 @if($complaint->video_url)
-                                    <span class="ds-badge-neutral text-micro">🎬 Video terlampir</span>
+                                    <div>
+                                        <video controls class="w-full max-w-[300px] rounded-[8px] border border-gray-200" preload="metadata">
+                                            <source src="{{ Storage::url($complaint->video_url) }}" type="video/mp4">
+                                            Browser tidak mendukung video player.
+                                        </video>
+                                    </div>
                                 @endif
                             </div>
                         @endif
