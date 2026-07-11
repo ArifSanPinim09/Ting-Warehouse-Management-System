@@ -119,6 +119,25 @@
                 <div class="ds-card p-5 space-y-5">
                     <h3 class="ds-section-subtitle">Bukti Barang</h3>
 
+                    {{-- Revisi Client: Add On --}}
+                    <div>
+                        <label class="ds-label">Add On (opsional)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-caption text-gray-400">Rp</span>
+                            <input type="number" wire:model="addOn" min="0" step="0.01" placeholder="0" class="ds-input pl-9 @error('addOn') ds-input-error @enderror" />
+                        </div>
+                        @error('addOn') <p class="ds-error">{{ $message }}</p> @enderror
+                        <p class="ds-hint">Biaya tambahan jika ada (opsional)</p>
+                    </div>
+
+                    {{-- Revisi Client: Catatan dari Klien --}}
+                    <div>
+                        <label class="ds-label">Catatan dari Klien (opsional)</label>
+                        <textarea wire:model="notes" rows="3" maxlength="500" placeholder="Catatan tambahan dari klien..." class="ds-input @error('notes') ds-input-error @enderror"></textarea>
+                        @error('notes') <p class="ds-error">{{ $message }}</p> @enderror
+                        <p class="ds-hint">Maksimal 500 karakter</p>
+                    </div>
+
                     <div>
                         <label class="ds-label">Foto Bukti (Proof CO) <span class="text-red-500">*</span></label>
                         <div

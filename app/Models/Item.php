@@ -32,6 +32,8 @@ class Item extends Model
         'arrived_indonesia',
         'arrived_indonesia_photo',
         'status',
+        'add_on',
+        'notes',
     ];
 
     /**

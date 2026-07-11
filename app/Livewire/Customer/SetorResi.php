@@ -31,6 +31,9 @@ class SetorResi extends Component
     public $proofCo = null;
     public bool $isSensitive = false;
     public ?string $sensitiveType = null;
+    // ─── Revisi Client: Add On & Catatan ────────────────────
+    public string $addOn = '0';
+    public string $notes = '';
     // ─── UI State ───────────────────────────────────────────────
     public bool $showSuccess = false;
     public bool $submitting = false;
@@ -49,6 +52,8 @@ class SetorResi extends Component
             'proofCo' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'isSensitive' => ['nullable', 'boolean'],
             'sensitiveType' => ['required_if:isSensitive,true', 'nullable', 'string', 'max:50'],
+            'addOn' => ['nullable', 'numeric', 'min:0', 'max:999999'],
+            'notes' => ['nullable', 'string', 'max:500'],
         ];
     }
 
@@ -134,6 +139,8 @@ class SetorResi extends Component
             'proof_co' => $proofPath,
             'is_sensitive' => $this->isSensitive,
             'sensitive_type' => $this->isSensitive ? $this->sensitiveType : null,
+            'add_on' => $this->addOn ?: 0,
+            'notes' => $this->notes ?: null,
         ]);
 
         // Update last_setor_date on box (Revisi §2.3)
@@ -152,7 +159,7 @@ class SetorResi extends Component
         $notifService->customerRegister(auth()->user());
 
         // Reset form
-        $this->reset(['name', 'quantity', 'priceYuan', 'resiNumber', 'proofCo', 'isSensitive', 'sensitiveType']);
+        $this->reset(['name', 'quantity', 'priceYuan', 'resiNumber', 'proofCo', 'isSensitive', 'sensitiveType', 'addOn', 'notes']);
         $this->showSuccess = true;
         $this->submitting = false;
 
@@ -174,7 +181,7 @@ class SetorResi extends Component
             ->orderByDesc('last_setor_date')
             ->get();
 
-        $sensitiveTypes = ['Elektronik', 'Baterai', 'Cairan', 'Kosmetik', 'Makanan', 'Obat-obatan', 'Magnet', 'Lainnya'];
+        $sensitiveTypes = ['Elektronik', 'Baterai', 'Cairan', 'Kosmetik', 'Makanan', 'Obat-obatan', 'Magnet', 'Garment', 'Lainnya'];
 
         return view('livewire.customer.setor-resi.index', compact('boxes', 'sensitiveTypes'))
             ->layout('layouts.app');
