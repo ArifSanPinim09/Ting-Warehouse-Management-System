@@ -36,11 +36,16 @@ class ManageBox extends Component
     public string $pendingStatus = '';
     public string $statusNote = '';
 
-    // ─── Box Edit (Tracking + ETA) ──────────────────────────────
+    // ─── Box Edit (All Fields) ──────────────────────────────────
     public bool $showEditModal = false;
     public string $editTrackingNumber = '';
     public string $editHurufBox = '';
     public string $editEta = '';
+    public string $editType = '';
+    public string $editMethod = '';
+    public string $editBatchName = '';
+    public ?int $editCustomerId = null;
+    public string $editNotes = '';
 
     // ─── Box Creation ───────────────────────────────────────────
     public bool $showCreateModal = false;
@@ -93,6 +98,11 @@ class ManageBox extends Component
         $this->editTrackingNumber = $box->tracking_number ?? '';
         $this->editHurufBox = $box->huruf_box ?? '';
         $this->editEta = $box->eta ? $box->eta->format('Y-m-d') : '';
+        $this->editType = $box->type;
+        $this->editMethod = $box->method;
+        $this->editBatchName = $box->batch_name ?? '';
+        $this->editCustomerId = $box->customer_id;
+        $this->editNotes = $box->notes ?? '';
         $this->showEditModal = true;
     }
 
@@ -102,6 +112,11 @@ class ManageBox extends Component
         $this->editTrackingNumber = '';
         $this->editHurufBox = '';
         $this->editEta = '';
+        $this->editType = '';
+        $this->editMethod = '';
+        $this->editBatchName = '';
+        $this->editCustomerId = null;
+        $this->editNotes = '';
     }
 
     public function saveBoxEdit(AuditLogService $auditService): void
@@ -112,27 +127,49 @@ class ManageBox extends Component
             'editTrackingNumber' => 'nullable|string|max:100',
             'editHurufBox' => 'nullable|string|max:10',
             'editEta' => 'nullable|date',
+            'editType' => 'required|in:sharing,direct,handcarry',
+            'editMethod' => 'required|in:air,sea',
+            'editBatchName' => 'nullable|string|max:100',
+            'editCustomerId' => 'nullable|exists:users,id',
+            'editNotes' => 'nullable|string|max:1000',
         ], [
             'editTrackingNumber.max' => 'Tracking number max 100 characters',
             'editHurufBox.max' => 'Huruf box max 10 characters',
             'editEta.date' => 'ETA must be a valid date',
+            'editType.required' => 'Tipe box wajib dipilih',
+            'editMethod.required' => 'Metode wajib dipilih',
         ]);
 
         $oldValues = [
             'tracking_number' => $box->tracking_number,
             'huruf_box' => $box->huruf_box,
             'eta' => $box->eta?->format('Y-m-d'),
+            'type' => $box->type,
+            'method' => $box->method,
+            'batch_name' => $box->batch_name,
+            'customer_id' => $box->customer_id,
+            'notes' => $box->notes,
         ];
 
         $box->tracking_number = $this->editTrackingNumber ?: null;
         $box->huruf_box = $this->editHurufBox ?: null;
         $box->eta = $this->editEta ?: null;
+        $box->type = $this->editType;
+        $box->method = $this->editMethod;
+        $box->batch_name = $this->editBatchName ?: null;
+        $box->customer_id = $this->editCustomerId;
+        $box->notes = $this->editNotes ?: null;
         $box->save();
 
         $newValues = [
             'tracking_number' => $box->tracking_number,
             'huruf_box' => $box->huruf_box,
             'eta' => $box->eta?->format('Y-m-d'),
+            'type' => $box->type,
+            'method' => $box->method,
+            'batch_name' => $box->batch_name,
+            'customer_id' => $box->customer_id,
+            'notes' => $box->notes,
         ];
 
         $auditService->log('updated', $box, $oldValues, $newValues);
@@ -141,6 +178,11 @@ class ManageBox extends Component
         $this->editTrackingNumber = '';
         $this->editHurufBox = '';
         $this->editEta = '';
+        $this->editType = '';
+        $this->editMethod = '';
+        $this->editBatchName = '';
+        $this->editCustomerId = null;
+        $this->editNotes = '';
 
         $this->dispatch('toast', type: 'success', title: 'Success', message: 'Box updated successfully.');
     }
@@ -164,17 +206,18 @@ class ManageBox extends Component
         $box = Box::findOrFail($this->selectedBoxId);
         $oldStatus = $box->status;
 
-        // Validate transition order (Revisi §2.3: CLOSED/LAST_SETOR are side branches)
-        $validTransitions = [
-            Box::STATUS_OPEN => Box::STATUS_SENT_TO_CARGO,
-            Box::STATUS_CLOSED => Box::STATUS_SENT_TO_CARGO,
-            Box::STATUS_SENT_TO_CARGO => Box::STATUS_OTW_INA,
-            Box::STATUS_OTW_INA => Box::STATUS_UP_INVOICE,
-            Box::STATUS_UP_INVOICE => Box::STATUS_DONE,
+        // Allow any status change (admin can fix mistakes)
+        $validStatuses = [
+            Box::STATUS_OPEN,
+            Box::STATUS_CLOSED,
+            Box::STATUS_SENT_TO_CARGO,
+            Box::STATUS_OTW_INA,
+            Box::STATUS_UP_INVOICE,
+            Box::STATUS_DONE,
         ];
 
-        if (!isset($validTransitions[$oldStatus]) || $validTransitions[$oldStatus] !== $this->pendingStatus) {
-            $this->dispatch('toast', type: 'error', title: 'Error', message: 'Perubahan status tidak valid.');
+        if (!in_array($this->pendingStatus, $validStatuses)) {
+            $this->dispatch('toast', type: 'error', title: 'Error', message: 'Status tidak valid.');
             return;
         }
 

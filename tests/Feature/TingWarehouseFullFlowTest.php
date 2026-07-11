@@ -291,21 +291,7 @@ class TingWarehouseFullFlowTest extends TestCase
     {
         $this->actingAs($this->admin);
 
-        // ── Step 7a: NEGATIVE — try OPEN → UP_INVOICE (must fail) ──
-
-        Livewire::test(ManageBox::class)
-            ->call('selectBox', $this->box->id)
-            ->call('confirmStatusChange', Box::STATUS_UP_INVOICE)
-            ->call('updateStatus');
-
-        $this->box->refresh();
-        $this->assertEquals(
-            Box::STATUS_OPEN,
-            $this->box->status,
-            'Must NOT jump from OPEN to UP_INVOICE — transition rejected'
-        );
-
-        // ── Step 7b: OPEN → SENT_TO_CARGO ──
+        // ── Step 7a: Admin can change status freely (client request) ──
 
         Livewire::test(ManageBox::class)
             ->call('selectBox', $this->box->id)
@@ -315,7 +301,7 @@ class TingWarehouseFullFlowTest extends TestCase
         $this->box->refresh();
         $this->assertEquals(Box::STATUS_SENT_TO_CARGO, $this->box->status);
 
-        // ── Step 7c: SENT_TO_CARGO → OTW_INA ──
+        // ── Step 7b: SENT_TO_CARGO → OTW_INA ──
 
         Livewire::test(ManageBox::class)
             ->call('selectBox', $this->box->id)

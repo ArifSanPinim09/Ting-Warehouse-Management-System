@@ -318,53 +318,18 @@
                             </div>
 
                             {{-- Status Action Buttons --}}
-                            @php
-                                $nextStatus = match($selectedBox->status) {
-                                    'OPEN' => 'SENT_TO_CARGO',
-                                    'CLOSED' => 'SENT_TO_CARGO',
-                                    'SENT_TO_CARGO' => 'OTW_INA',
-                                    'OTW_INA' => 'UP_INVOICE',
-                                    'UP_INVOICE' => 'DONE',
-                                    default => null,
-                                };
-                                $nextLabel = match($nextStatus) {
-                                    'SENT_TO_CARGO' => 'Kirim ke Cargo',
-                                    'OTW_INA' => 'OTW Indonesia',
-                                    'UP_INVOICE' => 'Buat Invoice',
-                                    'DONE' => 'Selesaikan',
-                                    default => null,
-                                };
-                            @endphp
                             <div class="space-y-2">
-                                @if($nextStatus)
-                                    <button
-                                        wire:click="confirmStatusChange('{{ $nextStatus }}')"
-                                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-body font-medium rounded-[8px] hover:bg-primary-light transition-colors"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                                        {{ $nextLabel }}
-                                    </button>
-                                @endif
-
-                                {{-- Close/Open Box Buttons (Revisi §2.3, §4.2) --}}
-                                @if($selectedBox->status === 'OPEN')
-                                    <button
-                                        wire:click="closeBox"
-                                        wire:confirm="Customer tidak bisa setor lagi setelah box ditutup. Lanjutkan?"
-                                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white text-body font-medium rounded-[8px] hover:bg-red-700 transition-colors"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                        Tutup Box
-                                    </button>
-                                @elseif($selectedBox->status === 'CLOSED')
-                                    <button
-                                        wire:click="openBox"
-                                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-body font-medium rounded-[8px] hover:bg-emerald-700 transition-colors"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
-                                        Buka Box
-                                    </button>
-                                @endif
+                                <p class="text-caption font-semibold text-gray-700 uppercase tracking-wide">Ubah Status</p>
+                                <select wire:change="confirmStatusChange($event.target.value)" 
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                    <option value="">-- Pilih Status --</option>
+                                    <option value="OPEN" {{ $selectedBox->status === 'OPEN' ? 'selected' : '' }}>Open</option>
+                                    <option value="CLOSED" {{ $selectedBox->status === 'CLOSED' ? 'selected' : '' }}>Closed</option>
+                                    <option value="SENT_TO_CARGO" {{ $selectedBox->status === 'SENT_TO_CARGO' ? 'selected' : '' }}>Sent to Cargo</option>
+                                    <option value="OTW_INA" {{ $selectedBox->status === 'OTW_INA' ? 'selected' : '' }}>OTW Indonesia</option>
+                                    <option value="UP_INVOICE" {{ $selectedBox->status === 'UP_INVOICE' ? 'selected' : '' }}>Buat Invoice</option>
+                                    <option value="DONE" {{ $selectedBox->status === 'DONE' ? 'selected' : '' }}>Selesai</option>
+                                </select>
                             </div>
 
                             {{-- Items --}}
@@ -596,25 +561,79 @@
                         </button>
                     </div>
                     <form wire:submit.prevent="saveBoxEdit" class="p-6 space-y-4">
-                        <div>
-                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Tracking Number</label>
-                            <input type="text" wire:model="editTrackingNumber" maxlength="100" placeholder="Enter tracking number"
-                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
-                            @error('editTrackingNumber') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        {{-- Type + Method --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Tipe <span class="text-red-500">*</span></label>
+                                <select wire:model="editType" class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                    <option value="sharing">Sharing</option>
+                                    <option value="direct">Direct</option>
+                                    <option value="handcarry">Handcarry</option>
+                                </select>
+                                @error('editType') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Metode <span class="text-red-500">*</span></label>
+                                <select wire:model="editMethod" class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                    <option value="air">Air</option>
+                                    <option value="sea">Sea</option>
+                                </select>
+                                @error('editMethod') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Huruf Box</label>
-                            <input type="text" wire:model="editHurufBox" maxlength="10" placeholder="e.g. H, A, B"
-                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
-                            <p class="text-[11px] text-gray-400 mt-1">Kode huruf box dari China (contoh: H, A, B)</p>
-                            @error('editHurufBox') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+
+                        {{-- Tracking + Batch --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Tracking Number</label>
+                                <input type="text" wire:model="editTrackingNumber" maxlength="100" placeholder="Enter tracking number"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('editTrackingNumber') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Batch Name</label>
+                                <input type="text" wire:model="editBatchName" maxlength="100" placeholder="e.g. Batch Juli 1"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('editBatchName') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
                         </div>
+
+                        {{-- Huruf Box + Customer --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Huruf Box</label>
+                                <input type="text" wire:model="editHurufBox" maxlength="10" placeholder="e.g. H, A, B"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('editHurufBox') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Customer</label>
+                                <select wire:model="editCustomerId" class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                    <option value="">Sharing (Semua Customer)</option>
+                                    @foreach($customers as $customer)
+                                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('editCustomerId') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        {{-- ETA --}}
                         <div>
                             <label class="block text-[12px] font-medium text-gray-600 mb-1">ETA</label>
                             <input type="date" wire:model="editEta"
                                 class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                             @error('editEta') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
+
+                        {{-- Notes --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Catatan</label>
+                            <textarea wire:model="editNotes" maxlength="1000" rows="2" placeholder="Catatan box (opsional)"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40"></textarea>
+                            @error('editNotes') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
                         <div class="flex items-center justify-end gap-3 pt-2">
                             <button type="button" wire:click="closeEditModal"
                                 class="px-4 py-2 text-[13px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">

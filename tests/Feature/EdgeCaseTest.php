@@ -723,11 +723,13 @@ class EdgeCaseTest extends TestCase
     // ═══════════════════════════════════════════════════════════════
     //  BOX STATUS NEGATIVE TESTS (§4.9)
     // ═══════════════════════════════════════════════════════════════
+    //  BOX STATUS EDITABLE TESTS (Client Request: Admin can fix mistakes)
+    // ═══════════════════════════════════════════════════════════════
 
     /**
-     * Box cannot skip status: SENT_TO_CARGO → DONE (must go through OTW_INA → UP_INVOICE).
+     * Admin can change box status to any valid status (client request).
      */
-    public function test_box_cannot_skip_to_done(): void
+    public function test_box_status_can_be_changed_freely(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'status' => User::STATUS_ACTIVE]);
         $customer = User::factory()->create(['role' => 'customer', 'status' => User::STATUS_ACTIVE]);
@@ -738,19 +740,20 @@ class EdgeCaseTest extends TestCase
 
         $this->actingAs($admin);
 
+        // Can skip to DONE (admin can fix mistakes)
         Livewire::test(ManageBox::class)
             ->call('selectBox', $box->id)
             ->call('confirmStatusChange', Box::STATUS_DONE)
             ->call('updateStatus');
 
         $box->refresh();
-        $this->assertEquals(Box::STATUS_SENT_TO_CARGO, $box->status, 'Box must NOT skip to DONE');
+        $this->assertEquals(Box::STATUS_DONE, $box->status, 'Admin can change to any status');
     }
 
     /**
-     * Box cannot go backward: OTW_INA → OPEN.
+     * Admin can go backward: OTW_INA → OPEN.
      */
-    public function test_box_cannot_go_backward(): void
+    public function test_box_status_can_go_backward(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'status' => User::STATUS_ACTIVE]);
         $customer = User::factory()->create(['role' => 'customer', 'status' => User::STATUS_ACTIVE]);
@@ -767,7 +770,7 @@ class EdgeCaseTest extends TestCase
             ->call('updateStatus');
 
         $box->refresh();
-        $this->assertEquals(Box::STATUS_OTW_INA, $box->status, 'Box must NOT go backward');
+        $this->assertEquals(Box::STATUS_OPEN, $box->status, 'Admin can go backward');
     }
 
     // ═══════════════════════════════════════════════════════════════
