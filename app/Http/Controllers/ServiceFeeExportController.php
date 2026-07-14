@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\WhChinaData;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ServiceFeeExportController extends Controller
 {
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request): StreamedResponse
     {
         $filterHurufBox = $request->input('huruf_box', '');
 
