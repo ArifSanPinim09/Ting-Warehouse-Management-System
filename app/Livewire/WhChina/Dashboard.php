@@ -32,6 +32,9 @@ class Dashboard extends Component
     // ─── Kurs ───────────────────────────────────────────────────
     public float $kursYuan = 0;
 
+    // ─── REV-03.9: Filter & Export ─────────────────────────────
+    public string $filterHurufBox = '';
+
     // ─── Search ─────────────────────────────────────────────────
     public string $search = '';
 
@@ -235,10 +238,18 @@ class Dashboard extends Component
                 $q->where('resi_number', 'like', "%{$this->search}%")
                   ->orWhere('huruf_box', 'like', "%{$this->search}%");
             })
+            ->when($this->filterHurufBox, function ($q) {
+                $q->where('huruf_box', 'like', "%{$this->filterHurufBox}%");
+            })
             ->latest();
 
         $records = $query->paginate(20);
 
-        return view('livewire.wh-china.dashboard.index', compact('records'));
+        // Get unique huruf_box values for filter dropdown
+        $hurufBoxOptions = WhChinaData::whereNotNull('huruf_box')
+            ->distinct()
+            ->pluck('huruf_box');
+
+        return view('livewire.wh-china.dashboard.index', compact('records', 'hurufBoxOptions'));
     }
 }

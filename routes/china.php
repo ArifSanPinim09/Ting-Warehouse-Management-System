@@ -19,4 +19,5 @@ Route::middleware(['auth', 'verified', 'role:china_admin'])->prefix('china')->na
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/new-batch', NewBatch::class)->name('new-batch');
     Route::get('/requests', Requests::class)->name('requests');
+    Route::get('/export-service-fee', \App\Http\Controllers\ServiceFeeExportController::class)->name('export-service-fee');
 });
