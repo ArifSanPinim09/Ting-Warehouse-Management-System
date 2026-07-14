@@ -4,12 +4,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-display text-primary">My Box</h1>
-                    <p class="text-body text-gray-500 mt-1">Kelola box sharing dan direct Anda</p>
-                </div>
-                <div class="flex items-center bg-gray-100 rounded-button p-1" wire:loading.class="pointer-events-none opacity-50">
-                    <a href="{{ route('customer.box.sharing') }}" wire:navigate class="px-4 py-2.5 min-h-[44px] flex items-center rounded-button text-body font-medium transition-colors text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-accent/40">Sharing</a>
-                    <a href="{{ route('customer.box.direct') }}" wire:navigate class="px-4 py-2.5 min-h-[44px] flex items-center rounded-button text-body font-medium transition-colors bg-white text-primary shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/40">Direct</a>
+                    <h1 class="text-display text-primary">My Box Direct</h1>
+                    <p class="text-body text-gray-500 mt-1">Kelola box direct Anda</p>
                 </div>
             </div>
         </div>
