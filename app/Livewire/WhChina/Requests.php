@@ -12,9 +12,12 @@ class Requests extends Component
 {
     public function render()
     {
-        // REV-03.8: Show customer requests (placeholder until REV-04.3 adds request_type column)
-        // Currently returns empty — will be populated when customer request feature is implemented.
-        $requests = collect();
+        $requests = \App\Models\Item::whereNotNull('request_type')
+            ->where('request_type', '!=', '[]')
+            ->where('request_type', '!=', '')
+            ->with(['box', 'customer'])
+            ->latest()
+            ->get();
 
         return view('livewire.wh-china.requests.index', compact('requests'));
     }
