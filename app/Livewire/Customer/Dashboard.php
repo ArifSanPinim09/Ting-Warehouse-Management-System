@@ -139,6 +139,19 @@ class Dashboard extends Component
         // Unmatched WH China data count (for alert banner)
         $unmatchedWhCount = WhChinaData::whereNull('item_id')->count();
 
+        // REV-01.2: Info Open Box Global — list box yang sedang OPEN
+        $openBoxes = Box::where(function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->whereNull('customer_id')
+                        ->whereHas('items', function ($items) use ($user) {
+                            $items->where('customer_id', $user->id);
+                        });
+                })
+                ->orWhere('customer_id', $user->id);
+            })
+            ->where('status', Box::STATUS_OPEN)
+            ->pluck('batch_name', 'id');
+
         return view('livewire.customer.dashboard.index', compact(
             'activeBoxes',
             'unpaidInvoices',
@@ -152,6 +165,7 @@ class Dashboard extends Component
             'detailBox',
             'notifications',
             'unmatchedWhCount',
+            'openBoxes',
         ))->layout('layouts.app');
     }
 }

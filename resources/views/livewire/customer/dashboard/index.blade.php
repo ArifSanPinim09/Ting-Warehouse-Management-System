@@ -85,6 +85,21 @@
             </a>
         </div>
 
+        {{-- REV-01.2: Open Box Info Banner --}}
+        @if($openBoxes && $openBoxes->isNotEmpty())
+            <div class="bg-emerald-50 border border-emerald-200 rounded-[12px] px-5 py-3 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                </div>
+                <div>
+                    <p class="text-[13px] font-semibold text-emerald-800">
+                        Box {{ $openBoxes->implode(', ') }} sedang open
+                    </p>
+                    <p class="text-[12px] text-emerald-600 mt-0.5">Anda masih bisa setor barang ke box ini</p>
+                </div>
+            </div>
+        @endif
+
         {{-- Unmatched WH China Alert Banner --}}
         @if($unmatchedWhCount > 0)
             <a href="{{ route('customer.unmatched-resi') }}" wire:navigate
