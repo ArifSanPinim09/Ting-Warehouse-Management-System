@@ -7,13 +7,13 @@
 
     {{-- Page Header --}}
     <div class="bg-white border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <h1 class="text-[20px] font-bold text-primary">Warehouse China Dashboard</h1>
             <p class="text-[13px] text-gray-500 mt-1">Input and manage China warehouse data</p>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
         {{-- ═══════════════════════════════════════════════════ --}}
         {{-- SECTION A: INPUT FORM                               --}}

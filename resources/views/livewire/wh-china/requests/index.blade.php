@@ -2,13 +2,13 @@
 
     {{-- Page Header --}}
     <div class="bg-white border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <h1 class="text-[20px] font-bold text-primary">Customer Requests</h1>
             <p class="text-[13px] text-gray-500 mt-1">Special handling instructions from customers</p>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
         {{-- Requests Table --}}
         <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
