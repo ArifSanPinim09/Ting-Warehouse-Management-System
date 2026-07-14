@@ -275,11 +275,8 @@
                                                 </div>
                                             </div>
                                             <div class="flex flex-wrap gap-x-4 gap-y-1 text-caption">
-                                                @if($item->whChinaData)
-                                                    <span><span class="text-gray-400">Berat:</span> <span class="text-gray-700">{{ number_format($item->whChinaData->berat, 1) }} kg</span></span>
-                                                    @if($item->whChinaData->ukuran_box)
-                                                        <span><span class="text-gray-400">Ukuran:</span> <span class="text-gray-700">{{ $item->whChinaData->ukuran_box }}</span></span>
-                                                    @endif
+                                                @if($item->whChinaData && $item->whChinaData->berat_ina)
+                                                    <span><span class="text-gray-400">Berat INA:</span> <span class="text-gray-700">{{ number_format($item->whChinaData->berat_ina, 1) }} kg</span></span>
                                                 @endif
                                                 @if($item->resi_number)
                                                     <span><span class="text-gray-400">Resi:</span> <span class="text-gray-700 font-mono">{{ $item->resi_number }}</span></span>
@@ -350,10 +347,10 @@
                                                     <td class="px-4 py-3 text-body text-gray-700">{{ $item->quantity }}</td>
                                                     <td class="px-4 py-3 text-body text-gray-700">¥{{ number_format($item->price_yuan, 2) }}</td>
                                                     <td class="px-4 py-3 text-body text-gray-700">
-                                                        {{ $item->whChinaData ? number_format($item->whChinaData->berat, 1) . ' kg' : '-' }}
+                                                        {{ $item->whChinaData && $item->whChinaData->berat_ina ? number_format($item->whChinaData->berat_ina, 1) . ' kg' : '-' }}
                                                     </td>
                                                     <td class="px-4 py-3 text-body text-gray-700">
-                                                        {{ $item->whChinaData->ukuran_box ?? '-' }}
+                                                        {{ $item->whChinaData && $item->whChinaData->ukuran_box ? $item->whChinaData->ukuran_box : '-' }}
                                                     </td>
                                                     <td class="px-4 py-3">
                                                         <span class="text-caption text-gray-500 font-mono">{{ $item->resi_number ?? '-' }}</span>

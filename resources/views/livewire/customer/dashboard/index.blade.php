@@ -446,9 +446,9 @@
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">No</th>
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Nama Barang</th>
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Qty</th>
-                                                <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Berat</th>
-                                                <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">P×L×T</th>
-                                                <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Volume</th>
+                                                <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Berat INA</th>
+                                                <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">P×L×T (INA)</th>
+                                                <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Volume (INA)</th>
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Biaya Tax</th>
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Foto INA</th>
                                                 <th class="px-4 py-2.5 text-caption font-semibold text-gray-500 uppercase">Keterangan</th>
@@ -469,17 +469,17 @@
                                                     </td>
                                                     <td class="px-4 py-2.5 text-body text-gray-700">{{ $item->quantity }}</td>
                                                     <td class="px-4 py-2.5 text-body text-gray-700">
-                                                        {{ $item->whChinaData ? number_format($item->whChinaData->berat, 1) . ' kg' : '-' }}
+                                                        {{ $item->whChinaData && $item->whChinaData->berat_ina ? number_format($item->whChinaData->berat_ina, 1) . ' kg' : '-' }}
                                                     </td>
                                                     <td class="px-4 py-2.5 text-body text-gray-700">
-                                                        @if($item->whChinaData && $item->whChinaData->panjang && $item->whChinaData->lebar && $item->whChinaData->tinggi)
+                                                        @if($item->whChinaData && $item->whChinaData->berat_ina && $item->whChinaData->panjang && $item->whChinaData->lebar && $item->whChinaData->tinggi)
                                                             {{ $item->whChinaData->panjang }}×{{ $item->whChinaData->lebar }}×{{ $item->whChinaData->tinggi }} cm
                                                         @else
                                                             -
                                                         @endif
                                                     </td>
                                                     <td class="px-4 py-2.5 text-body text-gray-700">
-                                                        {{ $item->whChinaData && $item->whChinaData->volume ? number_format($item->whChinaData->volume, 4) : '-' }}
+                                                        {{ $item->whChinaData && $item->whChinaData->berat_ina && $item->whChinaData->volume ? number_format($item->whChinaData->volume, 4) : '-' }}
                                                     </td>
                                                     <td class="px-4 py-2.5 text-body text-gray-700">
                                                         {{ $item->whChinaData && $item->whChinaData->biaya_tax ? 'Rp ' . number_format($item->whChinaData->biaya_tax, 0, ',', '.') : '-' }}

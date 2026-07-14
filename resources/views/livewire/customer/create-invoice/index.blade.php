@@ -69,11 +69,13 @@
                             </div>
 
                             <div class="flex items-center gap-3 mt-2 text-caption text-gray-500">
-                                @if($item->whChinaData)
+                                @if($item->whChinaData && $item->whChinaData->berat_ina)
                                     <span class="inline-flex items-center gap-1">
                                         <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                        {{ number_format($item->whChinaData->berat, 2) }} kg
+                                        {{ number_format($item->whChinaData->berat_ina, 2) }} kg (INA)
                                     </span>
+                                @elseif($item->whChinaData)
+                                    <span class="text-amber-500">Menunggu QC Indonesia</span>
                                 @else
                                     <span class="text-amber-500">Belum ada data WH China</span>
                                 @endif

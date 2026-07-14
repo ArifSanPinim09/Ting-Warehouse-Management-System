@@ -91,14 +91,6 @@
                                         <p class="text-caption text-emerald-700 mt-1">Data akan otomatis terhubung saat Anda submit.</p>
                                         <div class="mt-2 grid grid-cols-2 gap-2 text-caption">
                                             <div>
-                                                <span class="text-emerald-600">Berat:</span>
-                                                <span class="font-medium text-emerald-800">{{ number_format($whMatchInfo['berat'], 2) }} kg</span>
-                                            </div>
-                                            <div>
-                                                <span class="text-emerald-600">Ukuran:</span>
-                                                <span class="font-medium text-emerald-800">{{ $whMatchInfo['ukuran'] }}</span>
-                                            </div>
-                                            <div>
                                                 <span class="text-emerald-600">Tanggal:</span>
                                                 <span class="font-medium text-emerald-800">{{ $whMatchInfo['tanggal'] }}</span>
                                             </div>
