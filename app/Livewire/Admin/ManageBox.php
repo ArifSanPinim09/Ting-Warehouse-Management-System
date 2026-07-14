@@ -59,6 +59,16 @@ class ManageBox extends Component
     public ?int $newCustomerId = null;
     public string $newNotes = '';
 
+    // ─── REV-05.5: Item Edit ───────────────────────────────────
+    public bool $showItemEditModal = false;
+    public ?int $editItemId = null;
+    public string $editItemResi = '';
+    public string $editItemName = '';
+    public string $editItemQuantity = '';
+    public string $editItemPriceYuan = '';
+    public bool $editItemIsSensitive = false;
+    public string $editItemNotes = '';
+
     // ─── Watchers ───────────────────────────────────────────────
     public function updatedSearch(): void
     {
@@ -123,6 +133,72 @@ class ManageBox extends Component
         $this->editBatchName = '';
         $this->editCustomerId = null;
         $this->editNotes = '';
+    }
+
+    // ─── REV-05.5: Item Edit Methods ──────────────────────────
+    public function openItemEditModal(int $itemId): void
+    {
+        $item = Item::findOrFail($this->editItemId = $itemId);
+        $this->editItemResi = $item->resi_number ?? '';
+        $this->editItemName = $item->name;
+        $this->editItemQuantity = (string) $item->quantity;
+        $this->editItemPriceYuan = $item->price_yuan !== null ? (string) $item->price_yuan : '';
+        $this->editItemIsSensitive = (bool) $item->is_sensitive;
+        $this->editItemNotes = $item->notes ?? '';
+        $this->showItemEditModal = true;
+    }
+
+    public function closeItemEditModal(): void
+    {
+        $this->showItemEditModal = false;
+        $this->editItemId = null;
+        $this->editItemResi = '';
+        $this->editItemName = '';
+        $this->editItemQuantity = '';
+        $this->editItemPriceYuan = '';
+        $this->editItemIsSensitive = false;
+        $this->editItemNotes = '';
+    }
+
+    public function saveItemEdit(AuditLogService $auditService): void
+    {
+        $item = Item::findOrFail($this->editItemId);
+
+        $this->validate([
+            'editItemResi' => 'nullable|string|max:100',
+            'editItemName' => 'required|string|max:255',
+            'editItemQuantity' => 'required|integer|min:1',
+            'editItemPriceYuan' => 'nullable|numeric|min:0',
+            'editItemNotes' => 'nullable|string|max:500',
+        ], [
+            'editItemName.required' => 'Nama barang wajib diisi.',
+            'editItemQuantity.required' => 'Jumlah wajib diisi.',
+            'editItemQuantity.integer' => 'Jumlah harus angka bulat.',
+        ]);
+
+        $oldValues = [
+            'resi_number' => $item->resi_number,
+            'name' => $item->name,
+            'quantity' => $item->quantity,
+            'price_yuan' => $item->price_yuan,
+            'is_sensitive' => $item->is_sensitive,
+            'notes' => $item->notes,
+        ];
+
+        $item->update([
+            'resi_number' => $this->editItemResi ?: null,
+            'name' => $this->editItemName,
+            'quantity' => (int) $this->editItemQuantity,
+            'price_yuan' => $this->editItemPriceYuan !== '' ? (float) $this->editItemPriceYuan : null,
+            'is_sensitive' => $this->editItemIsSensitive,
+            'notes' => $this->editItemNotes ?: null,
+        ]);
+
+        $newValues = $item->only(['resi_number', 'name', 'quantity', 'price_yuan', 'is_sensitive', 'notes']);
+        $auditService->log('updated_item', $item, $oldValues, $newValues);
+
+        $this->closeItemEditModal();
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: 'Data item berhasil diupdate.');
     }
 
     public function saveBoxEdit(AuditLogService $auditService): void

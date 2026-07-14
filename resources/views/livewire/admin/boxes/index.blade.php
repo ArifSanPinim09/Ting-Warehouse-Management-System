@@ -378,6 +378,15 @@
                                                         <span class="text-caption font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">Sensitive</span>
                                                     @endif
 
+                                                    {{-- REV-05.5: Edit Item --}}
+                                                    <button
+                                                        wire:click="openItemEditModal({{ $item->id }})"
+                                                        class="text-caption font-medium px-2 py-1 rounded-[6px] bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                                                        title="Edit item"
+                                                    >
+                                                        Edit
+                                                    </button>
+
                                                     {{-- Mark as No Tuan (active → no_tuan) --}}
                                                     @if($item->status === 'active')
                                                         <button
@@ -661,6 +670,88 @@
 
                         <div class="flex items-center justify-end gap-3 pt-2">
                             <button type="button" wire:click="closeEditModal"
+                                class="px-4 py-2 text-[13px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- ═══════════════════════════════════════════════════════════ --}}
+    {{-- MODAL: Edit Item (REV-05.5)                                 --}}
+    {{-- ═══════════════════════════════════════════════════════════ --}}
+    @if($showItemEditModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeItemEditModal">
+            <div class="fixed inset-0 bg-black/30 transition-opacity"></div>
+            <div class="flex min-h-full items-end sm:items-center justify-center p-4">
+                <div class="relative bg-white rounded-[16px] shadow-lg w-full max-w-md transform transition-all" @click.stop>
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-[10px] bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            </div>
+                            <h3 class="text-[15px] font-semibold text-gray-900">Edit Item</h3>
+                        </div>
+                        <button wire:click="closeItemEditModal" class="p-2 text-gray-400 hover:text-gray-600 rounded-[8px]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <form wire:submit.prevent="saveItemEdit" class="p-6 space-y-4">
+                        {{-- Resi Number --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Nomor Resi</label>
+                            <input type="text" wire:model="editItemResi" maxlength="100" placeholder="Nomor resi (opsional)"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                            @error('editItemResi') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Name --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Nama Barang <span class="text-red-500">*</span></label>
+                            <input type="text" wire:model="editItemName" maxlength="255" placeholder="Nama barang"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                            @error('editItemName') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Quantity + Price --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Jumlah <span class="text-red-500">*</span></label>
+                                <input type="number" wire:model="editItemQuantity" min="1" placeholder="0"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                                @error('editItemQuantity') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Harga (¥)</label>
+                                <input type="number" wire:model="editItemPriceYuan" step="0.01" min="0" placeholder="0.00"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                                @error('editItemPriceYuan') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        {{-- Sensitive --}}
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" wire:model="editItemIsSensitive" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-accent">
+                            <span class="text-[13px] text-gray-700">Barang Sensitif</span>
+                        </label>
+
+                        {{-- Notes --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Catatan</label>
+                            <textarea wire:model="editItemNotes" maxlength="500" rows="2" placeholder="Catatan (opsional)"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors"></textarea>
+                            @error('editItemNotes') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="flex items-center justify-end gap-3 pt-2">
+                            <button type="button" wire:click="closeItemEditModal"
                                 class="px-4 py-2 text-[13px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">
                                 Cancel
                             </button>
