@@ -51,10 +51,18 @@ class Dashboard extends Component
         $unpaidInvoices = (float) ($invoiceStats->unpaid_total ?? 0);
         $unpaidCount = (int) ($invoiceStats->unpaid_count ?? 0);
 
-        // PRD §4.3: Sharing box (customer_id NULL) + direct box milik customer
+        // REV-01.3: Hanya tampilkan sharing box dimana customer punya item
+        // + direct box milik customer ini
         $activeBoxes = Box::where(function ($query) use ($user) {
-                $query->whereNull('customer_id')
-                    ->orWhere('customer_id', $user->id);
+                // (1) Sharing box: customer_id NULL + customer punya barang
+                $query->where(function ($q) use ($user) {
+                    $q->whereNull('customer_id')
+                        ->whereHas('items', function ($items) use ($user) {
+                            $items->where('customer_id', $user->id);
+                        });
+                })
+                // (2) Sharing box milik customer ini
+                ->orWhere('customer_id', $user->id);
             })
             ->whereIn('status', [Box::STATUS_OPEN, Box::STATUS_SENT_TO_CARGO, Box::STATUS_OTW_INA])
             ->count();
@@ -81,10 +89,17 @@ class Dashboard extends Component
         $feeService = app(FeeCalculationService::class);
         $kursYuan = $feeService->getKursToday();
 
-        // PRD §4.3: Sharing box (customer_id NULL) + direct box milik customer
+        // REV-01.3: Status Box - hanya sharing box yang ada barang customer + direct box milik customer
         $boxes = Box::where(function ($query) use ($user) {
-                $query->whereNull('customer_id')
-                    ->orWhere('customer_id', $user->id);
+                // (1) Sharing box: customer_id NULL + customer punya barang
+                $query->where(function ($q) use ($user) {
+                    $q->whereNull('customer_id')
+                        ->whereHas('items', function ($items) use ($user) {
+                            $items->where('customer_id', $user->id);
+                        });
+                })
+                // (2) Sharing box milik customer ini
+                ->orWhere('customer_id', $user->id);
             })
             ->withCount('items')
             ->with(['items' => function ($query) {
@@ -93,13 +108,20 @@ class Dashboard extends Component
             ->latest()
             ->paginate(15);
 
-        // Detail box (sharing box bisa diakses semua customer)
+        // REV-01.3: Detail box - hanya sharing box yang ada barang customer + direct box milik customer
         $detailBox = null;
         if ($this->detailBoxId) {
             $detailBox = Box::where('id', $this->detailBoxId)
                 ->where(function ($query) use ($user) {
-                    $query->whereNull('customer_id')
-                        ->orWhere('customer_id', $user->id);
+                    // (1) Sharing box: customer_id NULL + customer punya barang
+                    $query->where(function ($q) use ($user) {
+                        $q->whereNull('customer_id')
+                            ->whereHas('items', function ($items) use ($user) {
+                                $items->where('customer_id', $user->id);
+                            });
+                    })
+                    // (2) Sharing box milik customer ini / direct box milik customer
+                    ->orWhere('customer_id', $user->id);
                 })
                 ->with(['items' => function ($query) {
                     $query->with('whChinaData');

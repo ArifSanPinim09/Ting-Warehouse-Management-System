@@ -51,10 +51,16 @@ class BoxSharing extends Component
 
         $boxes = Box::where('type', 'sharing')
             ->where(function ($query) use ($user) {
-                // Sharing box: semua customer bisa lihat (customer_id NULL)
-                $query->whereNull('customer_id')
-                    // Atau box yang memang milik customer ini
-                    ->orWhere('customer_id', $user->id);
+                // REV-01.3: Hanya sharing box dimana customer punya item
+                // (1) customer_id NULL + customer punya item di box ini
+                $query->where(function ($q) use ($user) {
+                    $q->whereNull('customer_id')
+                        ->whereHas('items', function ($items) use ($user) {
+                            $items->where('customer_id', $user->id);
+                        });
+                })
+                // (2) sharing box yang memang milik customer ini
+                ->orWhere('customer_id', $user->id);
             })
             ->when($this->search, function ($query) {
                 $query->where('tracking_number', 'like', "%{$this->search}%");
@@ -71,14 +77,21 @@ class BoxSharing extends Component
             ->latest()
             ->paginate(15);
 
-        // Detail box (sharing box bisa diakses semua customer)
+        // REV-01.3: Detail box - hanya sharing box yang ada barang customer
         $detailBox = null;
         if ($this->detailBoxId) {
             $detailBox = Box::where('id', $this->detailBoxId)
                 ->where('type', 'sharing')
                 ->where(function ($query) use ($user) {
-                    $query->whereNull('customer_id')
-                        ->orWhere('customer_id', $user->id);
+                    // customer_id NULL + customer punya item
+                    $query->where(function ($q) use ($user) {
+                        $q->whereNull('customer_id')
+                            ->whereHas('items', function ($items) use ($user) {
+                                $items->where('customer_id', $user->id);
+                            });
+                    })
+                    // atau sharing box milik customer ini
+                    ->orWhere('customer_id', $user->id);
                 })
                 ->with(['items' => function ($query) use ($user) {
                     $query->where('customer_id', $user->id)->with('whChinaData');
