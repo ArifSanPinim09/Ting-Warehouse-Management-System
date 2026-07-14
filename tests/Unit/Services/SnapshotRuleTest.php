@@ -123,10 +123,10 @@ class SnapshotRuleTest extends TestCase
         $expectedFees = [
             'volume' => 80.0,
             'basis' => 80.0,
-            'fee_tax' => 7200,
+            'fee_tax' => 6800, // REV-05.4: Direct Sea >25kg → rate -5
             'fee_wh' => 5000,
             'fee_packing' => 5000,
-            'grand_total' => 17200,
+            'grand_total' => 16800,
         ];
 
         // Introduce kurs_history
@@ -232,10 +232,10 @@ class SnapshotRuleTest extends TestCase
         $expectedFees = [
             'volume' => 160.0,
             'basis' => 160.0,
-            'fee_tax' => 14400,
+            'fee_tax' => 13600, // REV-05.4: Direct Sea >25kg → rate -5
             'fee_wh' => 5000,
             'fee_packing' => 5000,
-            'grand_total' => 24400,
+            'grand_total' => 23600,
         ];
 
         $admin = User::factory()->create(['role' => 'admin']);

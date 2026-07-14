@@ -102,11 +102,11 @@ class FeeCalculationServiceTest extends TestCase
      * - Volume = (100 × 80 × 60) / 6000 = 80
      * - Basis = max(50, 80) = 80 (volume wins)
      * - Rate key = rate_direct_sea_volume
-     * - Rate = 90
-     * - Fee TAX = 80 × 90 = 7200
+     * - Rate = 90 - 5 = 85 (REV-05.4: Direct Sea >25kg discount)
+     * - Fee TAX = 80 × 85 = 6800
      * - Fee WH = 5000 (50 kg → tier 0-150)
      * - Fee Packing = 5000 (same)
-     * - Grand Total = 7200 + 5000 + 5000 = 17200
+     * - Grand Total = 6800 + 5000 + 5000 = 16800
      */
     public function test_scenario_2_direct_sea_non_sensitive(): void
     {
@@ -123,11 +123,11 @@ class FeeCalculationServiceTest extends TestCase
         $this->assertEquals(80.0, $result['volume']);
         $this->assertEquals(80.0, $result['basis']);
         $this->assertEquals('rate_direct_sea_volume', $result['rate_key']);
-        $this->assertEquals(90, $result['rate_used']);
-        $this->assertEquals(7200, $result['fee_tax']);
+        $this->assertEquals(85, $result['rate_used']); // REV-05.4: 90 - 5
+        $this->assertEquals(6800, $result['fee_tax']);
         $this->assertEquals(5000, $result['fee_wh']);
         $this->assertEquals(5000, $result['fee_packing']);
-        $this->assertEquals(17200, $result['grand_total']);
+        $this->assertEquals(16800, $result['grand_total']);
     }
 
     /**
@@ -182,11 +182,11 @@ class FeeCalculationServiceTest extends TestCase
      * - Volume = (120 × 100 × 80) / 6000 = 160
      * - Basis = max(30, 160) = 160 (volume wins)
      * - Rate key = rate_direct_sea_volume (direct tidak punya sensitive variant)
-     * - Rate = 90
-     * - Fee TAX = 160 × 90 = 14400
+     * - Rate = 90 - 5 = 85 (REV-05.4: Direct Sea >25kg discount)
+     * - Fee TAX = 160 × 85 = 13600
      * - Fee WH = 5000 (30 kg → tier 0-150)
      * - Fee Packing = 5000 (same)
-     * - Grand Total = 14400 + 5000 + 5000 = 24400
+     * - Grand Total = 13600 + 5000 + 5000 = 23600
      */
     public function test_scenario_4_direct_sea_sensitive(): void
     {
@@ -203,11 +203,11 @@ class FeeCalculationServiceTest extends TestCase
         $this->assertEquals(160.0, $result['volume']);
         $this->assertEquals(160.0, $result['basis']);
         $this->assertEquals('rate_direct_sea_volume', $result['rate_key']);
-        $this->assertEquals(90, $result['rate_used']);
-        $this->assertEquals(14400, $result['fee_tax']);
+        $this->assertEquals(85, $result['rate_used']); // REV-05.4: 90 - 5
+        $this->assertEquals(13600, $result['fee_tax']);
         $this->assertEquals(5000, $result['fee_wh']);
         $this->assertEquals(5000, $result['fee_packing']);
-        $this->assertEquals(24400, $result['grand_total']);
+        $this->assertEquals(23600, $result['grand_total']);
     }
 
     /**

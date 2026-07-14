@@ -105,6 +105,11 @@ class FeeCalculationService
         // Per-customer rate override: if customRate is set, use it instead of global rate
         $rate = $customRate ?? ($this->rates[$rateKey] ?? 0);
 
+        // REV-05.4: Direct Sea >25kg → rate -5 per unit (confirmed by client)
+        if ($type === 'direct' && $method === 'sea' && $weight > 25 && $customRate === null) {
+            $rate = max(0, $rate - 5);
+        }
+
         $feeTax = $this->calculateFeeTax($basis, $rate);
         $feeWh = $this->calculateFeeWh($weight);
         $feePacking = $this->calculateFeePacking($weight);
