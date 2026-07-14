@@ -60,11 +60,12 @@ class BoxModelTest extends TestCase
     {
         $statuses = Box::getValidStatuses();
 
-        $this->assertCount(7, $statuses);
+        $this->assertCount(8, $statuses);
         $this->assertContains('OPEN', $statuses);
         $this->assertContains('CLOSED', $statuses);
         $this->assertContains('LAST_SETOR', $statuses);
         $this->assertContains('DONE', $statuses);
+        $this->assertContains('REQUEST_TO_CLOSE', $statuses);
     }
 
     public function test_etd_eta_cast_to_date(): void

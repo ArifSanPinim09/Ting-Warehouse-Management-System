@@ -85,6 +85,7 @@ class Box extends Model
     const STATUS_OTW_INA = 'OTW_INA';
     const STATUS_UP_INVOICE = 'UP_INVOICE';
     const STATUS_DONE = 'DONE';
+    const STATUS_REQUEST_TO_CLOSE = 'REQUEST_TO_CLOSE'; // REV-04.6
 
     /**
      * Get all valid statuses.
@@ -101,6 +102,7 @@ class Box extends Model
             self::STATUS_OTW_INA,
             self::STATUS_UP_INVOICE,
             self::STATUS_DONE,
+            self::STATUS_REQUEST_TO_CLOSE,
         ];
     }
 

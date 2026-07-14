@@ -7,7 +7,11 @@
                     <h1 class="text-display text-primary">My Box Direct</h1>
                     <p class="text-body text-gray-500 mt-1">Kelola box direct Anda</p>
                 </div>
-            </div>
+                <button wire:click="openCreateModal"
+                    class="px-4 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors inline-flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Buat Batch Baru
+                </button>
         </div>
     </div>
 
@@ -388,11 +392,76 @@
                     </div>
 
                     {{-- Modal Footer --}}
-                    <div class="px-6 py-4 border-t border-gray-100 flex justify-end bg-gray-50">
+                    <div class="px-6 py-4 border-t border-gray-100 flex justify-between bg-gray-50">
+                        <div>
+                            @if($detailBox && $detailBox->status === \App\Models\Box::STATUS_OPEN)
+                                <button wire:click="requestToClose({{ $detailBox->id }})" wire:confirm="Yakin ingin request close batch ini?"
+                                    class="px-4 py-2 text-[13px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-[8px] hover:bg-amber-100 transition-colors">
+                                    Request to Close
+                                </button>
+                            @endif
+                        </div>
                         <button wire:click="closeBoxDetail" class="px-5 py-2.5 text-body font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
                             Tutup
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- ═══════════════════════════════════════════════════ --}}
+    {{-- MODAL: Create Direct Batch (REV-04.5)              --}}
+    {{-- ═══════════════════════════════════════════════════ --}}
+    @if($showCreateModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeCreateModal">
+            <div class="fixed inset-0 bg-black/30 transition-opacity"></div>
+            <div class="flex min-h-full items-end sm:items-center justify-center p-4">
+                <div class="relative bg-white rounded-[16px] shadow-lg w-full max-w-md transform transition-all" @click.stop>
+                    {{-- Modal Header --}}
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-[10px] bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-semibold text-gray-900">Buat Batch Direct</h3>
+                                <p class="text-[12px] text-gray-400 mt-0.5">Buat batch pengiriman direct baru</p>
+                            </div>
+                        </div>
+                        <button wire:click="closeCreateModal" class="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-[8px] text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    {{-- Modal Body --}}
+                    <form wire:submit.prevent="createDirectBatch" class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Nama Batch <span class="text-red-500">*</span></label>
+                            <input type="text" wire:model="newBatchName" maxlength="100" placeholder="Contoh: TW-2026-DIRECT-001"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                            @error('newBatchName') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Tanggal Buka <span class="text-red-500">*</span></label>
+                            <input type="date" wire:model="newOpenDate"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                            @error('newOpenDate') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+                            <button type="button" wire:click="closeCreateModal"
+                                class="px-4 py-2 text-[13px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">
+                                Batal
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors inline-flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Buat Batch
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
