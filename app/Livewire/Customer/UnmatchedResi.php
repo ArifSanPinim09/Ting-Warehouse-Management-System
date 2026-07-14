@@ -45,7 +45,7 @@ class UnmatchedResi extends Component
             'itemName' => ['required', 'string', 'min:2', 'max:255'],
             'quantity' => ['required', 'integer', 'min:1', 'max:9999'],
             'priceYuan' => ['required', 'numeric', 'min:0.01', 'max:999999'],
-            'proofCo' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'proofCo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'isSensitive' => ['nullable', 'boolean'],
             'sensitiveType' => ['required_if:isSensitive,true', 'nullable', 'string', 'max:50'],
         ];
@@ -109,8 +109,8 @@ class UnmatchedResi extends Component
             return;
         }
 
-        // Upload proof photo
-        $proofPath = $this->proofCo->store('proof-co', 'public');
+        // Upload proof photo (nullable since REV-03.2)
+        $proofPath = $this->proofCo ? $this->proofCo->store('proof-co', 'public') : null;
 
         // Create the Item for this customer
         $item = Item::create([

@@ -131,7 +131,7 @@
                     </div>
 
                     <div>
-                        <label class="ds-label">Foto Bukti (Proof CO) <span class="text-red-500">*</span></label>
+                        <label class="ds-label">Foto Bukti (Proof CO) <span class="text-gray-400 font-normal">(opsional)</span></label>
                         <div
                             class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-200 rounded-card transition-colors hover:border-accent/30 hover:bg-accent/5"
                             x-data="{ dragging: false }"

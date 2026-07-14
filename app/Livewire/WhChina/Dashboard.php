@@ -93,6 +93,7 @@ class Dashboard extends Component
             'lebar' => 'nullable|numeric|min:0.01',
             'tinggi' => 'nullable|numeric|min:0.01',
             'serviceFeeYuan' => 'required|numeric|min:0',
+            'fotoArrivedChina' => 'nullable|array|max:2',
             'fotoArrivedChina.*' => 'nullable|image|max:5120',
         ], [
             'resiNumber.required' => 'Resi number is required.',

@@ -49,7 +49,7 @@ class SetorResi extends Component
             'quantity' => ['required', 'integer', 'min:1', 'max:9999'],
             'priceYuan' => ['required', 'numeric', 'min:0.01', 'max:999999'],
             'resiNumber' => ['required', 'string', 'min:3', 'max:100'],
-            'proofCo' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'proofCo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'isSensitive' => ['nullable', 'boolean'],
             'sensitiveType' => ['required_if:isSensitive,true', 'nullable', 'string', 'max:50'],
             'addOn' => ['nullable', 'numeric', 'min:0', 'max:999999'],
@@ -65,14 +65,10 @@ class SetorResi extends Component
             'name.required' => 'Nama barang wajib diisi',
             'name.min' => 'Nama barang minimal 2 karakter',
             'quantity.required' => 'Jumlah wajib diisi',
-            'quantity.integer' => 'Jumlah harus berupa angka',
-            'quantity.min' => 'Jumlah minimal 1',
             'priceYuan.required' => 'Harga wajib diisi',
             'priceYuan.numeric' => 'Harga harus berupa angka',
-            'priceYuan.min' => 'Harga minimal 0.01',
             'resiNumber.required' => 'Nomor resi wajib diisi',
             'resiNumber.min' => 'Nomor resi minimal 3 karakter',
-            'proofCo.required' => 'Foto bukti barang wajib diupload',
             'proofCo.mimes' => 'Format foto harus jpg, png, atau webp',
             'proofCo.max' => 'Ukuran foto maksimal 5MB',
             'sensitiveType.required_if' => 'Pilih jenis sensitive item',
@@ -126,8 +122,8 @@ class SetorResi extends Component
             return;
         }
 
-        // Upload proof photo with hashed filename
-        $proofPath = $this->proofCo->store('proof-co', 'public');
+        // Upload proof photo with hashed filename (nullable since REV-03.2)
+        $proofPath = $this->proofCo ? $this->proofCo->store('proof-co', 'public') : null;
 
         Item::create([
             'box_id' => $this->boxId,
