@@ -101,9 +101,11 @@ class Dashboard extends Component
                 // (2) Sharing box milik customer ini
                 ->orWhere('customer_id', $user->id);
             })
-            ->withCount('items')
-            ->with(['items' => function ($query) {
-                $query->with('whChinaData');
+            ->withCount(['items' => function ($query) use ($user) {
+                $query->where('customer_id', $user->id);
+            }])
+            ->with(['items' => function ($query) use ($user) {
+                $query->where('customer_id', $user->id)->with('whChinaData');
             }])
             ->latest()
             ->paginate(15);
@@ -123,8 +125,8 @@ class Dashboard extends Component
                     // (2) Sharing box milik customer ini / direct box milik customer
                     ->orWhere('customer_id', $user->id);
                 })
-                ->with(['items' => function ($query) {
-                    $query->with('whChinaData');
+                ->with(['items' => function ($query) use ($user) {
+                    $query->where('customer_id', $user->id)->with('whChinaData');
                 }])
                 ->first();
         }

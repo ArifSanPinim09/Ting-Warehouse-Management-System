@@ -507,10 +507,10 @@ class RealisticDataSeeder extends Seeder
             ['resi' => 'SF3000001', 'item_id' => $item2_1->id, 'huruf' => 'D', 'berat' => 85.0, 'berat_ina' => 87.0, 'P' => 120, 'L' => 80, 'T' => 60, 'jasa' => 1200000, 'tax' => 6090],
             ['resi' => 'SF3000002', 'item_id' => $item2_2->id, 'huruf' => 'D', 'berat' => 45.0, 'berat_ina' => 46.5, 'P' => 80, 'L' => 60, 'T' => 50, 'jasa' => 650000, 'tax' => 3255],
             // Customer 3 items (OTW)
-            ['resi' => 'SF5000001', 'item_id' => null, 'huruf' => 'B', 'berat' => 12.0, 'berat_ina' => null, 'P' => 60, 'L' => 40, 'T' => 30, 'jasa' => 180000, 'tax' => null],
+            ['resi' => 'SF5000001', 'item_id' => Item::where('resi_number', 'SF5000001')->first()?->id, 'huruf' => 'B', 'berat' => 12.0, 'berat_ina' => null, 'P' => 60, 'L' => 40, 'T' => 30, 'jasa' => 180000, 'tax' => null],
             // Customer 3 items (UP_INVOICE — sudah ada berat INA)
-            ['resi' => 'SF5500001', 'item_id' => null, 'huruf' => 'C', 'berat' => 120.0, 'berat_ina' => 125.0, 'P' => 150, 'L' => 80, 'T' => 60, 'jasa' => 1800000, 'tax' => 18750],
-            ['resi' => 'SF5500002', 'item_id' => null, 'huruf' => 'C', 'berat' => 8.0, 'berat_ina' => 8.2, 'P' => 40, 'L' => 30, 'T' => 20, 'jasa' => 120000, 'tax' => 574],
+            ['resi' => 'SF5500001', 'item_id' => Item::where('resi_number', 'SF5500001')->first()?->id, 'huruf' => 'C', 'berat' => 120.0, 'berat_ina' => 125.0, 'P' => 150, 'L' => 80, 'T' => 60, 'jasa' => 1800000, 'tax' => 18750],
+            ['resi' => 'SF5500002', 'item_id' => Item::where('resi_number', 'SF5500002')->first()?->id, 'huruf' => 'C', 'berat' => 8.0, 'berat_ina' => 8.2, 'P' => 40, 'L' => 30, 'T' => 20, 'jasa' => 120000, 'tax' => 574],
         ];
 
         foreach ($whDataSets as $d) {
