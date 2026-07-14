@@ -18,6 +18,7 @@ class Dashboard extends Component
     use WithFileUploads, WithPagination;
 
     // ─── Form State ─────────────────────────────────────────────
+    public bool $showModal = false;
     public string $resiNumber = '';
     public string $hurufBox = '';
     public string $berat = '';
@@ -59,6 +60,24 @@ class Dashboard extends Component
             return null;
         }
         return (float) $this->serviceFeeYuan * $this->kursYuan;
+    }
+
+    /**
+     * Open modal for new input.
+     */
+    public function openModal(): void
+    {
+        $this->resetForm();
+        $this->showModal = true;
+    }
+
+    /**
+     * Close modal.
+     */
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->resetForm();
     }
 
     /**
@@ -142,6 +161,7 @@ class Dashboard extends Component
         }
 
         $this->resetForm();
+        $this->showModal = false;
         $this->dispatch('toast', type: 'success', title: 'Success', message: 'Data saved successfully.');
     }
 
@@ -165,7 +185,8 @@ class Dashboard extends Component
             : '';
         $this->fotoArrivedChina = [];
 
-        // Scroll to top
+        // Open modal for editing
+        $this->showModal = true;
         $this->dispatch('scrollToTop');
     }
 

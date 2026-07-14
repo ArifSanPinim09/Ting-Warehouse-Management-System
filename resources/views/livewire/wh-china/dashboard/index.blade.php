@@ -7,121 +7,25 @@
 
     {{-- Page Header --}}
     <div class="bg-white border-b border-gray-100">
-        <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <h1 class="text-[20px] font-bold text-primary">Warehouse China Dashboard</h1>
-            <p class="text-[13px] text-gray-500 mt-1">Input and manage China warehouse data</p>
+        <div class="mx-auto w-full max-w-[1500px] px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-[20px] font-bold text-primary">Warehouse China Dashboard</h1>
+                    <p class="text-[13px] text-gray-500 mt-1">Manage China warehouse receipt data</p>
+                </div>
+                <button wire:click="openModal"
+                    class="px-4 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors inline-flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Input Data
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div class="mx-auto w-full max-w-[1500px] px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6 space-y-6">
 
         {{-- ═══════════════════════════════════════════════════ --}}
-        {{-- SECTION A: INPUT FORM                               --}}
-        {{-- ═══════════════════════════════════════════════════ --}}
-        <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h2 class="text-[15px] font-semibold text-gray-900">
-                    {{ $editingId ? 'Edit Data' : 'Input Data' }}
-                </h2>
-                <p class="text-[12px] text-gray-400 mt-0.5">Enter warehouse receipt data from China</p>
-            </div>
-
-            <form wire:submit.prevent="submitData" class="p-6 space-y-4">
-                {{-- Row 1: Resi + Huruf Box --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[12px] font-medium text-gray-600 mb-1">Resi Number <span class="text-red-500">*</span></label>
-                        <input type="text" wire:model="resiNumber" maxlength="100" placeholder="e.g. SF1234567890"
-                            class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
-                        @error('resiNumber') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-[12px] font-medium text-gray-600 mb-1">Box Letter <span class="text-red-500">*</span></label>
-                        <input type="text" wire:model="hurufBox" maxlength="10" placeholder="e.g. H, J, 129H"
-                            class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
-                        @error('hurufBox') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                </div>
-
-                {{-- Row 2: Weight + Dimensions (optional) --}}
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-[12px] font-medium text-gray-600 mb-1">Weight (kg) <span class="text-gray-400 font-normal">optional</span></label>
-                        <input type="number" wire:model="berat" step="0.01" min="0.01" placeholder="0.00"
-                            class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
-                        @error('berat') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-[12px] font-medium text-gray-600 mb-1">Length (cm) <span class="text-gray-400 font-normal">opt</span></label>
-                        <input type="number" wire:model="panjang" step="0.01" min="0.01" placeholder="0"
-                            class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
-                    </div>
-                    <div>
-                        <label class="block text-[12px] font-medium text-gray-600 mb-1">Width (cm) <span class="text-gray-400 font-normal">opt</span></label>
-                        <input type="number" wire:model="lebar" step="0.01" min="0.01" placeholder="0"
-                            class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
-                    </div>
-                    <div>
-                        <label class="block text-[12px] font-medium text-gray-600 mb-1">Height (cm) <span class="text-gray-400 font-normal">opt</span></label>
-                        <input type="number" wire:model="tinggi" step="0.01" min="0.01" placeholder="0"
-                            class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
-                    </div>
-                </div>
-
-                {{-- Row 3: Service Fee (Yuan) --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[12px] font-medium text-gray-600 mb-1">Service Fee (¥) <span class="text-red-500">*</span></label>
-                        <input type="number" wire:model="serviceFeeYuan" step="0.01" min="0" placeholder="0.00"
-                            class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
-                        @if($this->serviceFeeIdr !== null)
-                            <p class="text-[11px] text-gray-500 mt-1">= Rp {{ number_format($this->serviceFeeIdr, 0, ',', '.') }}</p>
-                        @endif
-                        @if($kursYuan > 0)
-                            <p class="text-[11px] text-gray-400 mt-0.5">Rate: 1 ¥ = Rp {{ number_format($kursYuan, 0, ',', '.') }}</p>
-                        @else
-                            <p class="text-[11px] text-amber-500 mt-0.5">⚠ No exchange rate set. Please ask admin to set the rate.</p>
-                        @endif
-                        @error('serviceFeeYuan') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-[12px] font-medium text-gray-600 mb-1">Photo "Arrive China" <span class="text-gray-400 font-normal">optional (max 2)</span></label>
-                        <input type="file" wire:model="fotoArrivedChina" multiple accept="image/*"
-                            class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-[12px] file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
-                        @error('fotoArrivedChina.*') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
-                        @if(!empty($fotoArrivedChina))
-                            <div class="flex gap-2 mt-2">
-                                @foreach($fotoArrivedChina as $foto)
-                                    @if($foto)
-                                        <img src="{{ $foto->temporaryUrl() }}" class="w-16 h-16 object-cover rounded-[8px] border border-gray-200">
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                <p class="text-[11px] text-gray-400">Weight and dimensions can be filled later when goods arrive in Indonesia.</p>
-
-                {{-- Actions --}}
-                <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
-                    @if($editingId)
-                        <button type="button" wire:click="cancelEdit"
-                            class="px-4 py-2 text-[13px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">
-                            Cancel
-                        </button>
-                    @endif
-                    <button type="submit"
-                        class="px-4 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors inline-flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        {{ $editingId ? 'Update Data' : 'Submit Data' }}
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        {{-- ═══════════════════════════════════════════════════ --}}
-        {{-- SECTION B: DATA TABLE                               --}}
+        {{-- DATA TABLE                                        --}}
         {{-- ═══════════════════════════════════════════════════ --}}
         <div class="bg-white rounded-[12px] border border-gray-100 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100">
@@ -147,7 +51,7 @@
                         </svg>
                     </div>
                     <h3 class="text-[14px] font-semibold text-gray-700 mb-1">No data yet</h3>
-                    <p class="text-[13px] text-gray-500">Submit your first warehouse receipt using the form above.</p>
+                    <p class="text-[13px] text-gray-500">Click "Input Data" to add your first warehouse receipt.</p>
                 </div>
             @else
                 <div class="overflow-x-auto">
@@ -220,4 +124,121 @@
         </div>
 
     </div>
+
+    {{-- ═══════════════════════════════════════════════════ --}}
+    {{-- MODAL: Input / Edit Data                          --}}
+    {{-- ═══════════════════════════════════════════════════ --}}
+    @if($showModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeModal">
+            <div class="fixed inset-0 bg-black/30 transition-opacity"></div>
+            <div class="flex min-h-full items-end sm:items-center justify-center p-4">
+                <div class="relative bg-white rounded-[16px] shadow-lg w-full max-w-lg transform transition-all" @click.stop>
+                    {{-- Modal Header --}}
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-[10px] bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-semibold text-gray-900">{{ $editingId ? 'Edit Data' : 'Input Data' }}</h3>
+                                <p class="text-[12px] text-gray-400 mt-0.5">Enter warehouse receipt data from China</p>
+                            </div>
+                        </div>
+                        <button wire:click="closeModal" class="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-[8px] text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    {{-- Modal Body --}}
+                    <form wire:submit.prevent="submitData" class="p-6 space-y-4">
+                        {{-- Row 1: Resi + Box Letter --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Resi Number <span class="text-red-500">*</span></label>
+                                <input type="text" wire:model="resiNumber" maxlength="100" placeholder="e.g. SF1234567890"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                                @error('resiNumber') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Box Letter <span class="text-red-500">*</span></label>
+                                <input type="text" wire:model="hurufBox" maxlength="10" placeholder="e.g. H, J, 129H"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                                @error('hurufBox') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        {{-- Row 2: Weight + Dimensions --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Weight (kg) <span class="text-gray-400 font-normal">optional</span></label>
+                                <input type="number" wire:model="berat" step="0.01" min="0.01" placeholder="0.00"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                                @error('berat') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Dimensions (cm) <span class="text-gray-400 font-normal">optional</span></label>
+                                <div class="grid grid-cols-3 gap-1.5">
+                                    <input type="number" wire:model="panjang" step="0.01" min="0.01" placeholder="L"
+                                        class="w-full px-2 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums text-center">
+                                    <input type="number" wire:model="lebar" step="0.01" min="0.01" placeholder="W"
+                                        class="w-full px-2 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums text-center">
+                                    <input type="number" wire:model="tinggi" step="0.01" min="0.01" placeholder="H"
+                                        class="w-full px-2 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums text-center">
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Row 3: Service Fee --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Service Fee (¥) <span class="text-red-500">*</span></label>
+                            <input type="number" wire:model="serviceFeeYuan" step="0.01" min="0" placeholder="0.00"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors tabular-nums">
+                            @if($this->serviceFeeIdr !== null)
+                                <p class="text-[11px] text-gray-500 mt-1">= Rp {{ number_format($this->serviceFeeIdr, 0, ',', '.') }}</p>
+                            @endif
+                            @if($kursYuan > 0)
+                                <p class="text-[11px] text-gray-400 mt-0.5">Rate: 1 ¥ = Rp {{ number_format($kursYuan, 0, ',', '.') }}</p>
+                            @else
+                                <p class="text-[11px] text-amber-500 mt-0.5">⚠ No exchange rate set. Please ask admin to set the rate.</p>
+                            @endif
+                            @error('serviceFeeYuan') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Row 4: Photo --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Photo "Arrive China" <span class="text-gray-400 font-normal">optional (max 2)</span></label>
+                            <input type="file" wire:model="fotoArrivedChina" multiple accept="image/*"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-[12px] file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                            @error('fotoArrivedChina.*') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            @if(!empty($fotoArrivedChina))
+                                <div class="flex gap-2 mt-2">
+                                    @foreach($fotoArrivedChina as $foto)
+                                        @if($foto)
+                                            <img src="{{ $foto->temporaryUrl() }}" class="w-16 h-16 object-cover rounded-[8px] border border-gray-200">
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+
+                        <p class="text-[11px] text-gray-400">Weight and dimensions can be filled later when goods arrive in Indonesia.</p>
+
+                        {{-- Actions --}}
+                        <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+                            <button type="button" wire:click="closeModal"
+                                class="px-4 py-2 text-[13px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors inline-flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                {{ $editingId ? 'Update' : 'Submit' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+
 </div>
