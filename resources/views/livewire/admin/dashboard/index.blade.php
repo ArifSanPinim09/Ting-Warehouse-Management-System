@@ -324,7 +324,7 @@
                                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                     </div>
                                     <div class="min-w-0">
-                                        <p class="text-body font-medium text-gray-800 truncate">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}</p>
+                                        <p class="text-body font-medium text-gray-800 truncate">{{ $box->display_name }}</p>
                                         <p class="text-caption text-gray-500">{{ ucfirst($box->type) }} · {{ $box->customer->name ?? '-' }}</p>
                                     </div>
                                 </div>

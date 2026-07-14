@@ -57,7 +57,7 @@
                                     <p class="text-body font-semibold text-gray-900">{{ $item->name }}</p>
                                     <p class="text-caption text-gray-500 mt-0.5">
                                         Resi: <span class="font-mono">{{ $item->resi_number ?? '-' }}</span>
-                                        · Box: {{ $item->box->tracking_number ?? $item->box->batch_name ?? 'Box #' . $item->box_id }}
+                                        · Box: {{ $item->box->display_name ?? '-' }}
                                     </p>
                                 </div>
                                 <div class="text-right flex-shrink-0">

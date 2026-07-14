@@ -136,7 +136,7 @@
                             class="w-full text-left px-4 py-3.5 hover:bg-gray-50/50 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent/40"
                         >
                             <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-body font-semibold text-primary">{{ $box->tracking_number ?? 'Box #' . $box->id }}</span>
+                                <span class="text-body font-semibold text-primary">{{ $box->display_name }}</span>
                                 <x-status-badge :status="$box->status" />
                             </div>
                             <div class="flex items-center gap-3 text-caption text-gray-500">
@@ -177,7 +177,7 @@
                                             wire:click="openBoxDetail({{ $box->id }})"
                                             class="text-body font-semibold text-primary hover:text-primary-light hover:underline transition-colors"
                                         >
-                                            {{ $box->tracking_number ?? 'Box #' . $box->id }}
+                                            {{ $box->display_name }}
                                         </button>
                                     </td>
                                     <td class="px-5 py-3.5 text-body text-gray-700">{{ $box->batch_name ?? '-' }}</td>
@@ -395,7 +395,7 @@
                     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                         <div>
                             <h3 class="text-subtitle font-semibold text-gray-900">Detail Box</h3>
-                            <p class="text-body text-gray-500 mt-0.5">{{ $detailBox->tracking_number ?? 'Box #' . $detailBox->id }}</p>
+                            <p class="text-body text-gray-500 mt-0.5">{{ $detailBox->display_name }}</p>
                         </div>
                         <button wire:click="closeBoxDetail" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-button text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors" aria-label="Tutup detail box">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>

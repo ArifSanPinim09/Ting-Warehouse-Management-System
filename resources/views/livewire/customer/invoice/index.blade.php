@@ -63,7 +63,7 @@
                             <tr>
                                 <td class="font-semibold text-primary">{{ $invoice->invoice_number }}</td>
                                 <td>
-                                    <span class="text-body">{{ $invoice->box->tracking_number ?? '-' }}</span>
+                                    <span class="text-body">{{ $invoice->box->display_name ?? '-' }}</span>
                                     <span class="text-caption text-gray-400 block">{{ strtoupper($invoice->box->method ?? '') }}</span>
                                 </td>
                                 <td class="text-right">{{ $invoice->weight ? number_format($invoice->weight, 2) . ' kg' : '-' }}</td>
@@ -107,7 +107,7 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <p class="text-body font-semibold text-primary">{{ $invoice->invoice_number }}</p>
-                                <p class="text-caption text-gray-500 mt-0.5">{{ $invoice->box->tracking_number ?? '-' }} · {{ strtoupper($invoice->box->method ?? '') }}</p>
+                                <p class="text-caption text-gray-500 mt-0.5">{{ $invoice->box->display_name ?? '-' }} · {{ strtoupper($invoice->box->method ?? '') }}</p>
                             </div>
                             <x-status-badge :status="$invoice->status" />
                         </div>

@@ -59,7 +59,7 @@
                             @if($item->box)
                                 <div class="flex items-center justify-between">
                                     <span class="text-caption text-gray-500">Box</span>
-                                    <span class="text-body text-gray-700">{{ $item->box->tracking_number ?? $item->box->batch_name ?? '#' . $item->box->id }}</span>
+                                    <span class="text-body text-gray-700">{{ $item->box->display_name ?? '-' }}</span>
                                 </div>
                             @endif
                             @if($item->is_sensitive)

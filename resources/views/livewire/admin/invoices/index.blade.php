@@ -76,7 +76,7 @@
                                                 <span class="text-body text-gray-700">{{ $inv->customer->name ?? '-' }}</span>
                                             </td>
                                             <td class="px-5 py-3.5">
-                                                <span class="text-body text-gray-600">{{ $inv->box->tracking_number ?? $inv->box->batch_name ?? 'Box #' . $inv->box_id }}</span>
+                                                <span class="text-body text-gray-600">{{ $inv->box->display_name ?? '-' }}</span>
                                             </td>
                                             <td class="px-5 py-3.5 text-right">
                                                 <span class="text-body text-gray-600">Rp {{ number_format($inv->fee_tax, 0, ',', '.') }}</span>
@@ -122,7 +122,7 @@
                                     <x-status-badge :status="$inv->status" />
                                 </div>
                                 <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                                    <span class="text-caption text-gray-500">{{ $inv->box->tracking_number ?? 'Box #' . $inv->box_id }}</span>
+                                    <span class="text-caption text-gray-500">{{ $inv->box->display_name ?? '-' }}</span>
                                     <span class="text-[15px] font-bold text-gray-900">Rp {{ number_format($inv->grand_total, 0, ',', '.') }}</span>
                                 </div>
                             </div>
@@ -155,7 +155,7 @@
                                 </div>
                                 <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Box</span>
-                                    <span class="font-medium text-gray-800">{{ $selectedInvoice->box->tracking_number ?? 'Box #' . $selectedInvoice->box_id }}</span>
+                                    <span class="font-medium text-gray-800">{{ $selectedInvoice->box->display_name ?? '-' }}</span>
                                 </div>
                                 <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Berat</span>
@@ -237,7 +237,7 @@
                             <select wire:model.live="selectedBoxId" class="w-full py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                                 <option value="">Pilih box</option>
                                 @foreach($availableBoxes as $box)
-                                    <option value="{{ $box->id }}">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }} — {{ $box->customer->name ?? '-' }} ({{ ucfirst($box->type) }}/{{ strtoupper($box->method) }})</option>
+                                    <option value="{{ $box->id }}">{{ $box->display_name }} — {{ $box->customer->name ?? '-' }} ({{ ucfirst($box->type) }}/{{ strtoupper($box->method) }})</option>
                                 @endforeach
                             </select>
                             @error('selectedBoxId') <p class="text-caption text-red-500 mt-1">{{ $message }}</p> @enderror

@@ -68,7 +68,7 @@
                         <option value="">Pilih box tempat barang ini berada</option>
                         @foreach($boxes as $box)
                             <option value="{{ $box->id }}">
-                                {{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}
+                                {{ $box->display_name }}
                                 — {{ strtoupper($box->type) }} / {{ strtoupper($box->method) }}
                                 ({{ $box->status }})
                             </option>

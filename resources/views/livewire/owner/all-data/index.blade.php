@@ -129,7 +129,7 @@
                                 @foreach($items as $box)
                                     <tr class="hover:bg-gray-50/50 transition-colors">
                                         <td class="px-5 py-3.5">
-                                            <p class="text-body font-semibold text-gray-900">{{ $box->tracking_number ?? $box->batch_name ?? 'Box #' . $box->id }}</p>
+                                            <p class="text-body font-semibold text-gray-900">{{ $box->display_name }}</p>
                                         </td>
                                         <td class="px-5 py-3.5 text-body text-gray-700">{{ $box->customer->name ?? '-' }}</td>
                                         <td class="px-5 py-3.5"><span class="text-caption font-medium text-gray-600 capitalize">{{ $box->type }}</span></td>

@@ -40,7 +40,7 @@
                             <option value="">Pilih box...</option>
                             @foreach($boxes as $box)
                                 <option value="{{ $box->id }}">
-                                    {{ $box->tracking_number ?? 'Box #' . $box->id }} — {{ strtoupper($box->method) }} · {{ ucfirst($box->type) }}
+                                    {{ $box->display_name }} — {{ strtoupper($box->method) }} · {{ ucfirst($box->type) }}
                                 </option>
                             @endforeach
                         </select>

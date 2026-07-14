@@ -71,7 +71,7 @@
                         <div wire:click="openBoxDetail({{ $box->id }})" class="bg-gray-50 rounded-[10px] p-4 space-y-2 cursor-pointer hover:bg-gray-100/70 transition-colors active:scale-[0.99]">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-body font-semibold text-primary truncate">{{ $box->tracking_number ?? 'Box #' . $box->id }}</p>
+                                    <p class="text-body font-semibold text-primary truncate">{{ $box->display_name }}</p>
                                     <p class="text-caption text-gray-500 mt-0.5">{{ $box->batch_name ?? '-' }} · {{ $box->items_count }} item</p>
                                 </div>
                                 <span class="shrink-0 text-caption font-medium px-2 py-0.5 rounded-full {{ $box->method === 'air' ? 'bg-blue-50 text-blue-700' : 'bg-cyan-50 text-cyan-700' }}">{{ strtoupper($box->method) }}</span>
@@ -119,7 +119,7 @@
                                     <td class="px-5 py-3.5 text-body text-gray-500">{{ $boxes->firstItem() + $i }}</td>
                                     <td class="px-5 py-3.5">
                                         <span class="text-body font-semibold text-primary hover:text-primary-light hover:underline">
-                                            {{ $box->tracking_number ?? 'Box #' . $box->id }}
+                                            {{ $box->display_name }}
                                         </span>
                                     </td>
                                     <td class="px-5 py-3.5 text-body text-gray-700">{{ $box->batch_name ?? '-' }}</td>
@@ -175,7 +175,7 @@
                             </div>
                             <div>
                                 <h3 class="text-[16px] font-semibold text-gray-900">Detail Box</h3>
-                                <p class="text-body text-gray-500 mt-0.5">{{ $detailBox->tracking_number ?? 'Box #' . $detailBox->id }}</p>
+                                <p class="text-body text-gray-500 mt-0.5">{{ $detailBox->display_name }}</p>
                             </div>
                         </div>
                         <button wire:click="closeBoxDetail" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">

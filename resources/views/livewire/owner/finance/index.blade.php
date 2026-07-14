@@ -190,7 +190,7 @@
                                         </div>
                                     </td>
                                     <td class="px-5 py-3.5">
-                                        <span class="text-caption text-gray-600">{{ $inv->box->tracking_number ?? $inv->box->batch_name ?? '-' }}</span>
+                                        <span class="text-caption text-gray-600">{{ $inv->box->display_name ?? '-' }}</span>
                                     </td>
                                     <td class="px-5 py-3.5 text-right">
                                         <span class="text-body text-gray-700">Rp {{ number_format($inv->fee_tax, 0, ',', '.') }}</span>
@@ -252,7 +252,7 @@
                             </div>
                         </div>
                         <div class="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
-                            <span class="text-caption text-gray-400">{{ $inv->box->tracking_number ?? $inv->box->batch_name ?? '-' }}</span>
+                            <span class="text-caption text-gray-400">{{ $inv->box->display_name ?? '-' }}</span>
                             <span class="text-caption text-gray-400">{{ $inv->created_at->format('d M Y') }}</span>
                         </div>
                     </div>

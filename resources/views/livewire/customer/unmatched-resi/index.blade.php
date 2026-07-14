@@ -126,7 +126,7 @@
                             <select wire:model="boxId" class="ds-input @error('boxId') ds-input-error @enderror">
                                 <option value="">Pilih box tujuan...</option>
                                 @foreach($openBoxes as $box)
-                                    <option value="{{ $box->id }}">{{ $box->tracking_number ?? 'Box #' . $box->id }} — {{ strtoupper($box->type) }} / {{ strtoupper($box->method) }}</option>
+                                    <option value="{{ $box->id }}">{{ $box->display_name }} — {{ strtoupper($box->type) }} / {{ strtoupper($box->method) }}</option>
                                 @endforeach
                             </select>
                             @error('boxId') <p class="ds-error">{{ $message }}</p> @enderror

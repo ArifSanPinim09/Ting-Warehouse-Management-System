@@ -179,7 +179,7 @@
                                             <span class="text-[13px] text-gray-600 tabular-nums">¥ {{ number_format($item->price_yuan ?? 0, 2) }}</span>
                                         </td>
                                         <td class="px-5 py-2.5">
-                                            <span class="text-[13px] text-gray-500">{{ $item->box->tracking_number ?? $item->box->batch_name ?? 'Box #' . $item->box_id }}</span>
+                                            <span class="text-[13px] text-gray-500">{{ $item->box->display_name ?? '-' }}</span>
                                         </td>
                                         <td class="px-5 py-2.5">
                                             <span class="text-[13px] text-gray-700">{{ $item->customer->name ?? '-' }}</span>

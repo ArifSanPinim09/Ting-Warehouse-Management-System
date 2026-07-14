@@ -272,7 +272,7 @@
 
                             <div>
                                 <p class="text-caption text-gray-400 uppercase tracking-wide mb-1">Box</p>
-                                <p class="text-body text-gray-700">{{ $selectedItem->box->tracking_number ?? $selectedItem->box->batch_name ?? '-' }}</p>
+                                <p class="text-body text-gray-700">{{ $selectedItem->box->display_name ?? '-' }}</p>
                             </div>
 
                             <div>
