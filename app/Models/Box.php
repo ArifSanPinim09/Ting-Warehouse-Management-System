@@ -33,6 +33,8 @@ class Box extends Model
         'close_date',
         'last_setor_date',
         'reminder_sent_at',
+        'is_redline',
+        'redline_note',
     ];
 
     /**

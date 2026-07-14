@@ -49,6 +49,10 @@ class ManageBox extends Component
     public ?int $editCustomerId = null;
     public string $editNotes = '';
 
+    // ─── REV-05.3: Redline Toggle ─────────────────────────────
+    public bool $editIsRedline = false;
+    public string $editRedlineNote = '';
+
     // ─── Box Creation ───────────────────────────────────────────
     public bool $showCreateModal = false;
     public string $newType = 'sharing';
@@ -117,6 +121,8 @@ class ManageBox extends Component
         $this->editBatchName = $box->batch_name ?? '';
         $this->editCustomerId = $box->customer_id;
         $this->editNotes = $box->notes ?? '';
+        $this->editIsRedline = (bool) $box->is_redline;
+        $this->editRedlineNote = $box->redline_note ?? '';
         $this->showEditModal = true;
     }
 
@@ -133,6 +139,8 @@ class ManageBox extends Component
         $this->editBatchName = '';
         $this->editCustomerId = null;
         $this->editNotes = '';
+        $this->editIsRedline = false;
+        $this->editRedlineNote = '';
     }
 
     // ─── REV-05.5: Item Edit Methods ──────────────────────────
@@ -249,6 +257,8 @@ class ManageBox extends Component
         $box->batch_name = $this->editBatchName ?: null;
         $box->customer_id = $this->editCustomerId;
         $box->notes = $this->editNotes ?: null;
+        $box->is_redline = $this->editIsRedline;
+        $box->redline_note = $this->editIsRedline ? ($this->editRedlineNote ?: null) : null;
         $box->save();
 
         $newValues = [

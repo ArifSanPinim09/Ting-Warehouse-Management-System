@@ -152,6 +152,19 @@ class Dashboard extends Component
             ->where('status', Box::STATUS_OPEN)
             ->pluck('batch_name', 'id');
 
+        // REV-05.3: Redline boxes ticker
+        $redlineBoxes = Box::where(function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->whereNull('customer_id')
+                        ->whereHas('items', function ($items) use ($user) {
+                            $items->where('customer_id', $user->id);
+                        });
+                })
+                ->orWhere('customer_id', $user->id);
+            })
+            ->where('is_redline', true)
+            ->get(['id', 'batch_name', 'huruf_box', 'redline_note']);
+
         return view('livewire.customer.dashboard.index', compact(
             'activeBoxes',
             'unpaidInvoices',
@@ -166,6 +179,7 @@ class Dashboard extends Component
             'notifications',
             'unmatchedWhCount',
             'openBoxes',
+            'redlineBoxes',
         ))->layout('layouts.app');
     }
 }

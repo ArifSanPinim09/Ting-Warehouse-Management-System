@@ -668,6 +668,20 @@
                             @error('editNotes') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
+                        {{-- REV-05.3: Redline Toggle --}}
+                        <div>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" wire:model="editIsRedline" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                                <span class="text-[13px] font-medium text-red-700">Red Line (tertahan di pelabuhan)</span>
+                            </label>
+                            @if($editIsRedline)
+                                <div class="mt-2">
+                                    <input type="text" wire:model="editRedlineNote" maxlength="500" placeholder="Keterangan red line (opsional)"
+                                        class="w-full px-3 py-2 text-[13px] bg-red-50 border border-red-200 rounded-[8px] focus:border-red-400 focus:ring-2 focus:ring-red-200 transition-colors">
+                                </div>
+                            @endif
+                        </div>
+
                         <div class="flex items-center justify-end gap-3 pt-2">
                             <button type="button" wire:click="closeEditModal"
                                 class="px-4 py-2 text-[13px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-colors">

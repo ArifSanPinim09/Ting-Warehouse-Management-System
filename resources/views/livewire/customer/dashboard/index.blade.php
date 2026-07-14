@@ -21,6 +21,31 @@
         </div>
     </div>
 
+    {{-- REV-05.3: Red Line Ticker --}}
+    @if($redlineBoxes && $redlineBoxes->isNotEmpty())
+        <div class="bg-red-50 border-b border-red-200 overflow-hidden">
+            <div class="flex items-center py-2">
+                <span class="flex-shrink-0 px-4 text-[12px] font-bold text-red-700 bg-red-100 py-1">🔴 RED LINE</span>
+                <div class="overflow-hidden flex-1">
+                    <div class="whitespace-nowrap animate-marquee">
+                        @foreach($redlineBoxes as $redline)
+                            <span class="inline-flex items-center gap-1 mx-4 text-[12px] text-red-800">
+                                <span class="font-semibold">{{ $redline->display_name }}</span>
+                                @if($redline->redline_note)
+                                    — {{ $redline->redline_note }}
+                                @endif
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+            .animate-marquee { animation: marquee 20s linear infinite; }
+        </style>
+    @endif
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
         {{-- R2: Stat Cards — Clickable --}}
