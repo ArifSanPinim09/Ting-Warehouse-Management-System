@@ -87,6 +87,14 @@ class User extends Authenticatable
         return $this->role === 'customer';
     }
 
+    /**
+     * Check if user has china_admin role.
+     */
+    public function isChinaAdmin(): bool
+    {
+        return $this->role === 'china_admin';
+    }
+
     // ─── Relationships (ERD §18.1) ─────────────────────────────────
 
     /**

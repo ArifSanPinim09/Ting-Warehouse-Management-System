@@ -17,11 +17,21 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/admin.php'));
             Route::middleware('web')
                 ->group(base_path('routes/owner.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/china.php'));
         },
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust ngrok proxy for HTTPS (ngrok terminates TLS)
+        $middleware->trustProxies(at: '*', headers: \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_AWS_ELB
+        );
+
         // Register custom middleware aliases (PRD §3.1-3.3, §7.5)
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,

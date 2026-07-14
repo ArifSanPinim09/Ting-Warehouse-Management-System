@@ -30,6 +30,7 @@ new #[Layout('layouts.guest')] class extends Component
         $redirect = match ($user->role) {
             'owner' => '/owner/dashboard',
             'admin' => '/admin/dashboard',
+            'china_admin' => '/china/dashboard',
             default => '/dashboard',
         };
 
