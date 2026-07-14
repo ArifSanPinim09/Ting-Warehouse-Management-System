@@ -104,6 +104,8 @@
                                 <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Close Date</th>
                                 <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">ETD</th>
                                 <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">ETA</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Stevedoring</th>
+                                <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Tgl Tagihan</th>
                                 <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-5 py-3 text-caption font-semibold text-gray-500 uppercase tracking-wider">Barang</th>
                             </tr>
@@ -134,6 +136,12 @@
                                     </td>
                                     <td class="px-5 py-3.5 text-body text-gray-700">
                                         {{ $box->eta ? $box->eta->format('d M Y') : '-' }}
+                                    </td>
+                                    <td class="px-5 py-3.5 text-body text-gray-700">
+                                        {{ $box->stevedoring_date ? $box->stevedoring_date->format('d M Y') : '-' }}
+                                    </td>
+                                    <td class="px-5 py-3.5 text-body text-gray-700">
+                                        {{ $box->tagihan_update_date ? $box->tagihan_update_date->format('d M Y') : '-' }}
                                     </td>
                                     <td class="px-5 py-3.5">
                                         <x-status-badge :status="$box->status" />

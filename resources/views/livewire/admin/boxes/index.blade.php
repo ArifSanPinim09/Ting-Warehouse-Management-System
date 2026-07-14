@@ -225,6 +225,18 @@
                                         <span class="text-body text-gray-700">{{ $selectedBox->eta->format('d M Y') }}</span>
                                     </div>
                                 @endif
+                                @if($selectedBox->stevedoring_date)
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-caption text-gray-500">Stevedoring</span>
+                                        <span class="text-body text-gray-700">{{ $selectedBox->stevedoring_date->format('d M Y') }}</span>
+                                    </div>
+                                @endif
+                                @if($selectedBox->tagihan_update_date)
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-caption text-gray-500">Tgl Update Tagihan</span>
+                                        <span class="text-body text-gray-700">{{ $selectedBox->tagihan_update_date->format('d M Y') }}</span>
+                                    </div>
+                                @endif
                                 @if($selectedBox->open_date)
                                     <div class="flex items-center justify-between">
                                         <span class="text-caption text-gray-500">Dibuka</span>
@@ -621,6 +633,22 @@
                             <input type="date" wire:model="editEta"
                                 class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                             @error('editEta') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Stevedoring --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Stevedoring</label>
+                            <input type="date" wire:model="editStevedoringDate"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                            @error('editStevedoringDate') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Tanggal Update Tagihan --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Tanggal Update Tagihan</label>
+                            <input type="date" wire:model="editTagihanUpdateDate"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                            @error('editTagihanUpdateDate') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Notes --}}

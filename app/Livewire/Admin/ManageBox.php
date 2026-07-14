@@ -41,6 +41,8 @@ class ManageBox extends Component
     public string $editTrackingNumber = '';
     public string $editHurufBox = '';
     public string $editEta = '';
+    public string $editStevedoringDate = '';
+    public string $editTagihanUpdateDate = '';
     public string $editType = '';
     public string $editMethod = '';
     public string $editBatchName = '';
@@ -98,6 +100,8 @@ class ManageBox extends Component
         $this->editTrackingNumber = $box->tracking_number ?? '';
         $this->editHurufBox = $box->huruf_box ?? '';
         $this->editEta = $box->eta ? $box->eta->format('Y-m-d') : '';
+        $this->editStevedoringDate = $box->stevedoring_date ? $box->stevedoring_date->format('Y-m-d') : '';
+        $this->editTagihanUpdateDate = $box->tagihan_update_date ? $box->tagihan_update_date->format('Y-m-d') : '';
         $this->editType = $box->type;
         $this->editMethod = $box->method;
         $this->editBatchName = $box->batch_name ?? '';
@@ -112,6 +116,8 @@ class ManageBox extends Component
         $this->editTrackingNumber = '';
         $this->editHurufBox = '';
         $this->editEta = '';
+        $this->editStevedoringDate = '';
+        $this->editTagihanUpdateDate = '';
         $this->editType = '';
         $this->editMethod = '';
         $this->editBatchName = '';
@@ -127,6 +133,8 @@ class ManageBox extends Component
             'editTrackingNumber' => 'nullable|string|max:100',
             'editHurufBox' => 'nullable|string|max:10',
             'editEta' => 'nullable|date',
+            'editStevedoringDate' => 'nullable|date',
+            'editTagihanUpdateDate' => 'nullable|date',
             'editType' => 'required|in:sharing,direct,handcarry',
             'editMethod' => 'required|in:air,sea',
             'editBatchName' => 'nullable|string|max:100',
@@ -136,6 +144,8 @@ class ManageBox extends Component
             'editTrackingNumber.max' => 'Tracking number max 100 characters',
             'editHurufBox.max' => 'Huruf box max 10 characters',
             'editEta.date' => 'ETA must be a valid date',
+            'editStevedoringDate.date' => 'Stevedoring date must be a valid date',
+            'editTagihanUpdateDate.date' => 'Tagihan update date must be a valid date',
             'editType.required' => 'Tipe box wajib dipilih',
             'editMethod.required' => 'Metode wajib dipilih',
         ]);
@@ -144,6 +154,8 @@ class ManageBox extends Component
             'tracking_number' => $box->tracking_number,
             'huruf_box' => $box->huruf_box,
             'eta' => $box->eta?->format('Y-m-d'),
+            'stevedoring_date' => $box->stevedoring_date?->format('Y-m-d'),
+            'tagihan_update_date' => $box->tagihan_update_date?->format('Y-m-d'),
             'type' => $box->type,
             'method' => $box->method,
             'batch_name' => $box->batch_name,
@@ -154,6 +166,8 @@ class ManageBox extends Component
         $box->tracking_number = $this->editTrackingNumber ?: null;
         $box->huruf_box = $this->editHurufBox ?: null;
         $box->eta = $this->editEta ?: null;
+        $box->stevedoring_date = $this->editStevedoringDate ?: null;
+        $box->tagihan_update_date = $this->editTagihanUpdateDate ?: null;
         $box->type = $this->editType;
         $box->method = $this->editMethod;
         $box->batch_name = $this->editBatchName ?: null;
@@ -165,6 +179,8 @@ class ManageBox extends Component
             'tracking_number' => $box->tracking_number,
             'huruf_box' => $box->huruf_box,
             'eta' => $box->eta?->format('Y-m-d'),
+            'stevedoring_date' => $box->stevedoring_date?->format('Y-m-d'),
+            'tagihan_update_date' => $box->tagihan_update_date?->format('Y-m-d'),
             'type' => $box->type,
             'method' => $box->method,
             'batch_name' => $box->batch_name,

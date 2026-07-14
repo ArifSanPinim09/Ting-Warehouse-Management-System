@@ -27,6 +27,8 @@ class Box extends Model
         'notes',
         'etd',
         'eta',
+        'stevedoring_date',
+        'tagihan_update_date',
         'open_date',
         'close_date',
         'last_setor_date',
@@ -66,6 +68,8 @@ class Box extends Model
         return [
             'etd' => 'date',
             'eta' => 'date',
+            'stevedoring_date' => 'date',
+            'tagihan_update_date' => 'date',
             'open_date' => 'datetime',
             'close_date' => 'datetime',
             'last_setor_date' => 'datetime',
