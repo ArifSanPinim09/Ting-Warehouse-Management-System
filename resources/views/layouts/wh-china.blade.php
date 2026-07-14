@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Ting Warehouse — China')</title>
-    @vite(['resources/css/app.css', 'resources/js/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <style>
         [x-cloak] { display: none !important; }
