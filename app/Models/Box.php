@@ -32,6 +32,7 @@ class Box extends Model
         'open_date',
         'close_date',
         'last_setor_date',
+        'reminder_sent_at',
     ];
 
     /**

@@ -11,3 +11,6 @@ Artisan::command('inspire', function () {
 
 // Revisi §2.10.5: Check deadlines daily at 08:00
 Schedule::command(CheckDeadlinesCommand::class)->dailyAt('08:00');
+
+// REV-04.7: Send direct box reminder daily at 09:00
+Schedule::command(\App\Console\Commands\SendDirectReminderCommand::class)->dailyAt('09:00');
