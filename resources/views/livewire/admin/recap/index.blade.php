@@ -154,52 +154,92 @@
                         <table class="w-full">
                             <thead>
                                 <tr class="border-b border-gray-100 bg-gray-50/60">
-                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">No Resi</th>
-                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Nama Barang</th>
-                                    <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Qty</th>
-                                    <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Harga (¥)</th>
-                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Tanggal</th>
-                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Box</th>
-                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                                    <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="text-left px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th class="text-left px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">No Resi</th>
+                                    <th class="text-left px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Info Barang</th>
+                                    <th class="text-center px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Foto CO</th>
+                                    <th class="text-center px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Sensitif</th>
+                                    <th class="text-left px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Request</th>
+                                    <th class="text-center px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Foto CN</th>
+                                    <th class="text-center px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Foto INA</th>
+                                    <th class="text-left px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Berat/Vol</th>
+                                    <th class="text-right px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Tax</th>
+                                    <th class="text-left px-3 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Box</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
                                 @foreach($customerItems as $item)
                                     <tr class="hover:bg-gray-50/50 transition-colors">
-                                        <td class="px-5 py-2.5">
+                                        <td class="px-3 py-2.5">
+                                            <span class="text-[13px] text-gray-700 font-medium">{{ $item->customer->name ?? '-' }}</span>
+                                        </td>
+                                        <td class="px-3 py-2.5">
                                             <span class="text-[13px] font-mono font-semibold text-gray-900">{{ $item->resi_number }}</span>
+                                            <p class="text-[11px] text-gray-400 mt-0.5">{{ $item->created_at->format('d M Y H:i') }}</p>
                                         </td>
-                                        <td class="px-5 py-2.5">
+                                        <td class="px-3 py-2.5">
                                             <span class="text-[13px] text-gray-700">{{ $item->name }}</span>
+                                            <p class="text-[11px] text-gray-500">{{ $item->quantity }}x · ¥{{ number_format($item->price_yuan ?? 0, 2) }}</p>
                                         </td>
-                                        <td class="px-5 py-2.5 text-center">
-                                            <span class="text-[13px] text-gray-600 tabular-nums">{{ $item->quantity }}</span>
-                                        </td>
-                                        <td class="px-5 py-2.5 text-right">
-                                            <span class="text-[13px] text-gray-600 tabular-nums">¥ {{ number_format($item->price_yuan ?? 0, 2) }}</span>
-                                        </td>
-                                        <td class="px-5 py-2.5">
-                                            <span class="text-[13px] text-gray-500">{{ $item->created_at->format('d M Y H:i') }}</span>
-                                        </td>
-                                        <td class="px-5 py-2.5">
-                                            <span class="text-[13px] text-gray-500">{{ $item->box->display_name ?? '-' }}</span>
-                                        </td>
-                                        <td class="px-5 py-2.5">
-                                            <span class="text-[13px] text-gray-700">{{ $item->customer->name ?? '-' }}</span>
-                                        </td>
-                                        <td class="px-5 py-2.5 text-center">
-                                            @if($item->whChinaData)
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                                    Matched
-                                                </span>
+                                        <td class="px-3 py-2.5 text-center">
+                                            @if($item->proof_co)
+                                                <a href="{{ Storage::url($item->proof_co) }}" target="_blank" class="text-[11px] text-accent hover:underline font-medium">Foto</a>
                                             @else
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/60">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                                    Unmatched
-                                                </span>
+                                                <span class="text-[11px] text-gray-300">-</span>
                                             @endif
+                                        </td>
+                                        <td class="px-3 py-2.5 text-center">
+                                            @if($item->is_sensitive)
+                                                <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">{{ $item->sensitive_type ?? 'Ya' }}</span>
+                                            @else
+                                                <span class="text-[11px] text-gray-300">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2.5">
+                                            @if($item->request_type)
+                                                @php $requests = json_decode($item->request_type, true) ?? []; @endphp
+                                                @foreach($requests as $req)
+                                                    <span class="text-[10px] font-medium text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-full mr-0.5">{{ str_replace('_', ' ', ucfirst($req)) }}</span>
+                                                @endforeach
+                                            @else
+                                                <span class="text-[11px] text-gray-300">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2.5 text-center">
+                                            @if($item->whChinaData && $item->whChinaData->foto_arrived_china)
+                                                <a href="{{ Storage::url($item->whChinaData->foto_arrived_china) }}" target="_blank" class="text-[11px] text-accent hover:underline font-medium">Foto</a>
+                                            @else
+                                                <span class="text-[11px] text-gray-300">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2.5 text-center">
+                                            @if($item->whChinaData && $item->whChinaData->foto_arrived_ina)
+                                                <a href="{{ Storage::url($item->whChinaData->foto_arrived_ina) }}" target="_blank" class="text-[11px] text-accent hover:underline font-medium">Foto</a>
+                                            @else
+                                                <span class="text-[11px] text-gray-300">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2.5">
+                                            @if($item->whChinaData)
+                                                @if($item->whChinaData->berat)
+                                                    <span class="text-[12px] text-gray-700">{{ number_format($item->whChinaData->berat, 1) }} kg</span>
+                                                @endif
+                                                @if($item->whChinaData->panjang && $item->whChinaData->lebar && $item->whChinaData->tinggi)
+                                                    <p class="text-[11px] text-gray-500">{{ $item->whChinaData->panjang }}×{{ $item->whChinaData->lebar }}×{{ $item->whChinaData->tinggi }} · {{ number_format($item->whChinaData->volume ?? 0, 2) }} m³</p>
+                                                @endif
+                                            @else
+                                                <span class="text-[11px] text-gray-300">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2.5 text-right">
+                                            @if($item->whChinaData && $item->whChinaData->biaya_tax)
+                                                <span class="text-[12px] text-gray-700 tabular-nums">Rp {{ number_format($item->whChinaData->biaya_tax, 0, ',', '.') }}</span>
+                                            @else
+                                                <span class="text-[11px] text-gray-300">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2.5">
+                                            <span class="text-[12px] text-gray-500">{{ $item->box->display_name ?? '-' }}</span>
                                         </td>
                                     </tr>
                                 @endforeach
