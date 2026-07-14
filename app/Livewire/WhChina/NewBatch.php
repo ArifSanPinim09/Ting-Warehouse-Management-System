@@ -22,6 +22,21 @@ class NewBatch extends Component
     public string $method = 'air';
     public string $type = 'sharing';
 
+    // ─── Modal State ───────────────────────────────────────────
+    public bool $showModal = false;
+
+    public function openModal(): void
+    {
+        $this->reset(['batchName', 'hurufBox', 'openDate', 'closeDate']);
+        $this->showModal = true;
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->reset(['batchName', 'hurufBox', 'openDate', 'closeDate']);
+    }
+
     public function createBatch(): void
     {
         $this->validate([
@@ -50,6 +65,7 @@ class NewBatch extends Component
         ]);
 
         $this->reset(['batchName', 'hurufBox', 'openDate', 'closeDate']);
+        $this->showModal = false;
         $this->dispatch('toast', type: 'success', title: 'Batch Created', message: 'New batch created successfully.');
     }
 
