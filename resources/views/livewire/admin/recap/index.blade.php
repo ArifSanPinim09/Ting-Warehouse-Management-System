@@ -158,6 +158,7 @@
                                     <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Nama Barang</th>
                                     <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Qty</th>
                                     <th class="text-right px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Harga (¥)</th>
+                                    <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Tanggal</th>
                                     <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Box</th>
                                     <th class="text-left px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
                                     <th class="text-center px-5 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
@@ -177,6 +178,9 @@
                                         </td>
                                         <td class="px-5 py-2.5 text-right">
                                             <span class="text-[13px] text-gray-600 tabular-nums">¥ {{ number_format($item->price_yuan ?? 0, 2) }}</span>
+                                        </td>
+                                        <td class="px-5 py-2.5">
+                                            <span class="text-[13px] text-gray-500">{{ $item->created_at->format('d M Y H:i') }}</span>
                                         </td>
                                         <td class="px-5 py-2.5">
                                             <span class="text-[13px] text-gray-500">{{ $item->box->display_name ?? '-' }}</span>
@@ -229,6 +233,7 @@
                                     @endif
                                 </div>
                                 <p class="text-[12px] text-gray-500 truncate">{{ $item->name }} · {{ $item->customer->name ?? '-' }}</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5">{{ $item->created_at->format('d M Y H:i') }}</p>
                             </div>
                             <div class="text-right flex-shrink-0">
                                 <p class="text-[13px] font-medium text-gray-700 tabular-nums">{{ $item->quantity }}x</p>

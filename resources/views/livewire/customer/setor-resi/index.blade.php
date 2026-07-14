@@ -124,8 +124,30 @@
 
                     {{-- Revisi Client: Catatan dari Klien --}}
                     <div>
-                        <label class="ds-label">Catatan dari Klien (opsional)</label>
-                        <textarea wire:model="notes" rows="3" maxlength="500" placeholder="Catatan tambahan dari klien..." class="ds-input @error('notes') ds-input-error @enderror"></textarea>
+                        <label class="ds-label">Request Barang</label>
+                        <div class="mt-2 space-y-2">
+                            @php
+                                $presetRequests = [
+                                    'extra_bubble_wrap' => 'Extra Bubble Wrap',
+                                    'stripping' => 'Stripping',
+                                    'pisahin_album' => 'Pisahin Album',
+                                    'take_out_freebies' => 'Take Out Freebies',
+                                ];
+                            @endphp
+                            @foreach($presetRequests as $value => $label)
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" wire:model="requestTypes" value="{{ $value }}"
+                                        class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-accent">
+                                    <span class="text-[13px] text-gray-700">{{ $label }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        <p class="ds-hint mt-2">Pilih request khusus jika ada (opsional)</p>
+                    </div>
+
+                    <div>
+                        <label class="ds-label">Catatan Tambahan (opsional)</label>
+                        <textarea wire:model="notes" rows="2" maxlength="500" placeholder="Catatan tambahan dari klien..." class="ds-input @error('notes') ds-input-error @enderror"></textarea>
                         @error('notes') <p class="ds-error">{{ $message }}</p> @enderror
                         <p class="ds-hint">Maksimal 500 karakter</p>
                     </div>

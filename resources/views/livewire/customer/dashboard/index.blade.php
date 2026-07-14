@@ -466,6 +466,7 @@
                                                             @endif
                                                         </div>
                                                         <p class="text-caption text-gray-500">{{ $item->resi_number }}</p>
+                                                        <p class="text-micro text-gray-400 mt-0.5">{{ $item->created_at->format('d M Y H:i') }}</p>
                                                     </td>
                                                     <td class="px-4 py-2.5 text-body text-gray-700">{{ $item->quantity }}</td>
                                                     <td class="px-4 py-2.5 text-body text-gray-700">

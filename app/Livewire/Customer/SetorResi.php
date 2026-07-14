@@ -34,6 +34,8 @@ class SetorResi extends Component
     // ─── Revisi Client: Add On & Catatan ────────────────────
     public string $addOn = '0';
     public string $notes = '';
+    // ─── REV-04.3: Preset Request ────────────────────────────
+    public array $requestTypes = [];
     // ─── UI State ───────────────────────────────────────────────
     public bool $showSuccess = false;
     public bool $submitting = false;
@@ -137,6 +139,7 @@ class SetorResi extends Component
             'sensitive_type' => $this->isSensitive ? $this->sensitiveType : null,
             'add_on' => $this->addOn ?: 0,
             'notes' => $this->notes ?: null,
+            'request_type' => !empty($this->requestTypes) ? json_encode($this->requestTypes) : null,
         ]);
 
         // Update last_setor_date on box (Revisi §2.3)

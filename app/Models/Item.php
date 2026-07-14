@@ -34,6 +34,7 @@ class Item extends Model
         'status',
         'add_on',
         'notes',
+        'request_type',
     ];
 
     /**

@@ -595,7 +595,6 @@
       });
     }
     makeRequest(name, formData, method, url, headers, retrievePaths) {
-      headers["ngrok-skip-browser-warning"] = "true";
       let request = new XMLHttpRequest();
       request.open(method, url);
       Object.entries(headers).forEach(([key, value]) => {
@@ -4407,7 +4406,6 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
       }),
       headers: {
         "Content-type": "application/json",
-        "ngrok-skip-browser-warning": "true",
         "X-Livewire": ""
       }
     };
