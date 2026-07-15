@@ -78,6 +78,7 @@ class FinanceIndex extends Component
         if (!$invoice) return;
 
         $oldTax = $invoice->fee_tax;
+        $oldGrandTotal = (float) $invoice->grand_total;
         $newTax = (float) $this->editFeeTax;
 
         // Recalculate grand_total
@@ -95,7 +96,7 @@ class FinanceIndex extends Component
             'subject_type' => 'App\\Models\\Invoice',
             'subject_id' => $invoice->id,
             'event' => 'updated',
-            'old_values' => ['fee_tax' => $oldTax, 'grand_total' => $invoice->getOriginal('grand_total')],
+            'old_values' => ['fee_tax' => $oldTax, 'grand_total' => $oldGrandTotal],
             'new_values' => ['fee_tax' => $newTax, 'grand_total' => $newGrandTotal],
         ]);
 
