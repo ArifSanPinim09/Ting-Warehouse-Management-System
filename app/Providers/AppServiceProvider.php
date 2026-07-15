@@ -36,8 +36,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Force HTTPS when APP_URL is https (ngrok, production, etc.)
         // Prevents Mixed Content: browser blocks HTTP assets on HTTPS page
-        // if (str_starts_with(config('app.url'), 'https://')) {
-        //     URL::forceScheme('https');
-        // }
+        if (str_starts_with(config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
     }
 }
