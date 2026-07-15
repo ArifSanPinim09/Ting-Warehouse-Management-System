@@ -193,7 +193,16 @@
                                         <span class="text-caption text-gray-600">{{ $inv->box->display_name ?? '-' }}</span>
                                     </td>
                                     <td class="px-5 py-3.5 text-right">
-                                        <span class="text-body text-gray-700">Rp {{ number_format($inv->fee_tax, 0, ',', '.') }}</span>
+                                        <div class="flex items-center justify-end gap-1">
+                                            <span class="text-body text-gray-700">Rp {{ number_format($inv->fee_tax, 0, ',', '.') }}</span>
+                                            <button
+                                                wire:click="openEditTax({{ $inv->id }})"
+                                                class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-primary transition-colors"
+                                                title="Edit Fee Tax"
+                                            >
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                            </button>
+                                        </div>
                                     </td>
                                     <td class="px-5 py-3.5 text-right">
                                         <span class="text-body text-gray-700">Rp {{ number_format($inv->fee_wh, 0, ',', '.') }}</span>
@@ -294,5 +303,87 @@
                 </div>
             </div>
         </div>
+    @endif
+
+    {{-- REV-05.7: Edit Tax Modal --}}
+    @if($showEditTax && $editInvoiceId)
+        @php $editInv = \App\Models\Invoice::find($editInvoiceId); @endphp
+        @if($editInv)
+            <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeEditTax" role="dialog" aria-modal="true">
+                <div class="fixed inset-0 bg-black/30 transition-opacity"></div>
+                <div class="flex min-h-full items-end sm:items-center justify-center p-4">
+                    <div class="relative bg-white rounded-[12px] shadow-xl max-w-md w-full" wire:click.stop>
+                        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-[16px] font-semibold text-gray-900">Edit Fee Tax</h3>
+                                <p class="text-[12px] text-gray-500 mt-0.5">{{ $editInv->invoice_number }} — {{ $editInv->customer->name ?? '-' }}</p>
+                            </div>
+                            <button wire:click="closeEditTax" class="p-2 rounded-[8px] text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                        <div class="px-6 py-4 space-y-4">
+                            {{-- Current breakdown --}}
+                            <div class="bg-gray-50 rounded-[8px] p-3 space-y-1.5 text-[12px]">
+                                <div class="flex justify-between"><span class="text-gray-500">Fee WH</span><span class="text-gray-700">Rp {{ number_format($editInv->fee_wh, 0, ',', '.') }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">Fee Packing</span><span class="text-gray-700">Rp {{ number_format($editInv->fee_packing, 0, ',', '.') }}</span></div>
+                                @if($editInv->add_on > 0)
+                                    <div class="flex justify-between"><span class="text-gray-500">Add On</span><span class="text-gray-700">Rp {{ number_format($editInv->add_on, 0, ',', '.') }}</span></div>
+                                @endif
+                                @if($editInv->denda_total > 0)
+                                    <div class="flex justify-between"><span class="text-gray-500">Denda</span><span class="text-gray-700">Rp {{ number_format($editInv->denda_total, 0, ',', '.') }}</span></div>
+                                @endif
+                                <div class="flex justify-between pt-1.5 border-t border-gray-200">
+                                    <span class="font-semibold text-gray-900">Grand Total (saat ini)</span>
+                                    <span class="font-bold text-gray-900">Rp {{ number_format($editInv->grand_total, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+
+                            {{-- Edit field --}}
+                            <div>
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Fee Tax Baru (Rp)</label>
+                                <input
+                                    type="number"
+                                    wire:model="editFeeTax"
+                                    class="w-full border border-gray-300 rounded-[8px] px-3 py-2.5 text-[14px] focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                    min="0"
+                                    step="100"
+                                    placeholder="Masukkan fee tax baru"
+                                />
+                                @error('editFeeTax')
+                                    <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            {{-- Preview --}}
+                            @if($editFeeTax && is_numeric($editFeeTax))
+                                @php
+                                    $newGrandTotal = (float) $editFeeTax + (float) $editInv->fee_wh + (float) $editInv->fee_packing + (float) $editInv->add_on + (float) $editInv->denda_total;
+                                    $diff = $newGrandTotal - (float) $editInv->grand_total;
+                                @endphp
+                                <div class="bg-blue-50 rounded-[8px] p-3 text-[12px]">
+                                    <div class="flex justify-between">
+                                        <span class="text-blue-700">Grand Total baru</span>
+                                        <span class="font-bold text-blue-900">Rp {{ number_format($newGrandTotal, 0, ',', '.') }}</span>
+                                    </div>
+                                    @if($diff != 0)
+                                        <div class="flex justify-between mt-1">
+                                            <span class="text-blue-600">Selisih</span>
+                                            <span class="font-medium {{ $diff > 0 ? 'text-red-600' : 'text-green-600' }}">
+                                                {{ $diff > 0 ? '+' : '' }}Rp {{ number_format($diff, 0, ',', '.') }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-100 flex items-center gap-3 justify-end">
+                            <button wire:click="closeEditTax" class="px-4 py-2.5 text-[13px] font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50">Batal</button>
+                            <button wire:click="saveTax" class="px-4 py-2.5 text-[13px] font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light">Simpan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     @endif
 </div>

@@ -46,6 +46,64 @@ class FinanceIndex extends Component
     public bool $showExportConfirm = false;
     public string $exportType = '';
 
+    // ─── REV-05.7: Edit Tax State ─────────────────────────────
+    public ?int $editInvoiceId = null;
+    public string $editFeeTax = '';
+    public bool $showEditTax = false;
+
+    public function openEditTax(int $invoiceId): void
+    {
+        $invoice = Invoice::find($invoiceId);
+        if (!$invoice) return;
+
+        $this->editInvoiceId = $invoiceId;
+        $this->editFeeTax = (string) $invoice->fee_tax;
+        $this->showEditTax = true;
+    }
+
+    public function closeEditTax(): void
+    {
+        $this->editInvoiceId = null;
+        $this->editFeeTax = '';
+        $this->showEditTax = false;
+    }
+
+    public function saveTax(): void
+    {
+        $this->validate([
+            'editFeeTax' => 'required|numeric|min:0',
+        ]);
+
+        $invoice = Invoice::find($this->editInvoiceId);
+        if (!$invoice) return;
+
+        $oldTax = $invoice->fee_tax;
+        $newTax = (float) $this->editFeeTax;
+
+        // Recalculate grand_total
+        $newGrandTotal = $newTax + (float) $invoice->fee_wh + (float) $invoice->fee_packing
+            + (float) $invoice->add_on + (float) $invoice->denda_total;
+
+        $invoice->update([
+            'fee_tax' => $newTax,
+            'grand_total' => $newGrandTotal,
+        ]);
+
+        // Audit log
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'subject_type' => 'App\\Models\\Invoice',
+            'subject_id' => $invoice->id,
+            'event' => 'updated',
+            'old_values' => ['fee_tax' => $oldTax, 'grand_total' => $invoice->getOriginal('grand_total')],
+            'new_values' => ['fee_tax' => $newTax, 'grand_total' => $newGrandTotal],
+        ]);
+
+        $this->closeEditTax();
+
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "Fee Tax {$invoice->invoice_number} berhasil diupdate.");
+    }
+
     public function resetFilters(): void
     {
         $this->reset([
