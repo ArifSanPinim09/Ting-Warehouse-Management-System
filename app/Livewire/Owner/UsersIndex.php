@@ -110,6 +110,64 @@ class UsersIndex extends Component
         $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "{$user->name} berhasil {$label}.");
     }
 
+    // ─── Sprint 4: Blacklist Customer ────────────────────────────
+    public bool $showBlacklistModal = false;
+    public string $blacklistReason = '';
+
+    public function openBlacklistModal(): void
+    {
+        $user = User::findOrFail($this->selectedId);
+        if ($user->isOwner() || $user->isAdmin()) {
+            $this->dispatch('toast', type: 'error', title: 'Error', message: 'Tidak bisa blacklist admin/owner.');
+            return;
+        }
+        $this->blacklistReason = $user->blacklist_reason ?? '';
+        $this->showBlacklistModal = true;
+    }
+
+    public function closeBlacklistModal(): void
+    {
+        $this->showBlacklistModal = false;
+        $this->blacklistReason = '';
+    }
+
+    public function toggleBlacklist(AuditLogService $auditService): void
+    {
+        $user = User::findOrFail($this->selectedId);
+
+        if ($user->isOwner() || $user->isAdmin()) {
+            $this->dispatch('toast', type: 'error', title: 'Error', message: 'Tidak bisa blacklist admin/owner.');
+            return;
+        }
+
+        if ($user->is_blacklisted) {
+            // Un-blacklist
+            $user->update([
+                'is_blacklisted' => false,
+                'blacklist_reason' => null,
+                'blacklisted_at' => null,
+                'status' => User::STATUS_ACTIVE,
+            ]);
+            $auditService->logCustom($user, 'unblacklisted', "User di-unblacklist: {$user->name}");
+            $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "{$user->name} di-unblacklist.");
+        } else {
+            $this->validate([
+                'blacklistReason' => ['required', 'string', 'min:5', 'max:500'],
+            ]);
+
+            $user->update([
+                'is_blacklisted' => true,
+                'blacklist_reason' => $this->blacklistReason,
+                'blacklisted_at' => now(),
+                'status' => User::STATUS_BLACKLISTED,
+            ]);
+            $auditService->logCustom($user, 'blacklisted', "User di-blacklist: {$user->name} — {$this->blacklistReason}");
+            $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "{$user->name} di-blacklist.");
+        }
+
+        $this->closeBlacklistModal();
+    }
+
     public function getSelectedUserProperty(): ?User
     {
         if (!$this->selectedId) return null;

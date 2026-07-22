@@ -323,6 +323,20 @@
                                             Aktifkan
                                         </button>
                                     @endif
+
+                                    {{-- Sprint 4: Blacklist Button (customer only) --}}
+                                    @if($selectedUser->role === 'customer')
+                                        <button
+                                            wire:click="openBlacklistModal"
+                                            class="w-full flex items-center justify-center gap-2 px-4 py-2.5 {{ $selectedUser->is_blacklisted ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-orange-50 text-orange-600 hover:bg-orange-100' }} text-body font-medium rounded-[8px] transition-colors mt-2"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                            {{ $selectedUser->is_blacklisted ? 'Unblacklist' : 'Blacklist' }}
+                                        </button>
+                                        @if($selectedUser->is_blacklisted)
+                                            <p class="text-[11px] text-orange-500 mt-1 px-1">Reason: {{ $selectedUser->blacklist_reason }}</p>
+                                        @endif
+                                    @endif
                                 </div>
                             @else
                                 <div class="p-3 bg-violet-50 rounded-[8px] text-center">
@@ -365,6 +379,45 @@
                         </button>
                         <button wire:click="updateRole" class="px-4 py-2.5 text-body font-medium text-white bg-primary rounded-[8px] hover:bg-primary-light transition-colors" wire:loading.attr="disabled">
                             Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Sprint 4: Blacklist Modal --}}
+    @if($showBlacklistModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" wire:click.self="closeBlacklistModal">
+            <div class="fixed inset-0 bg-black/30 transition-opacity"></div>
+            <div class="flex min-h-full items-end sm:items-center justify-center p-4">
+                <div class="relative bg-white rounded-[16px] shadow-modal w-full max-w-md p-6 transform transition-all" @click.stop>
+                    <div class="flex items-center justify-between mb-5">
+                        <h3 class="text-[16px] font-semibold text-red-600">
+                            {{ $selectedUser?->is_blacklisted ? 'Unblacklist User' : 'Blacklist User' }}
+                        </h3>
+                        <button wire:click="closeBlacklistModal" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    @if($selectedUser?->is_blacklisted)
+                        <p class="text-[14px] text-gray-600 mb-4">Apakah Anda yakin ingin meng-unblacklist <strong>{{ $selectedUser?->name }}</strong>?</p>
+                    @else
+                        <p class="text-[14px] text-gray-600 mb-4">Blacklist <strong>{{ $selectedUser?->name }}</strong>? User tidak akan bisa login atau menggunakan layanan.</p>
+                        <div class="mb-4">
+                            <label class="block text-caption font-medium text-gray-700 mb-1.5">Alasan Blacklist</label>
+                            <textarea wire:model="blacklistReason" rows="3" class="w-full py-2.5 px-3 text-body border border-gray-200 rounded-[8px] focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none" placeholder="Contoh: Tidak membayar tagihan, kabur, dll..."></textarea>
+                            @error('blacklistReason') <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    @endif
+
+                    <div class="flex items-center gap-3 justify-end mt-6">
+                        <button wire:click="closeBlacklistModal" class="px-4 py-2.5 text-body font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
+                            Batal
+                        </button>
+                        <button wire:click="toggleBlacklist" class="px-4 py-2.5 text-body font-medium text-white {{ $selectedUser?->is_blacklisted ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700' }} rounded-[8px] transition-colors" wire:loading.attr="disabled">
+                            {{ $selectedUser?->is_blacklisted ? 'Unblacklist' : 'Blacklist' }}
                         </button>
                     </div>
                 </div>

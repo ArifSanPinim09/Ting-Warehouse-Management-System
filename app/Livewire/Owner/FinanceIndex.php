@@ -209,6 +209,13 @@ class FinanceIndex extends Component
         $this->totalProfit = $this->cashIn - $this->cashOut;
         $this->totalInvoiceCount = (int) ($summary->total_count ?? 0);
 
+        // Sprint 4: Shipping/Material/Goods fees summary (in Rupiah)
+        $kurs = (float) \App\Models\Setting::getValue('kurs_yuan_idr', 2460);
+        $shippingMaterialTotal = \App\Models\ShippingMaterialFee::sum('biaya_yuan');
+        $goodsWeightTotal = \App\Models\GoodsWeightFee::sum('biaya_yuan');
+        $totalFeesYuan = $shippingMaterialTotal + $goodsWeightTotal;
+        $totalFeesRupiah = $totalFeesYuan * $kurs;
+
         $invoices = $query->latest()->paginate($this->perPage);
 
         $customers = User::where('role', 'customer')
@@ -228,6 +235,11 @@ class FinanceIndex extends Component
             'invoices' => $invoices,
             'customers' => $customers,
             'years' => $years,
+            'shippingMaterialTotalYuan' => $shippingMaterialTotal,
+            'goodsWeightTotalYuan' => $goodsWeightTotal,
+            'totalFeesYuan' => $totalFeesYuan,
+            'totalFeesRupiah' => $totalFeesRupiah,
+            'kursYuan' => $kurs,
         ]);
     }
 }

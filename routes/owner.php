@@ -5,6 +5,7 @@ use App\Livewire\AuditLogIndex;
 use App\Livewire\Owner\AllDataIndex;
 use App\Livewire\Owner\Dashboard;
 use App\Livewire\Owner\FinanceIndex;
+use App\Livewire\Owner\KursManagement;
 use App\Livewire\Owner\ManageAdminIndex;
 use App\Livewire\Owner\UsersIndex;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,9 @@ Route::middleware(['auth', 'verified', 'role:owner'])->prefix('owner')->name('ow
 
     // Manage Users (PRD §7.4)
     Route::get('/users', UsersIndex::class)->name('users');
+
+    // Sprint 4: Kurs Management
+    Route::get('/kurs', KursManagement::class)->name('kurs');
 
     // All Data (PRD §7.4)
     Route::get('/data', AllDataIndex::class)->name('all-data');
