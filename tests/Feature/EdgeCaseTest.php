@@ -175,7 +175,7 @@ class EdgeCaseTest extends TestCase
         $customer = User::factory()->create(['role' => 'customer', 'status' => User::STATUS_ACTIVE]);
         $box = Box::factory()->create([
             'customer_id' => $customer->id,
-            'status' => Box::STATUS_SENT_TO_CARGO,
+            'status' => Box::STATUS_SEND_TO_CARGO,
         ]);
 
         $this->actingAs($customer);
@@ -576,7 +576,7 @@ class EdgeCaseTest extends TestCase
             'type' => 'direct',
             'tracking_number' => 'DIR-002',
             'batch_name' => 'Batch Direct B',
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
         ]);
         $sharingBox = Box::factory()->create([
             'customer_id' => $customer->id,
@@ -735,7 +735,7 @@ class EdgeCaseTest extends TestCase
         $customer = User::factory()->create(['role' => 'customer', 'status' => User::STATUS_ACTIVE]);
         $box = Box::factory()->create([
             'customer_id' => $customer->id,
-            'status' => Box::STATUS_SENT_TO_CARGO,
+            'status' => Box::STATUS_SEND_TO_CARGO,
         ]);
 
         $this->actingAs($admin);
@@ -759,7 +759,7 @@ class EdgeCaseTest extends TestCase
         $customer = User::factory()->create(['role' => 'customer', 'status' => User::STATUS_ACTIVE]);
         $box = Box::factory()->create([
             'customer_id' => $customer->id,
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
         ]);
 
         $this->actingAs($admin);

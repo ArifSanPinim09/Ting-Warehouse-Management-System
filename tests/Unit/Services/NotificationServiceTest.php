@@ -122,7 +122,7 @@ class NotificationServiceTest extends TestCase
             'status' => Box::STATUS_OPEN,
         ]);
 
-        $this->service->boxStatusChanged($box, Box::STATUS_OPEN, Box::STATUS_SENT_TO_CARGO);
+        $this->service->boxStatusChanged($box, Box::STATUS_OPEN, Box::STATUS_SEND_TO_CARGO);
 
         $notif = Notification::where('notifiable_id', $customer->id)
             ->where('type', NotificationService::TYPE_BOX_STATUS_CHANGED)
@@ -131,7 +131,7 @@ class NotificationServiceTest extends TestCase
         $this->assertNotNull($notif);
         $this->assertEquals('Status Box Berubah', $notif->data['title']);
         $this->assertEquals(Box::STATUS_OPEN, $notif->data['old_status']);
-        $this->assertEquals(Box::STATUS_SENT_TO_CARGO, $notif->data['new_status']);
+        $this->assertEquals(Box::STATUS_SEND_TO_CARGO, $notif->data['new_status']);
         $this->assertEquals('TRK-001', $notif->data['tracking_number']);
     }
 

@@ -26,6 +26,7 @@ class Item extends Model
         'resi_number',
         'proof_co',
         'is_sensitive',
+        'is_garment',
         'sensitive_type',
         'arrived_china',
         'arrived_china_photo',
@@ -46,6 +47,7 @@ class Item extends Model
     {
         return [
             'is_sensitive' => 'boolean',
+            'is_garment' => 'boolean',
             'arrived_china' => 'boolean',
             'arrived_indonesia' => 'boolean',
             'price_yuan' => 'decimal:2',

@@ -205,7 +205,7 @@ class InvoiceConsistencyTest extends TestCase
             'customer_id' => $this->customer->id,
             'type' => 'sharing',
             'method' => 'air',
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
         ]);
 
         // Admin generates invoice the old way
@@ -287,7 +287,7 @@ class InvoiceConsistencyTest extends TestCase
             'type' => 'sharing',
             'method' => 'air',
             'tracking_number' => 'TRK-OLD-001',
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
         ]);
 
         $invoice = Invoice::factory()->create([
@@ -318,7 +318,7 @@ class InvoiceConsistencyTest extends TestCase
             'customer_id' => $this->customer->id,
             'type' => 'sharing',
             'method' => 'air',
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
         ]);
 
         $item1 = Item::factory()->create([

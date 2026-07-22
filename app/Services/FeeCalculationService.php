@@ -40,6 +40,11 @@ class FeeCalculationService
         'rate_direct_air_volume',
         'rate_direct_sea_berat',
         'rate_direct_sea_volume',
+        // Sprint 1: Garment rates (4 variants)
+        'rate_sharing_air_garment',
+        'rate_sharing_sea_garment',
+        'rate_direct_air_garment',
+        'rate_direct_sea_garment',
     ];
 
     private const PACKING_KEYS = [
@@ -95,12 +100,14 @@ class FeeCalculationService
         float $addOn = 0.0,
         float $dendaTotal = 0.0,
         ?float $customRate = null,
+        bool $isGarment = false,
     ): array {
         $this->loadRates();
 
         $volume = $this->calculateVolume($length, $width, $height);
+        $volumeIna = $this->calculateVolumeIna($length, $width, $height);
         $basis = $this->calculateBasis($weight, $volume);
-        $rateKey = $this->getRateKey($type, $method, $isSensitive, $weight, $volume);
+        $rateKey = $this->getRateKey($type, $method, $isSensitive, $weight, $volume, $isGarment);
 
         // Per-customer rate override: if customRate is set, use it instead of global rate
         $rate = $customRate ?? ($this->rates[$rateKey] ?? 0);
@@ -117,6 +124,7 @@ class FeeCalculationService
 
         return [
             'volume' => round($volume, 2),
+            'volume_ina' => round($volumeIna, 2),
             'basis' => round($basis, 2),
             'fee_tax' => round($feeTax, 0),
             'fee_wh' => round($feeWh, 0),
@@ -132,17 +140,40 @@ class FeeCalculationService
     /**
      * Calculate volume in m³ equivalent.
      *
-     * PRD §4.8: Volume = (P × L × T) / 6000
+     * Volume = (P × L × T) / 6000
      * Input in cm, output in kg equivalent (for weight comparison).
+     * Standard volumetric weight formula used by logistics industry.
+     *
+     * Note: Client doc writes "(PxLxT)/6" — this is the same formula
+     * where input is in meters (÷6) or cm (÷6000). We use cm input
+     * with /6000 divisor for consistency with industry standard.
      *
      * @param  float  $length  Panjang (cm)
      * @param  float  $width   Lebar (cm)
      * @param  float  $height  Tinggi (cm)
-     * @return float  Volume (m³ equivalent)
+     * @return float  Volume (kg equivalent)
      */
     public function calculateVolume(float $length, float $width, float $height): float
     {
         return ($length * $width * $height) / 6000;
+    }
+
+    /**
+     * Calculate Volume INA — for expedition in Indonesia.
+     *
+     * VI = (P × L × T) / 4000
+     * (Client doc: "VI (Volume INA) ini untuk kirim ke ekspedisi di indonesia karna beda satuan")
+     * INA expeditions use different volumetric divisor (4000 vs 6000).
+     * Input in cm, output in kg equivalent.
+     *
+     * @param  float  $length  Panjang (cm)
+     * @param  float  $width   Lebar (cm)
+     * @param  float  $height  Tinggi (cm)
+     * @return float  Volume INA (kg equivalent)
+     */
+    public function calculateVolumeIna(float $length, float $width, float $height): float
+    {
+        return ($length * $width * $height) / 4000;
     }
 
     /**
@@ -332,8 +363,14 @@ class FeeCalculationService
         bool $isSensitive,
         float $weight,
         float $volume,
+        bool $isGarment = false,
     ): string {
         $basis = ($weight >= $volume) ? 'berat' : 'volume';
+
+        // Sprint 1: Garment rate takes priority over sensitive
+        if ($isGarment) {
+            return "rate_{$type}_{$method}_garment";
+        }
 
         // PRD §4.12: Hanya sharing yang punya sensitive rate
         if ($isSensitive && $type === 'sharing') {

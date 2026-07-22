@@ -470,7 +470,7 @@ class FeeCalculationServiceTest extends TestCase
     {
         $rates = $this->service->getAllRates();
 
-        $this->assertCount(16, $rates);
+        $this->assertCount(20, $rates);
         $this->assertArrayHasKey('rate_sharing_air_berat', $rates);
         $this->assertArrayHasKey('fee_packing_150', $rates);
         $this->assertArrayHasKey('fee_packing_extra_per_kg', $rates);

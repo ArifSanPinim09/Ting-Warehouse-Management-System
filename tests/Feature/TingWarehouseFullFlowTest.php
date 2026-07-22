@@ -295,21 +295,21 @@ class TingWarehouseFullFlowTest extends TestCase
 
         Livewire::test(ManageBox::class)
             ->call('selectBox', $this->box->id)
-            ->call('confirmStatusChange', Box::STATUS_SENT_TO_CARGO)
+            ->call('confirmStatusChange', Box::STATUS_SEND_TO_CARGO)
             ->call('updateStatus');
 
         $this->box->refresh();
-        $this->assertEquals(Box::STATUS_SENT_TO_CARGO, $this->box->status);
+        $this->assertEquals(Box::STATUS_SEND_TO_CARGO, $this->box->status);
 
         // ── Step 7b: SENT_TO_CARGO → OTW_INA ──
 
         Livewire::test(ManageBox::class)
             ->call('selectBox', $this->box->id)
-            ->call('confirmStatusChange', Box::STATUS_OTW_INA)
+            ->call('confirmStatusChange', Box::STATUS_ARRIVED_INA)
             ->call('updateStatus');
 
         $this->box->refresh();
-        $this->assertEquals(Box::STATUS_OTW_INA, $this->box->status);
+        $this->assertEquals(Box::STATUS_ARRIVED_INA, $this->box->status);
 
         // Assert 2 box_status_changed notifications sent to customer
         $boxNotifs = Notification::where('notifiable_id', $this->customer->id)
@@ -320,10 +320,10 @@ class TingWarehouseFullFlowTest extends TestCase
         $this->assertCount(2, $boxNotifs, 'Customer should receive 2 box status notifications');
 
         $this->assertEquals(Box::STATUS_OPEN, $boxNotifs[0]->data['old_status']);
-        $this->assertEquals(Box::STATUS_SENT_TO_CARGO, $boxNotifs[0]->data['new_status']);
+        $this->assertEquals(Box::STATUS_SEND_TO_CARGO, $boxNotifs[0]->data['new_status']);
 
-        $this->assertEquals(Box::STATUS_SENT_TO_CARGO, $boxNotifs[1]->data['old_status']);
-        $this->assertEquals(Box::STATUS_OTW_INA, $boxNotifs[1]->data['new_status']);
+        $this->assertEquals(Box::STATUS_SEND_TO_CARGO, $boxNotifs[1]->data['old_status']);
+        $this->assertEquals(Box::STATUS_ARRIVED_INA, $boxNotifs[1]->data['new_status']);
 
         // Audit logs: status changes logged by ManageBox + BoxObserver (each transition = 2 logs)
         $statusLogs = ActivityLog::where('subject_type', Box::class)
@@ -370,7 +370,7 @@ class TingWarehouseFullFlowTest extends TestCase
             ->first();
 
         $this->assertNotNull($customerBox);
-        $this->assertEquals(Box::STATUS_OTW_INA, $customerBox->status);
+        $this->assertEquals(Box::STATUS_ARRIVED_INA, $customerBox->status);
         $this->assertEquals('2026-08-01', $customerBox->etd->format('Y-m-d'));
         $this->assertEquals('2026-08-15', $customerBox->eta->format('Y-m-d'));
         $this->assertEquals('TRK-FULL-001', $customerBox->tracking_number);
@@ -415,7 +415,7 @@ class TingWarehouseFullFlowTest extends TestCase
 
         // Box status → UP_INVOICE
         $this->box->refresh();
-        $this->assertEquals(Box::STATUS_UP_INVOICE, $this->box->status);
+        $this->assertEquals(Box::STATUS_INVOICE, $this->box->status);
 
         // Notification to customer
         $invNotif = Notification::where('notifiable_id', $this->customer->id)

@@ -50,9 +50,9 @@ class BoxModelTest extends TestCase
     public function test_status_constants(): void
     {
         $this->assertEquals('OPEN', Box::STATUS_OPEN);
-        $this->assertEquals('SENT_TO_CARGO', Box::STATUS_SENT_TO_CARGO);
-        $this->assertEquals('OTW_INA', Box::STATUS_OTW_INA);
-        $this->assertEquals('UP_INVOICE', Box::STATUS_UP_INVOICE);
+        $this->assertEquals('SEND_TO_CARGO', Box::STATUS_SEND_TO_CARGO);
+        $this->assertEquals('ARRIVED_INA', Box::STATUS_ARRIVED_INA);
+        $this->assertEquals('INVOICE', Box::STATUS_INVOICE);
         $this->assertEquals('DONE', Box::STATUS_DONE);
     }
 
@@ -60,10 +60,10 @@ class BoxModelTest extends TestCase
     {
         $statuses = Box::getValidStatuses();
 
-        $this->assertCount(8, $statuses);
+        $this->assertCount(15, $statuses);
         $this->assertContains('OPEN', $statuses);
         $this->assertContains('CLOSED', $statuses);
-        $this->assertContains('LAST_SETOR', $statuses);
+        $this->assertContains('LAST_CLAIM', $statuses);
         $this->assertContains('DONE', $statuses);
         $this->assertContains('REQUEST_TO_CLOSE', $statuses);
     }

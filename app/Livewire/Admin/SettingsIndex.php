@@ -27,6 +27,11 @@ class SettingsIndex extends Component
     public string $rate_direct_air_volume = '';
     public string $rate_direct_sea_berat = '';
     public string $rate_direct_sea_volume = '';
+    // Sprint 1: Garment rates
+    public string $rate_sharing_air_garment = '';
+    public string $rate_sharing_sea_garment = '';
+    public string $rate_direct_air_garment = '';
+    public string $rate_direct_sea_garment = '';
     public string $fee_packing_150 = '';
     public string $fee_packing_1000 = '';
     public string $fee_packing_2000 = '';
@@ -54,6 +59,9 @@ class SettingsIndex extends Component
             'rate_sharing_sensitive_sea_berat', 'rate_sharing_sensitive_sea_volume',
             'rate_direct_air_berat', 'rate_direct_air_volume',
             'rate_direct_sea_berat', 'rate_direct_sea_volume',
+            // Sprint 1: Garment rates
+            'rate_sharing_air_garment', 'rate_sharing_sea_garment',
+            'rate_direct_air_garment', 'rate_direct_sea_garment',
             'fee_packing_150', 'fee_packing_1000', 'fee_packing_2000', 'fee_packing_extra_per_kg',
         ];
 
@@ -89,6 +97,9 @@ class SettingsIndex extends Component
             'rate_sharing_sensitive_air_volume' => 'required|numeric|min:1|max:99999',
             'rate_sharing_sensitive_sea_berat' => 'required|numeric|min:1|max:99999',
             'rate_sharing_sensitive_sea_volume' => 'required|numeric|min:1|max:99999',
+            // Sprint 1: Garment rates
+            'rate_sharing_air_garment' => 'required|numeric|min:1|max:99999',
+            'rate_sharing_sea_garment' => 'required|numeric|min:1|max:99999',
         ]);
 
         $sharingKeys = [
@@ -96,6 +107,8 @@ class SettingsIndex extends Component
             'rate_sharing_sea_berat', 'rate_sharing_sea_volume',
             'rate_sharing_sensitive_air_berat', 'rate_sharing_sensitive_air_volume',
             'rate_sharing_sensitive_sea_berat', 'rate_sharing_sensitive_sea_volume',
+            // Sprint 1: Garment rates
+            'rate_sharing_air_garment', 'rate_sharing_sea_garment',
         ];
 
         $oldValues = [];
@@ -127,9 +140,17 @@ class SettingsIndex extends Component
             'rate_direct_air_volume' => 'required|numeric|min:1|max:99999',
             'rate_direct_sea_berat' => 'required|numeric|min:1|max:99999',
             'rate_direct_sea_volume' => 'required|numeric|min:1|max:99999',
+            // Sprint 1: Garment rates
+            'rate_direct_air_garment' => 'required|numeric|min:1|max:99999',
+            'rate_direct_sea_garment' => 'required|numeric|min:1|max:99999',
         ]);
 
-        $directKeys = ['rate_direct_air_berat', 'rate_direct_air_volume', 'rate_direct_sea_berat', 'rate_direct_sea_volume'];
+        $directKeys = [
+            'rate_direct_air_berat', 'rate_direct_air_volume',
+            'rate_direct_sea_berat', 'rate_direct_sea_volume',
+            // Sprint 1: Garment rates
+            'rate_direct_air_garment', 'rate_direct_sea_garment',
+        ];
 
         $oldValues = [];
         $newValues = [];

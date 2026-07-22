@@ -26,7 +26,7 @@ class GenerateInvoiceTest extends TestCase
         $customer = User::factory()->create(['role' => 'customer', 'status' => User::STATUS_ACTIVE]);
         $this->box = Box::factory()->create([
             'customer_id' => $customer->id,
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
             'type' => 'sharing',
             'method' => 'air',
         ]);
@@ -59,7 +59,7 @@ class GenerateInvoiceTest extends TestCase
 
         // Box status updated
         $this->box->refresh();
-        $this->assertEquals(Box::STATUS_UP_INVOICE, $this->box->status);
+        $this->assertEquals(Box::STATUS_INVOICE, $this->box->status);
     }
 
     /**

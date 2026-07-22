@@ -45,7 +45,7 @@ class AuditLogServiceTest extends TestCase
             event: 'updated',
             subject: $box,
             old: ['status' => Box::STATUS_OPEN],
-            new: ['status' => Box::STATUS_SENT_TO_CARGO],
+            new: ['status' => Box::STATUS_SEND_TO_CARGO],
         );
 
         $log = ActivityLog::first();
@@ -56,7 +56,7 @@ class AuditLogServiceTest extends TestCase
         $this->assertEquals($box->id, $log->subject_id);
         $this->assertEquals('updated', $log->event);
         $this->assertEquals(['status' => Box::STATUS_OPEN], $log->old_values);
-        $this->assertEquals(['status' => Box::STATUS_SENT_TO_CARGO], $log->new_values);
+        $this->assertEquals(['status' => Box::STATUS_SEND_TO_CARGO], $log->new_values);
     }
 
     /**
@@ -100,7 +100,7 @@ class AuditLogServiceTest extends TestCase
                 'password'   => 'old-hash',
             ],
             new: [
-                'status'     => Box::STATUS_SENT_TO_CARGO,
+                'status'     => Box::STATUS_SEND_TO_CARGO,
                 'updated_at' => '2024-01-02 00:00:00',
                 'created_at' => '2024-01-01 00:00:00',
                 'password'   => 'new-hash',
@@ -240,7 +240,7 @@ class AuditLogServiceTest extends TestCase
 
         // Create different events
         $this->service->log(event: 'created', subject: $box, new: ['status' => 'OPEN']);
-        $this->service->log(event: 'updated', subject: $box, old: ['status' => 'OPEN'], new: ['status' => 'SENT_TO_CARGO']);
+        $this->service->log(event: 'updated', subject: $box, old: ['status' => 'OPEN'], new: ['status' => 'SEND_TO_CARGO']);
         $this->service->log(event: 'generated', subject: $invoice, new: ['invoice_number' => 'INV-001']);
 
         // Test ForEvent scope
@@ -361,7 +361,7 @@ class AuditLogServiceTest extends TestCase
             event: 'updated',
             subject: $box,
             old: ['status' => Box::STATUS_OPEN, 'tracking_number' => 'TRK-OLD', 'notes' => 'lama'],
-            new: ['status' => Box::STATUS_SENT_TO_CARGO, 'tracking_number' => 'TRK-NEW', 'notes' => 'lama'],
+            new: ['status' => Box::STATUS_SEND_TO_CARGO, 'tracking_number' => 'TRK-NEW', 'notes' => 'lama'],
         );
 
         $log = ActivityLog::first();
@@ -369,7 +369,7 @@ class AuditLogServiceTest extends TestCase
         $this->assertNotNull($log);
         // status and tracking_number changed
         $this->assertEquals(Box::STATUS_OPEN, $log->old_values['status']);
-        $this->assertEquals(Box::STATUS_SENT_TO_CARGO, $log->new_values['status']);
+        $this->assertEquals(Box::STATUS_SEND_TO_CARGO, $log->new_values['status']);
         $this->assertEquals('TRK-OLD', $log->old_values['tracking_number']);
         $this->assertEquals('TRK-NEW', $log->new_values['tracking_number']);
         // notes didn't change, should NOT appear

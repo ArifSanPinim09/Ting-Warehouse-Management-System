@@ -39,6 +39,12 @@ class SettingsSeeder extends Seeder
             ['key' => 'rate_direct_sea_berat', 'value' => '70', 'group' => 'rate_direct'],
             ['key' => 'rate_direct_sea_volume', 'value' => '90', 'group' => 'rate_direct'],
 
+            // ─── Sprint 1: Rate Garment ────────────────────────────
+            ['key' => 'rate_sharing_air_garment', 'value' => '240', 'group' => 'rate_garment'],
+            ['key' => 'rate_sharing_sea_garment', 'value' => '75', 'group' => 'rate_garment'],
+            ['key' => 'rate_direct_air_garment', 'value' => '220', 'group' => 'rate_garment'],
+            ['key' => 'rate_direct_sea_garment', 'value' => '80', 'group' => 'rate_garment'],
+
             // ─── Fee Packing (tiered) ────────────────────────────────
             ['key' => 'fee_packing_150', 'value' => '5000', 'group' => 'fee_packing'],
             ['key' => 'fee_packing_1000', 'value' => '6500', 'group' => 'fee_packing'],

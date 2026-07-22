@@ -30,7 +30,7 @@ class DendaInvoiceTest extends TestCase
         $this->customer = User::factory()->create(['role' => 'customer', 'status' => User::STATUS_ACTIVE]);
         $this->box = Box::factory()->create([
             'customer_id' => $this->customer->id,
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
             'type' => 'sharing',
             'method' => 'air',
         ]);
@@ -86,7 +86,7 @@ class DendaInvoiceTest extends TestCase
 
         // Box status updated
         $this->box->refresh();
-        $this->assertEquals(Box::STATUS_UP_INVOICE, $this->box->status);
+        $this->assertEquals(Box::STATUS_INVOICE, $this->box->status);
     }
 
     // ─── Test: invoice tanpa denda → denda_total = 0 ────────────
@@ -148,7 +148,7 @@ class DendaInvoiceTest extends TestCase
         $customerB = User::factory()->create(['role' => 'customer', 'status' => User::STATUS_ACTIVE]);
         $boxB = Box::factory()->create([
             'customer_id' => $customerB->id,
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
             'type' => 'sharing',
             'method' => 'air',
         ]);

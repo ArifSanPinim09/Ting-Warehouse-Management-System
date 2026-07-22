@@ -30,6 +30,7 @@ class SetorResi extends Component
     public string $resiNumber = '';
     public $proofCo = null;
     public bool $isSensitive = false;
+    public bool $isGarment = false; // Sprint 1: Garment checkbox
     public ?string $sensitiveType = null;
     // ─── Revisi Client: Add On & Catatan ────────────────────
     public string $addOn = '0';
@@ -53,6 +54,7 @@ class SetorResi extends Component
             'resiNumber' => ['required', 'string', 'min:3', 'max:100'],
             'proofCo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'isSensitive' => ['nullable', 'boolean'],
+            'isGarment' => ['nullable', 'boolean'], // Sprint 1: Garment
             'sensitiveType' => ['required_if:isSensitive,true', 'nullable', 'string', 'max:50'],
             'addOn' => ['nullable', 'numeric', 'min:0', 'max:999999'],
             'notes' => ['nullable', 'string', 'max:500'],
@@ -136,6 +138,7 @@ class SetorResi extends Component
             'resi_number' => $this->resiNumber,
             'proof_co' => $proofPath,
             'is_sensitive' => $this->isSensitive,
+            'is_garment' => $this->isGarment, // Sprint 1: Garment
             'sensitive_type' => $this->isSensitive ? $this->sensitiveType : null,
             'add_on' => $this->addOn ?: 0,
             'notes' => $this->notes ?: null,
@@ -158,7 +161,7 @@ class SetorResi extends Component
         $notifService->customerRegister(auth()->user());
 
         // Reset form
-        $this->reset(['name', 'quantity', 'priceYuan', 'resiNumber', 'proofCo', 'isSensitive', 'sensitiveType', 'addOn', 'notes']);
+        $this->reset(['name', 'quantity', 'priceYuan', 'resiNumber', 'proofCo', 'isSensitive', 'isGarment', 'sensitiveType', 'addOn', 'notes']);
         $this->showSuccess = true;
         $this->submitting = false;
 

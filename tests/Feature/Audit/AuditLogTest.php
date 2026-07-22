@@ -33,7 +33,7 @@ class AuditLogTest extends TestCase
 
         Livewire::test(ManageBox::class)
             ->call('selectBox', $box->id)
-            ->call('confirmStatusChange', Box::STATUS_SENT_TO_CARGO)
+            ->call('confirmStatusChange', Box::STATUS_SEND_TO_CARGO)
             ->set('statusNote', 'Box sudah dikirim ke cargo')
             ->call('updateStatus');
 
@@ -57,7 +57,7 @@ class AuditLogTest extends TestCase
         $customer = User::factory()->create(['role' => 'customer']);
         $box = Box::factory()->create([
             'customer_id' => $customer->id,
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
             'type' => 'sharing',
             'method' => 'air',
         ]);

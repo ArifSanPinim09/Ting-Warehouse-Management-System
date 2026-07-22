@@ -36,7 +36,7 @@ class DeadlineReminderTest extends TestCase
         $this->customer = User::factory()->create(['role' => 'customer']);
         $this->box = Box::factory()->create([
             'customer_id' => $this->customer->id,
-            'status' => Box::STATUS_OTW_INA,
+            'status' => Box::STATUS_ARRIVED_INA,
         ]);
     }
 
@@ -84,7 +84,7 @@ class DeadlineReminderTest extends TestCase
             'arrived_indonesia' => false,
         ]);
 
-        $this->box->update(['status' => Box::STATUS_UP_INVOICE]);
+        $this->box->update(['status' => Box::STATUS_INVOICE]);
 
         foreach ($items as $item) {
             $this->assertTrue($item->fresh()->arrived_indonesia);
@@ -100,7 +100,7 @@ class DeadlineReminderTest extends TestCase
             'storage_deadline' => null,
         ]);
 
-        $this->box->update(['status' => Box::STATUS_UP_INVOICE]);
+        $this->box->update(['status' => Box::STATUS_INVOICE]);
 
         $this->assertNotNull($invoice->fresh()->storage_deadline);
         $this->assertTrue(
@@ -125,7 +125,7 @@ class DeadlineReminderTest extends TestCase
 
         $invoice->items()->attach($items->pluck('id'));
 
-        $this->box->update(['status' => Box::STATUS_UP_INVOICE]);
+        $this->box->update(['status' => Box::STATUS_INVOICE]);
 
         $this->assertNotNull($invoice->fresh()->storage_deadline);
     }

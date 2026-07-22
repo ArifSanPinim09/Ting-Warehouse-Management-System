@@ -177,13 +177,13 @@ class GenerateInvoice extends Component
                 ]);
             }
 
-            // Update box status
-            $box->status = Box::STATUS_UP_INVOICE;
+            // Update box status (Sprint 1: UP_INVOICE → INVOICE)
+            $box->status = Box::STATUS_INVOICE;
             $box->save();
 
             // Audit logs
             $auditService->logCustom($invoice, 'generated', "Invoice {$invoiceNumber} dibuat untuk box #{$box->id}" . ($dendaTotal > 0 ? " (denda: Rp " . number_format($dendaTotal, 0, ',', '.') . ")" : ''));
-            $auditService->logCustom($box, 'status_changed', "Status box berubah dari OTW_INA ke UP_INVOICE");
+            $auditService->logCustom($box, 'status_changed', "Status box berubah dari ARRIVED_INA ke INVOICE");
 
             // Notify customer
             $notifService->invoiceGenerated($invoice);
