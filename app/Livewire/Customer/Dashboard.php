@@ -79,11 +79,20 @@ class Dashboard extends Component
         $receiptsThisMonth = (int) ($itemStats->receipts ?? 0);
 
         // Batch load settings (1 query instead of 3)
-        $settings = Setting::whereIn('key', ['rate_sharing_air_berat', 'rate_sharing_sea_berat'])
-            ->pluck('value', 'key');
+        $settings = Setting::whereIn('key', [
+            'rate_sharing_air_berat', 'rate_sharing_sea_berat',
+            // Sprint 3: Sensitive + Garment rates
+            'rate_sharing_sensitive_air_berat', 'rate_sharing_sensitive_sea_berat',
+            'rate_sharing_air_garment', 'rate_sharing_sea_garment',
+        ])->pluck('value', 'key');
 
         $rateAir = (float) ($settings['rate_sharing_air_berat'] ?? 255);
         $rateSea = (float) ($settings['rate_sharing_sea_berat'] ?? 70);
+        // Sprint 3: Additional rates for dashboard display
+        $rateAirSensitive = (float) ($settings['rate_sharing_sensitive_air_berat'] ?? 315);
+        $rateSeaSensitive = (float) ($settings['rate_sharing_sensitive_sea_berat'] ?? 95);
+        $rateAirGarment = (float) ($settings['rate_sharing_air_garment'] ?? 240);
+        $rateSeaGarment = (float) ($settings['rate_sharing_sea_garment'] ?? 75);
 
         // Kurs from history table (Revisi §2.2) — always use today's kurs
         $feeService = app(FeeCalculationService::class);
@@ -176,6 +185,10 @@ class Dashboard extends Component
             'kursYuan',
             'rateAir',
             'rateSea',
+            'rateAirSensitive',
+            'rateSeaSensitive',
+            'rateAirGarment',
+            'rateSeaGarment',
             'boxes',
             'detailBox',
             'notifications',

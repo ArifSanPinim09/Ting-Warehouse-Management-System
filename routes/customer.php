@@ -49,6 +49,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Kalkulator (PRD §4.8)
     Route::get('/kalkulator', Kalkulator::class)->name('customer.kalkulator');
 
+    // Sprint 3: Mesin Pencari Resi
+    Route::get('/resi-search', \App\Livewire\Customer\ResiSearch::class)->name('customer.resi-search');
+
     // No Tuan (Revisi §2.1, §4.1)
     Route::get('/no-tuan', NoTuanIndex::class)->name('customer.no-tuan');
 

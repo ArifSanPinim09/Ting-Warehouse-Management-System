@@ -27,6 +27,9 @@ class Checkout extends Model
         'packing_photo',
         'tracking_number',
         'status',
+        'ekspedisi_id',
+        'ongkir',
+        'payment_timeout_at',
     ];
 
     /**
@@ -36,7 +39,10 @@ class Checkout extends Model
      */
     protected function casts(): array
     {
-        return [];
+        return [
+            'ongkir' => 'decimal:2',
+            'payment_timeout_at' => 'datetime',
+        ];
     }
 
     // ─── Status Constants ──────────────────────────────────────────
@@ -75,5 +81,13 @@ class Checkout extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    /**
+     * Sprint 3: Ekspedisi chosen by customer.
+     */
+    public function ekspedisi(): BelongsTo
+    {
+        return $this->belongsTo(Ekspedisi::class);
     }
 }

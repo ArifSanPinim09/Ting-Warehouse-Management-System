@@ -188,6 +188,23 @@
                             </div>
                         @endif
 
+                        {{-- Sprint 3: Pilih Ekspedisi --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[13px] font-medium text-gray-700 mb-1.5">Ekspedisi</label>
+                                <select wire:model="ekspedisiId" class="w-full border border-gray-200 rounded-[8px] px-3 py-2 text-[14px] focus:border-primary outline-none">
+                                    <option value="">Pilih ekspedisi...</option>
+                                    @foreach($ekspedisis as $ekspedisi)
+                                        <option value="{{ $ekspedisi->id }}">{{ $ekspedisi->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[13px] font-medium text-gray-700 mb-1.5">Ongkir (Rp) — optional</label>
+                                <input wire:model="ongkir" type="number" step="0.01" placeholder="0" class="w-full border border-gray-200 rounded-[8px] px-3 py-2 text-[14px] focus:border-primary outline-none">
+                            </div>
+                        </div>
+
                         <label class="flex items-start gap-3 cursor-pointer">
                             <input type="checkbox" wire:model="confirmation" class="mt-0.5 rounded border-gray-300 text-accent focus:ring-accent/20" />
                             <span class="text-body text-gray-600">Saya mengkonfirmasi data di atas sudah benar dan ingin mengajukan checkout.</span>

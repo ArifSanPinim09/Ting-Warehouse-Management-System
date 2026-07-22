@@ -18,6 +18,7 @@ class User extends Authenticatable
     const STATUS_PENDING = 'pending';
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';
+    const STATUS_BLACKLISTED = 'blacklisted'; // Sprint 3: Customer kabur
 
     /**
      * The attributes that are mass assignable.
@@ -36,6 +37,12 @@ class User extends Authenticatable
         'password',
         'custom_rate_air',
         'custom_rate_sea',
+        // Sprint 3: Blacklist + TnC
+        'is_blacklisted',
+        'blacklist_reason',
+        'blacklisted_at',
+        'tnc_accepted',
+        'tnc_accepted_at',
     ];
 
     /**
@@ -58,6 +65,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_blacklisted' => 'boolean',
+            'blacklisted_at' => 'datetime',
+            'tnc_accepted' => 'boolean',
+            'tnc_accepted_at' => 'datetime',
         ];
     }
 

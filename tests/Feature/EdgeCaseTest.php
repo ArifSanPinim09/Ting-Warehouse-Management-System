@@ -90,7 +90,8 @@ class EdgeCaseTest extends TestCase
             ->set('ktp_number', '1234567890123456')
             ->set('address', 'Jl. Test No. 123, Jakarta')
             ->set('password', 'password123')
-            ->set('password_confirmation', 'password123');
+            ->set('password_confirmation', 'password123')
+            ->set('tncAccepted', true);
 
         $component->call('register');
 
@@ -115,7 +116,8 @@ class EdgeCaseTest extends TestCase
             ->set('ktp_number', '1234567890123456')
             ->set('address', 'Jl. Test No. 123, Jakarta')
             ->set('password', 'password123')
-            ->set('password_confirmation', 'password123');
+            ->set('password_confirmation', 'password123')
+            ->set('tncAccepted', true);
 
         $component->call('register');
 

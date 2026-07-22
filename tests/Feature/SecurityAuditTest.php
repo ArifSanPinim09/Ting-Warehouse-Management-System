@@ -96,6 +96,7 @@ class SecurityAuditTest extends TestCase
                 ->set('address', "Jl. Test No. {$i}, Jakarta Selatan")
                 ->set('password', 'password123')
                 ->set('password_confirmation', 'password123')
+                ->set('tncAccepted', true)
                 ->call('register')
                 ->assertRedirect(route('login', absolute: false));
         }
@@ -109,6 +110,7 @@ class SecurityAuditTest extends TestCase
             ->set('address', 'Jl. Test No. 4, Jakarta Selatan')
             ->set('password', 'password123')
             ->set('password_confirmation', 'password123')
+                ->set('tncAccepted', true)
             ->call('register')
             ->assertHasErrors(['email']);
     }

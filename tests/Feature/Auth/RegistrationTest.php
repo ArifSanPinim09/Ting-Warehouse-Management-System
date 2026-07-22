@@ -29,7 +29,8 @@ class RegistrationTest extends TestCase
             ->set('ktp_number', '1234567890123456')
             ->set('address', 'Jl. Test No. 123, Jakarta')
             ->set('password', 'password')
-            ->set('password_confirmation', 'password');
+            ->set('password_confirmation', 'password')
+            ->set('tncAccepted', true);
 
         $component->call('register');
 
@@ -60,7 +61,8 @@ class RegistrationTest extends TestCase
             ->set('ktp_number', '1234567890123456')
             ->set('address', 'Jl. Test No. 123, Jakarta')
             ->set('password', 'password')
-            ->set('password_confirmation', 'password');
+            ->set('password_confirmation', 'password')
+            ->set('tncAccepted', true);
 
         $component->call('register');
 
@@ -81,7 +83,8 @@ class RegistrationTest extends TestCase
             ->set('ktp_number', '1234567890123456')
             ->set('address', 'Jl. Test No. 123, Jakarta')
             ->set('password', 'password')
-            ->set('password_confirmation', 'password');
+            ->set('password_confirmation', 'password')
+            ->set('tncAccepted', true);
 
         $component->call('register');
 
@@ -101,6 +104,7 @@ class RegistrationTest extends TestCase
             ->set('address', 'Jl. Test No. 123, Jakarta')
             ->set('password', 'password')
             ->set('password_confirmation', 'password')
+            ->set('tncAccepted', true)
             ->call('register');
 
         $user = User::where('email', 'test@example.com')->first();

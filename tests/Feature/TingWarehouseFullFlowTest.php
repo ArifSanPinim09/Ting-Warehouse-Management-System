@@ -108,6 +108,7 @@ class TingWarehouseFullFlowTest extends TestCase
             ->set('address', 'Jl. Sudirman No. 123, Jakarta Selatan')
             ->set('password', 'password123')
             ->set('password_confirmation', 'password123')
+            ->set('tncAccepted', true)
             ->call('register')
             ->assertRedirect(route('login', absolute: false));
 

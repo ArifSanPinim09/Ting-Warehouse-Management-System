@@ -21,12 +21,15 @@ new #[Layout('layouts.guest')] class extends Component
     public string $address = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public bool $tncAccepted = false; // Sprint 3: TnC checkbox
+    public bool $showTnc = false; // Sprint 3: TnC modal
 
     /**
      * Handle an incoming registration request.
      *
      * PRD §4.1: Validasi -> Simpan(PENDING) -> Notif admin -> Aktivasi -> Login
      * PRD §20.5: Register rate limit 3x per hour
+     * Sprint 3: TnC must be accepted
      * User TIDAK langsung login setelah register, harus tunggu aktivasi admin.
      */
     public function register(): void
@@ -39,9 +42,18 @@ new #[Layout('layouts.guest')] class extends Component
 
         $validated = $this->validate((new RegisterRequest())->rules(), (new RegisterRequest())->messages());
 
+        // Sprint 3: TnC validation
+        if (!$this->tncAccepted) {
+            throw ValidationException::withMessages([
+                'tncAccepted' => 'Anda harus menyetujui Syarat & Ketentuan untuk mendaftar.',
+            ]);
+        }
+
         $validated['password'] = Hash::make($validated['password']);
         $validated['status'] = User::STATUS_PENDING;
         $validated['role'] = 'customer';
+        $validated['tnc_accepted'] = true;
+        $validated['tnc_accepted_at'] = now();
 
         event(new Registered($user = User::create($validated)));
 
@@ -134,6 +146,45 @@ new #[Layout('layouts.guest')] class extends Component
                             name="password_confirmation" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
+
+        {{-- Sprint 3: TnC Checkbox --}}
+        <div class="mt-4">
+            <label class="flex items-start gap-2">
+                <input wire:model="tncAccepted" type="checkbox" name="tnc_accepted" required class="mt-1 rounded border-gray-300 text-primary focus:ring-primary">
+                <span class="text-[13px] text-gray-600">
+                    Saya menyetujui
+                    <button type="button" wire:click="$set('showTnc', true)" class="text-primary underline hover:text-primary/80">Syarat & Ketentuan</button>
+                    Ting Warehouse
+                </span>
+            </label>
+            @error('tncAccepted') <p class="text-[12px] text-red-500 mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        {{-- TnC Modal --}}
+        @if($showTnc ?? false)
+            <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/30" wire:click="$set('showTnc', false)"></div>
+                <div class="relative bg-white rounded-[12px] shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto z-10">
+                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white">
+                        <h3 class="text-[15px] font-semibold text-gray-900">Syarat & Ketentuan</h3>
+                        <button wire:click="$set('showTnc', false)" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-3 text-[13px] text-gray-600 leading-relaxed">
+                        <p><strong>1. Pendaftaran</strong><br>Dengan mendaftar, Anda setuju untuk memberikan informasi yang benar dan akurat.</p>
+                        <p><strong>2. Resi & Barang</strong><br>Customer wajib menyetorkan resi dari supplier China. Barang yang tidak diklaim dalam 1 minggu akan dikenakan denda.</p>
+                        <p><strong>3. Pembayaran</strong><br>Tagihan harus dibayar dalam 5 hari. Keterlambatan dikenakan denda Rp 5.000/hari. Setelah 1 minggu, barang akan di-hold.</p>
+                        <p><strong>4. Lelang</strong><br>Barang yang tidak diklaim setelah 15 hari (12 hari + 3 hari grace) akan dilelang.</p>
+                        <p><strong>5. Blacklist</strong><br>Customer yang kabur/tidak membayar akan di-blacklist dan tidak dapat menggunakan layanan lagi.</p>
+                        <p><strong>6. Sensitive & Garment</strong><br>Barang sensitive dan garment dikenakan rate khusus. Wajib declare saat setor resi.</p>
+                    </div>
+                    <div class="px-6 py-4 border-t border-gray-100 sticky bottom-0 bg-white">
+                        <button wire:click="$set('showTnc', false)" class="w-full bg-primary text-white text-[14px] font-medium rounded-[8px] py-2 hover:bg-primary/90">Saya Mengerti</button>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-body text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/40" href="{{ route('login') }}" wire:navigate>

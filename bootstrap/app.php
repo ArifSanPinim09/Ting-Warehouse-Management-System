@@ -36,12 +36,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'active' => \App\Http\Middleware\EnsureUserIsActive::class,
+            'blacklist' => \App\Http\Middleware\CheckBlacklist::class, // Sprint 3
         ]);
 
         // Append EnsureUserIsActive to web middleware group
         // PRD §7.5: Check if account is active on every authenticated request
         $middleware->web(append: [
             \App\Http\Middleware\EnsureUserIsActive::class,
+            \App\Http\Middleware\CheckBlacklist::class, // Sprint 3: Block blacklisted users
         ]);
 
         // PRD §20.4: Security headers on all responses

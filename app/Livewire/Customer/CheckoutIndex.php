@@ -30,6 +30,10 @@ class CheckoutIndex extends Component
     public bool $confirmation = false;
     public bool $submitting = false;
 
+    // Sprint 3: Ekspedisi + ongkir
+    public ?int $ekspedisiId = null;
+    public string $ongkir = '0';
+
     public function updatingFilterStatus(): void { $this->resetPage(); }
 
     public function openForm(): void
@@ -41,7 +45,7 @@ class CheckoutIndex extends Component
     public function closeForm(): void
     {
         $this->showForm = false;
-        $this->reset(['invoiceId', 'addressType', 'recipientName', 'recipientPhone', 'address', 'senderName', 'senderPhone', 'confirmation']);
+        $this->reset(['invoiceId', 'addressType', 'recipientName', 'recipientPhone', 'address', 'senderName', 'senderPhone', 'confirmation', 'ekspedisiId', 'ongkir']);
         $this->resetValidation();
     }
 
@@ -56,6 +60,9 @@ class CheckoutIndex extends Component
             'senderName' => [$this->addressType === 'dropship' ? 'required' : 'nullable', 'string', 'max:255'],
             'senderPhone' => [$this->addressType === 'dropship' ? 'required' : 'nullable', 'string', 'max:20'],
             'confirmation' => ['required', 'accepted'],
+            // Sprint 3: Ekspedisi
+            'ekspedisiId' => ['nullable', 'exists:ekspedisis,id'],
+            'ongkir' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
         ], [
             'invoiceId.required' => 'Pilih invoice terlebih dahulu',
             'invoiceId.exists' => 'Invoice tidak ditemukan',
@@ -105,6 +112,9 @@ class CheckoutIndex extends Component
             'sender_name' => $this->addressType === 'dropship' ? $this->senderName : null,
             'sender_phone' => $this->addressType === 'dropship' ? $this->senderPhone : null,
             'status' => Checkout::STATUS_REQUEST,
+            // Sprint 3: Ekspedisi + ongkir
+            'ekspedisi_id' => $this->ekspedisiId,
+            'ongkir' => $this->ongkir ?: 0,
         ]);
 
         $this->closeForm();
@@ -116,7 +126,7 @@ class CheckoutIndex extends Component
     public function render()
     {
         $checkouts = Checkout::where('customer_id', auth()->id())
-            ->with(['invoice', 'invoice.box'])
+            ->with(['invoice', 'invoice.box', 'ekspedisi'])
             ->when($this->filterStatus, function ($query) {
                 $query->where('status', $this->filterStatus);
             })
@@ -132,7 +142,10 @@ class CheckoutIndex extends Component
             ->with('box')
             ->get();
 
-        return view('livewire.customer.checkout.index', compact('checkouts', 'verifiedInvoices'))
+        // Sprint 3: Active ekspedisi list
+        $ekspedisis = \App\Models\Ekspedisi::getActive();
+
+        return view('livewire.customer.checkout.index', compact('checkouts', 'verifiedInvoices', 'ekspedisis'))
             ->layout('layouts.app');
     }
 }
