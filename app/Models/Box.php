@@ -19,6 +19,9 @@ class Box extends Model
     protected $fillable = [
         'type',
         'tracking_number',
+        'cargo_destination',
+        'cargo_tracking_number',
+        'cargo_photo',
         'batch_name',
         'huruf_box',
         'status',
