@@ -213,6 +213,19 @@
                     @endif
                 </div>
 
+                {{-- Flow Website: Garment Item --}}
+                <div class="ds-card p-5 space-y-5">
+                    <div class="flex items-start gap-3">
+                        <div class="flex items-center h-5 mt-0.5">
+                            <input type="checkbox" wire:model="isGarment" id="is_garment" class="rounded border-gray-300 text-accent focus:ring-accent/20" />
+                        </div>
+                        <div>
+                            <label for="is_garment" class="text-body font-medium text-gray-800">Barang Garment</label>
+                            <p class="text-caption text-gray-500 mt-0.5">Centang jika barang termasuk kategori garment (pakaian, kain, tekstil)</p>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Submit --}}
                 <div class="flex items-center justify-end gap-3 pt-2">
                     <a href="{{ route('dashboard') }}" wire:navigate class="ds-btn-secondary">Batal</a>

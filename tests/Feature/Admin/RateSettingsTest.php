@@ -21,7 +21,8 @@ class RateSettingsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->admin = User::factory()->create(['role' => 'admin', 'status' => User::STATUS_ACTIVE]);
+        // Flow Website: kurs edit is Owner-only (QA BUG-005 fix)
+        $this->admin = User::factory()->create(['role' => 'owner', 'status' => User::STATUS_ACTIVE]);
 
         // Seed default rates (no longer kurs_yuan_idr — that's now in kurs_history)
         Setting::create(['key' => 'rate_sharing_air_berat', 'value' => '255', 'group' => 'rate_sharing']);

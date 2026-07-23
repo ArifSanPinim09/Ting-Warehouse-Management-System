@@ -56,6 +56,10 @@ new #[Layout('layouts.guest')] class extends Component
         $validated['tnc_accepted'] = true;
         $validated['tnc_accepted_at'] = now();
 
+        // Auto-generate unique customer_code (Nama ID) from name initials
+        // Flow Website: Nama ID customer harus unik & tidak bisa diganti setelah register
+        $validated['customer_code'] = $this->generateUniqueCustomerCode($validated['name']);
+
         event(new Registered($user = User::create($validated)));
 
         // Notify admins about new registration (PRD §4.1)
@@ -89,6 +93,30 @@ new #[Layout('layouts.guest')] class extends Component
     protected function throttleKey(): string
     {
         return Str::transliterate('register|' . request()->ip());
+    }
+
+    /**
+     * Generate a unique 3-letter customer_code from customer name.
+     * Takes first letters of up to 3 words, uppercase. Appends number if collision.
+     * Example: "Rina Wijaya" → "RIW", "Budi" → "BUD", "Budi" again → "BUD2"
+     */
+    protected function generateUniqueCustomerCode(string $name): string
+    {
+        $words = explode(' ', trim($name));
+        $code = '';
+        foreach (array_slice($words, 0, 3) as $word) {
+            $code .= strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $word), 0, 1));
+        }
+        $code = str_pad($code ?: 'XXX', 3, 'X');
+
+        $base = $code;
+        $suffix = 1;
+        while (\App\Models\User::where('customer_code', $code)->exists()) {
+            $suffix++;
+            $code = $base . $suffix;
+        }
+
+        return $code;
     }
 }; ?>
 

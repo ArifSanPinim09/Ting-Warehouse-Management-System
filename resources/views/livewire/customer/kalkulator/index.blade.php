@@ -89,6 +89,15 @@
                             <p class="text-caption text-gray-500 mt-0.5">Kena rate berbeda untuk barang kategori khusus</p>
                         </div>
                     </label>
+
+                    {{-- Flow Website: Garment option --}}
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" wire:model.live="isGarment" class="mt-0.5 rounded border-gray-300 text-accent focus:ring-accent/20" />
+                        <div>
+                            <span class="text-body font-medium text-gray-800">Barang Garment</span>
+                            <p class="text-caption text-gray-500 mt-0.5">Kena rate garment untuk pakaian, kain, tekstil</p>
+                        </div>
+                    </label>
                 </div>
 
                 <button wire:click="calculate" class="ds-btn-primary ds-btn-lg w-full justify-center">

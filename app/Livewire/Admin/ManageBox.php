@@ -315,14 +315,23 @@ class ManageBox extends Component
         $box = Box::findOrFail($this->selectedBoxId);
         $oldStatus = $box->status;
 
-        // Allow any status change (admin can fix mistakes)
+        // All 15 valid box statuses per Flow Website
         $validStatuses = [
             Box::STATUS_OPEN,
+            Box::STATUS_LAST_CLAIM,
             Box::STATUS_CLOSED,
-            Box::STATUS_SENT_TO_CARGO,
-            Box::STATUS_OTW_INA,
-            Box::STATUS_UP_INVOICE,
+            Box::STATUS_REQUEST_TO_SEND,
+            Box::STATUS_SEND_TO_CARGO,
+            Box::STATUS_ARRIVED_AT_CARGO,
+            Box::STATUS_WAITING_FOR_DEPARTURE,
+            Box::STATUS_DEPARTURE,
+            Box::STATUS_ARRIVED_INA,
+            Box::STATUS_REDLINE,
+            Box::STATUS_STEVEDORING,
+            Box::STATUS_CHECKED_BY_WH,
+            Box::STATUS_INVOICE,
             Box::STATUS_DONE,
+            Box::STATUS_REQUEST_TO_CLOSE,
         ];
 
         if (!in_array($this->pendingStatus, $validStatuses)) {

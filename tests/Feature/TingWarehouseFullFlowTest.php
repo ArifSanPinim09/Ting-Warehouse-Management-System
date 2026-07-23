@@ -805,9 +805,10 @@ class TingWarehouseFullFlowTest extends TestCase
 
     private function runTahap9_RevisiExtensions(): void
     {
-        // ── Step 21: R1 — Admin inputs kurs for today ──
+        // ── Step 21: R1 — Owner inputs kurs for today (QA BUG-005: kurs edit is Owner-only) ──
 
-        $this->actingAs($this->admin);
+        $owner = User::factory()->create(['role' => 'owner', 'status' => User::STATUS_ACTIVE]);
+        $this->actingAs($owner);
 
         $today = now()->format('Y-m-d');
         Livewire::test(\App\Livewire\Admin\KursHistoryIndex::class)
@@ -819,7 +820,7 @@ class TingWarehouseFullFlowTest extends TestCase
         $kurs = KursHistory::whereDate('effective_date', $today)->first();
         $this->assertNotNull($kurs, 'Kurs history must be created');
         $this->assertEquals(2650.0, (float) $kurs->kurs_value);
-        $this->assertEquals($this->admin->id, $kurs->input_by);
+        $this->assertEquals($owner->id, $kurs->input_by);
 
         $kursLog = ActivityLog::where('subject_type', KursHistory::class)
             ->where('subject_id', $kurs->id)

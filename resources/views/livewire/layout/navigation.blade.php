@@ -17,6 +17,7 @@ new class extends Component
     $isCustomer = $user->isCustomer();
     $navItems = $isCustomer ? [
         ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'home'],
+        ['label' => 'Mesin Pencari Resi', 'route' => 'customer.resi-search', 'icon' => 'search'],
         ['label' => 'Box Sharing', 'route' => 'customer.box.sharing', 'icon' => 'box'],
         ['label' => 'Box Direct', 'route' => 'customer.box.direct', 'icon' => 'box'],
         ['label' => 'Setor Resi', 'route' => 'customer.setor-resi', 'icon' => 'document'],

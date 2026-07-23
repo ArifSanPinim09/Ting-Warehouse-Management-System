@@ -19,6 +19,7 @@ class Kalkulator extends Component
     public string $width = '';
     public string $height = '';
     public bool $isSensitive = false;
+    public bool $isGarment = false; // Flow Website: Garment option
 
     public ?array $result = null;
     public bool $calculated = false;
@@ -47,6 +48,7 @@ class Kalkulator extends Component
             width: (float) $this->width,
             height: (float) $this->height,
             isSensitive: $this->isSensitive,
+            isGarment: $this->isGarment, // Flow Website: pass garment flag
         );
 
         $this->calculated = true;
@@ -54,7 +56,7 @@ class Kalkulator extends Component
 
     public function resetForm(): void
     {
-        $this->reset(['weight', 'length', 'width', 'height', 'isSensitive', 'result', 'calculated']);
+        $this->reset(['weight', 'length', 'width', 'height', 'isSensitive', 'isGarment', 'result', 'calculated']);
     }
 
     public function render()

@@ -47,14 +47,21 @@ class ResiSearch extends Component
             'resi_number' => $item->resi_number,
             'name' => $item->name,
             'quantity' => $item->quantity,
+            'customer_name' => $item->customer?->name ?? '-',
             'is_sensitive' => $item->is_sensitive,
             'is_garment' => $item->is_garment,
+            'request_note' => $item->notes ?? null,
+            'add_on' => $item->add_on ?? null,
             'box_name' => $item->box?->display_name ?? '-',
             'box_status' => $item->box?->status ?? '-',
             'box_method' => $item->box?->method ?? '-',
+            'box_number' => $item->box?->huruf_box ?? '-',
             'status_display' => $statusDisplay,
             'foto_china' => $item->whChinaData?->foto_arrived_china 
                 ? \Illuminate\Support\Facades\Storage::url($item->whChinaData->foto_arrived_china) 
+                : null,
+            'foto_co' => $item->proof_co
+                ? \Illuminate\Support\Facades\Storage::url($item->proof_co) 
                 : null,
         ];
     }

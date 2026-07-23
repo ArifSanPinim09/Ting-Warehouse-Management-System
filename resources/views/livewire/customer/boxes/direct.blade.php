@@ -436,17 +436,29 @@
 
                     {{-- Modal Body --}}
                     <form wire:submit.prevent="createDirectBatch" class="p-6 space-y-4">
+                        {{-- Flow Website: Nomor Batch --}}
                         <div>
-                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Nama Batch <span class="text-red-500">*</span></label>
-                            <input type="text" wire:model="newBatchName" maxlength="100" placeholder="Contoh: TW-2026-DIRECT-001"
-                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
-                            @error('newBatchName') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Nomor Batch <span class="text-red-500">*</span></label>
+                            <input type="number" wire:model="newBatchNumber" min="1" placeholder="Contoh: 1, 2, 3..."
+                                class="ds-input @error('newBatchNumber') ds-input-error @enderror" />
+                            @error('newBatchNumber') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            <p class="text-[11px] text-gray-400 mt-1">Format otomatis: {{ auth()->user()->customer_code ?? 'XXX' }}_SEA/AIR_B-NomorBatch</p>
+                        </div>
+
+                        {{-- Flow Website: Cargo:SEA/AIR --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Cargo <span class="text-red-500">*</span></label>
+                            <select wire:model="newCargoType" class="ds-input @error('newCargoType') ds-input-error @enderror">
+                                <option value="sea">SEA (Laut)</option>
+                                <option value="air">AIR (Udara)</option>
+                            </select>
+                            @error('newCargoType') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
                             <label class="block text-[12px] font-medium text-gray-600 mb-1">Tanggal Buka <span class="text-red-500">*</span></label>
                             <input type="date" wire:model="newOpenDate"
-                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                                class="ds-input @error('newOpenDate') ds-input-error @enderror" />
                             @error('newOpenDate') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 

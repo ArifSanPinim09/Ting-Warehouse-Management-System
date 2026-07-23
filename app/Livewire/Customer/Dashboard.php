@@ -51,6 +51,26 @@ class Dashboard extends Component
         $unpaidInvoices = (float) ($invoiceStats->unpaid_total ?? 0);
         $unpaidCount = (int) ($invoiceStats->unpaid_count ?? 0);
 
+        // Flow Website: Tagihan Berlangsung (invoice belum verified)
+        $tagihanBerlangsung = Invoice::where('customer_id', $user->id)
+            ->whereIn('status', ['waiting_payment', 'waiting_verification'])
+            ->count();
+
+        // Flow Website: History Pengiriman (invoice verified)
+        $historyPengiriman = Invoice::where('customer_id', $user->id)
+            ->where('status', 'verified')
+            ->count();
+
+        // Flow Website: Checkout History (checkout status sent)
+        $checkoutHistory = \App\Models\Checkout::where('customer_id', $user->id)
+            ->where('status', 'sent')
+            ->count();
+
+        // Flow Website: Info box notuan (items customer dengan status no_tuan)
+        $notuanCount = Item::where('customer_id', $user->id)
+            ->where('status', Item::STATUS_NO_TUAN)
+            ->count();
+
         // REV-01.3: Hanya tampilkan sharing box dimana customer punya item
         // + direct box milik customer ini
         $activeBoxes = Box::where(function ($query) use ($user) {
@@ -180,6 +200,10 @@ class Dashboard extends Component
             'activeBoxes',
             'unpaidInvoices',
             'unpaidCount',
+            'tagihanBerlangsung',
+            'historyPengiriman',
+            'checkoutHistory',
+            'notuanCount',
             'goodsThisMonth',
             'receiptsThisMonth',
             'kursYuan',

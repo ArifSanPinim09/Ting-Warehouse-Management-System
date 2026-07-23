@@ -110,7 +110,44 @@
             </a>
         </div>
 
-        {{-- REV-01.2: Open Box Info Banner --}}
+        {{-- Flow Website: Tagihan Berlangsung, History Pengiriman, Checkout History --}}
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {{-- Tagihan Berlangsung --}}
+            <a href="{{ route('customer.invoice') }}" wire:navigate class="ds-stat group cursor-pointer hover:shadow-card-hover transition-all" aria-label="Lihat tagihan berlangsung">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="ds-stat-icon bg-amber-50 text-amber-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                    </div>
+                    @if($tagihanBerlangsung > 0)
+                        <span class="ds-badge-warning text-micro">Aktif</span>
+                    @endif
+                </div>
+                <div class="ds-stat-value">{{ $tagihanBerlangsung }}</div>
+                <div class="ds-stat-label">Tagihan Berlangsung</div>
+            </a>
+
+            {{-- History Pengiriman --}}
+            <a href="{{ route('customer.invoice') }}" wire:navigate class="ds-stat group cursor-pointer hover:shadow-card-hover transition-all" aria-label="Lihat history pengiriman">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="ds-stat-icon bg-emerald-50 text-emerald-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                </div>
+                <div class="ds-stat-value">{{ $historyPengiriman }}</div>
+                <div class="ds-stat-label">History Pengiriman</div>
+            </a>
+
+            {{-- Checkout History --}}
+            <a href="{{ route('customer.checkout') }}" wire:navigate class="ds-stat group cursor-pointer hover:shadow-card-hover transition-all" aria-label="Lihat checkout history">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="ds-stat-icon bg-violet-50 text-violet-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                    </div>
+                </div>
+                <div class="ds-stat-value">{{ $checkoutHistory }}</div>
+                <div class="ds-stat-label">Checkout History</div>
+            </a>
+        </div>
         @if($openBoxes && $openBoxes->isNotEmpty())
             <div class="bg-emerald-50 border border-emerald-200 rounded-[12px] px-5 py-3 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
@@ -140,6 +177,27 @@
                         <p class="text-caption text-blue-600 mt-0.5">Klik di sini untuk melihat dan mengklaim resi yang mungkin milik Anda.</p>
                     </div>
                     <svg class="w-5 h-5 text-blue-400 flex-shrink-0 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </a>
+        @endif
+
+        {{-- Flow Website: Info box notuan [notif] --}}
+        @if($notuanCount > 0)
+            <a href="{{ route('customer.no-tuan') }}" wire:navigate
+                class="block bg-orange-50 border border-orange-200 rounded-[12px] p-4 hover:bg-orange-100/50 transition-colors group">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-200 transition-colors">
+                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-body font-semibold text-orange-800">Ada {{ $notuanCount }} barang No Tuan (tanpa pemilik)</p>
+                        <p class="text-caption text-orange-600 mt-0.5">Klik di sini untuk melihat dan mengklaim barang yang mungkin milik Anda.</p>
+                    </div>
+                    <svg class="w-5 h-5 text-orange-400 flex-shrink-0 group-hover:text-orange-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
                 </div>

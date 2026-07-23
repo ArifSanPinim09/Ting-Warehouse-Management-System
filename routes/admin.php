@@ -42,8 +42,8 @@ Route::middleware(['auth', 'verified', 'role:admin,owner'])->prefix('admin')->na
     // Verification (PRD §4.11, §8.13)
     Route::get('/verification', VerificationIndex::class)->name('verification');
 
-    // Settings / Rate (PRD §4.12, §8.14)
-    Route::get('/settings', SettingsIndex::class)->name('settings');
+    // Settings / Rate — Owner only (Flow Website: Admin INA tidak bisa lihat Pengaturan Rate)
+    Route::middleware(['role:owner'])->get('/settings', SettingsIndex::class)->name('settings');
 
     // Info Customer (PRD §4.14)
     Route::get('/customers', CustomerIndex::class)->name('customers');
@@ -60,7 +60,7 @@ Route::middleware(['auth', 'verified', 'role:admin,owner'])->prefix('admin')->na
     // Complains (PRD §4.7, §7.3)
     Route::get('/complains', ManageComplain::class)->name('complains');
 
-    // History Kurs (Revisi §2.2, §4.1)
+    // History Kurs — Owner only edit, admin view (Flow Website: hanya Owner bisa ubah rate)
     Route::get('/kurs-history', KursHistoryIndex::class)->name('kurs-history');
 
     // Barang Lelang (Revisi §2.9, §4.1)

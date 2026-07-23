@@ -28,6 +28,8 @@ class BoxDirect extends Component
     public bool $showCreateModal = false;
     public string $newBatchName = '';
     public string $newOpenDate = '';
+    public string $newCargoType = 'sea'; // Flow Website: SEA/AIR pilihan
+    public string $newBatchNumber = ''; // Flow Website: Nomor Batch
 
     public function updatingSearch(): void
     {
@@ -56,6 +58,8 @@ class BoxDirect extends Component
     {
         $this->newBatchName = '';
         $this->newOpenDate = now()->format('Y-m-d');
+        $this->newCargoType = 'sea'; // Flow Website: default SEA
+        $this->newBatchNumber = '';
         $this->showCreateModal = true;
     }
 
@@ -64,31 +68,39 @@ class BoxDirect extends Component
         $this->showCreateModal = false;
         $this->newBatchName = '';
         $this->newOpenDate = '';
+        $this->newCargoType = 'sea';
+        $this->newBatchNumber = '';
     }
 
     public function createDirectBatch(): void
     {
         $this->validate([
-            'newBatchName' => 'required|string|max:100',
+            'newBatchNumber' => 'required|integer|min:1',
+            'newCargoType' => 'required|in:sea,air',
             'newOpenDate' => 'required|date',
         ], [
-            'newBatchName.required' => 'Nama batch wajib diisi.',
+            'newBatchNumber.required' => 'Nomor batch wajib diisi.',
+            'newCargoType.required' => 'Jenis cargo wajib dipilih.',
             'newOpenDate.required' => 'Tanggal buka wajib diisi.',
         ]);
 
         $user = auth()->user();
 
+        // Flow Website: auto-generate NamaID_SEA/AIR_B-NoBatch
+        $namaId = $user->customer_code ?: strtoupper(substr($user->name, 0, 3));
+        $autoName = $namaId . '_' . strtoupper($this->newCargoType) . '_B-' . $this->newBatchNumber;
+
         Box::create([
-            'batch_name' => $this->newBatchName,
+            'batch_name' => $autoName,
             'type' => 'direct',
-            'method' => 'sea', // default, admin can change
+            'method' => $this->newCargoType,
             'status' => Box::STATUS_OPEN,
             'customer_id' => $user->id,
             'open_date' => $this->newOpenDate,
         ]);
 
         $this->closeCreateModal();
-        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: 'Batch direct berhasil dibuat.');
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: 'Batch direct berhasil dibuat: ' . $autoName);
     }
 
     // ─── REV-04.6: Request to Close ────────────────────────────

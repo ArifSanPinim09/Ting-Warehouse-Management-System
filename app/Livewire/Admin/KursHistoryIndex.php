@@ -42,6 +42,12 @@ class KursHistoryIndex extends Component
      */
     public function editKurs(int $id): void
     {
+        // Only owner can edit kurs (Flow Website: hanya Owner bisa ubah rate)
+        if (auth()->user()->role !== 'owner') {
+            $this->dispatch('toast', type: 'error', title: 'Akses Ditolak', message: 'Hanya Owner yang dapat mengubah kurs.');
+            return;
+        }
+
         $kurs = KursHistory::findOrFail($id);
         $this->editingId = $kurs->id;
         $this->kurs_value = (string) $kurs->kurs_value;
@@ -51,6 +57,12 @@ class KursHistoryIndex extends Component
 
     public function saveKurs(AuditLogService $auditService): void
     {
+        // Only owner can save kurs (Flow Website: hanya Owner bisa ubah rate)
+        if (auth()->user()->role !== 'owner') {
+            $this->dispatch('toast', type: 'error', title: 'Akses Ditolak', message: 'Hanya Owner yang dapat menyimpan kurs.');
+            return;
+        }
+
         $this->validate([
             'kurs_value' => 'required|numeric|min:1|max:99999',
             'effective_date' => 'required|date|before_or_equal:today',

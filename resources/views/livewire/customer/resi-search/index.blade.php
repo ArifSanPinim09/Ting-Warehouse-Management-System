@@ -52,10 +52,10 @@
                         <div class="text-right">
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-[13px] font-semibold
                                 {{ str_contains(strtolower($result['status_display']), 'lelang') ? 'bg-red-100 text-red-700' :
-                                   str_contains(strtolower($result['status_display']), 'hold') ? 'bg-orange-100 text-orange-700' :
-                                   str_contains(strtolower($result['status_display']), 'notuan') ? 'bg-yellow-100 text-yellow-700' :
-                                   str_contains(strtolower($result['status_display']), 'belum') ? 'bg-blue-100 text-blue-700' :
-                                   'bg-green-100 text-green-700' }}">
+                                   (str_contains(strtolower($result['status_display']), 'hold') ? 'bg-orange-100 text-orange-700' :
+                                   (str_contains(strtolower($result['status_display']), 'notuan') ? 'bg-yellow-100 text-yellow-700' :
+                                   (str_contains(strtolower($result['status_display']), 'belum') ? 'bg-blue-100 text-blue-700' :
+                                   'bg-green-100 text-green-700'))) }}">
                                 {{ $result['status_display'] }}
                             </span>
                         </div>
@@ -64,8 +64,16 @@
 
                 <div class="p-6 grid grid-cols-2 gap-4">
                     <div>
+                        <p class="text-[12px] text-gray-400 font-medium uppercase">Customer</p>
+                        <p class="text-[14px] font-medium text-gray-900">{{ $result['customer_name'] }}</p>
+                    </div>
+                    <div>
                         <p class="text-[12px] text-gray-400 font-medium uppercase">Box</p>
                         <p class="text-[14px] font-medium text-gray-900">{{ $result['box_name'] }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[12px] text-gray-400 font-medium uppercase">Box Number</p>
+                        <p class="text-[14px] font-medium text-gray-900">{{ $result['box_number'] }}</p>
                     </div>
                     <div>
                         <p class="text-[12px] text-gray-400 font-medium uppercase">Method</p>
@@ -89,12 +97,31 @@
                             @endif
                         </div>
                     </div>
+                    @if($result['request_note'])
+                    <div>
+                        <p class="text-[12px] text-gray-400 font-medium uppercase">Request</p>
+                        <p class="text-[14px] font-medium text-gray-900">{{ $result['request_note'] }}</p>
+                    </div>
+                    @endif
+                    @if($result['add_on'])
+                    <div>
+                        <p class="text-[12px] text-gray-400 font-medium uppercase">Add On</p>
+                        <p class="text-[14px] font-medium text-gray-900">Rp {{ number_format($result['add_on'], 0, ',', '.') }}</p>
+                    </div>
+                    @endif
                 </div>
 
-                @if($result['foto_china'])
+                @if($result['foto_china'] || $result['foto_co'])
                     <div class="px-6 pb-6">
                         <p class="text-[12px] text-gray-400 font-medium uppercase mb-2">Foto Barang</p>
-                        <img src="{{ $result['foto_china'] }}" alt="Foto barang" class="w-32 h-32 object-cover rounded-[8px] border border-gray-100">
+                        <div class="flex gap-3">
+                            @if($result['foto_co'])
+                                <img src="{{ $result['foto_co'] }}" alt="Foto bukti barang" class="w-32 h-32 object-cover rounded-[8px] border border-gray-100">
+                            @endif
+                            @if($result['foto_china'])
+                                <img src="{{ $result['foto_china'] }}" alt="Foto arrived WH China" class="w-32 h-32 object-cover rounded-[8px] border border-gray-100">
+                            @endif
+                        </div>
                     </div>
                 @endif
             </div>
