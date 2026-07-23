@@ -277,7 +277,7 @@ class ItemStatusServiceTest extends TestCase
     {
         $statuses = Item::getValidStatuses();
 
-        $this->assertCount(8, $statuses);
+        $this->assertCount(13, $statuses);
         $this->assertContains(Item::STATUS_ACTIVE, $statuses);
         $this->assertContains(Item::STATUS_NO_TUAN, $statuses);
         $this->assertContains(Item::STATUS_CLAIMED, $statuses);
@@ -286,6 +286,12 @@ class ItemStatusServiceTest extends TestCase
         $this->assertContains(Item::STATUS_HOLD, $statuses);
         $this->assertContains(Item::STATUS_DIJUAL, $statuses);
         $this->assertContains(Item::STATUS_LELANG, $statuses);
+        // Sprint 5C: New statuses
+        $this->assertContains(Item::STATUS_OTW, $statuses);
+        $this->assertContains(Item::STATUS_SEND_BACK, $statuses);
+        $this->assertContains(Item::STATUS_SEND_DIFF, $statuses);
+        $this->assertContains(Item::STATUS_NEVER_ARRIVED, $statuses);
+        $this->assertContains(Item::STATUS_WRONG_ADDRESS, $statuses);
     }
 
     // ─── Full Flow Test ─────────────────────────────────────────────

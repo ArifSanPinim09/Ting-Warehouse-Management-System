@@ -627,6 +627,14 @@
                             @error('hurufBox') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
+                        {{-- Sprint 5B: China Batch Name (untuk Matched Data) --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">China Batch Name <span class="text-gray-400 font-normal">(optional)</span></label>
+                            <input type="text" wire:model="chinaBatchName" maxlength="50" placeholder="e.g. 20072607-26"
+                                class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors">
+                            <p class="text-[11px] text-gray-400 mt-1">Batch Admin China untuk Matched Data di Manage Box</p>
+                        </div>
+
                         {{-- Photo (required) --}}
                         <div>
                             <label class="block text-[12px] font-medium text-gray-600 mb-1">Photo <span class="text-red-500">*</span></label>

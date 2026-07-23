@@ -171,6 +171,10 @@
                                     <span class="font-medium text-gray-800">{{ $selectedCustomer->line_id ?? '-' }}</span>
                                 </div>
                                 <div class="flex justify-between text-body">
+                                    <span class="text-gray-500">Customer Code</span>
+                                    <span class="font-medium text-gray-800">{{ $selectedCustomer->customer_code ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between text-body">
                                     <span class="text-gray-500">Rate Air</span>
                                     <span class="font-medium text-gray-800">{{ $selectedCustomer->custom_rate_air ?? 'Global' }}</span>
                                 </div>
@@ -273,6 +277,15 @@
                                     </button>
                                 @endif
 
+                                {{-- Reset Password Button --}}
+                                <button
+                                    wire:click="openResetPasswordConfirm"
+                                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-amber-600 text-body font-medium rounded-[8px] border border-amber-200 hover:bg-amber-50 transition-colors"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                    Reset Password
+                                </button>
+
                                 {{-- Delete Button --}}
                                 <button
                                     wire:click="openDeleteConfirm"
@@ -348,7 +361,7 @@
                             @error('editAddress') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
-                        {{-- LINE ID + Status --}}
+                        {{-- LINE ID + Customer Code --}}
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[12px] font-medium text-gray-600 mb-1">LINE ID</label>
@@ -356,14 +369,22 @@
                                     class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                             </div>
                             <div>
-                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Status <span class="text-red-500">*</span></label>
-                                <select wire:model="editStatus" class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
-                                    <option value="pending">Pending</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
-                                @error('editStatus') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                                <label class="block text-[12px] font-medium text-gray-600 mb-1">Customer Code</label>
+                                <input type="text" wire:model="editCustomerCode" maxlength="10" placeholder="Misal: LIX"
+                                    class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                @error('editCustomerCode') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
+                        </div>
+
+                        {{-- Status --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Status <span class="text-red-500">*</span></label>
+                            <select wire:model="editStatus" class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                <option value="pending">Pending</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                            @error('editStatus') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Custom Rates --}}
@@ -432,6 +453,47 @@
                             Hapus
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Sprint 5B: Reset Password Modal --}}
+    @if($showResetPasswordConfirm)
+        <div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div class="fixed inset-0 bg-gray-900/50" wire:click="closeResetPasswordConfirm"></div>
+            <div class="relative bg-white rounded-[12px] shadow-xl max-w-md w-full p-6 z-10">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[16px] font-semibold text-gray-900">Reset Password Customer</h3>
+                        <p class="text-body text-gray-500 mt-1">
+                            Masukkan password baru untuk
+                            <span class="font-semibold text-gray-700">{{ $selectedCustomer->name ?? '' }}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-[13px] font-medium text-gray-700 mb-1.5">Password Baru <span class="text-red-500">*</span></label>
+                    <input
+                        type="password"
+                        wire:model="newPassword"
+                        placeholder="Minimal 8 karakter"
+                        class="w-full px-3 py-2.5 text-body border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/30"
+                    >
+                    @error('newPassword') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="flex items-center gap-3 justify-end">
+                    <button wire:click="closeResetPasswordConfirm" class="px-4 py-2 text-body font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">
+                        Batal
+                    </button>
+                    <button wire:click="resetPassword" class="px-4 py-2 text-body font-medium text-white bg-amber-600 rounded-[8px] hover:bg-amber-700 transition-colors">
+                        Reset Password
+                    </button>
                 </div>
             </div>
         </div>

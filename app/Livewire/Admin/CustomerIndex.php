@@ -31,12 +31,50 @@ class CustomerIndex extends Component
     public string $editKtpNumber = '';
     public string $editAddress = '';
     public string $editLineId = '';
+    public string $editCustomerCode = '';
     public string $editStatus = '';
     public string $editCustomRateAir = '';
     public string $editCustomRateSea = '';
 
     // ─── Delete Confirmation ───────────────────────────────────
     public bool $showDeleteConfirm = false;
+
+    // ─── Password Reset ────────────────────────────────────────
+    public bool $showResetPasswordConfirm = false;
+    public string $newPassword = '';
+
+    public function openResetPasswordConfirm(): void
+    {
+        $this->newPassword = '';
+        $this->showResetPasswordConfirm = true;
+    }
+
+    public function closeResetPasswordConfirm(): void
+    {
+        $this->showResetPasswordConfirm = false;
+        $this->newPassword = '';
+    }
+
+    public function resetPassword(AuditLogService $auditService): void
+    {
+        $this->validate([
+            'newPassword' => 'required|string|min:8|max:50',
+        ], [
+            'newPassword.required' => 'Password baru wajib diisi.',
+            'newPassword.min' => 'Password minimal 8 karakter.',
+        ]);
+
+        $customer = User::findOrFail($this->selectedId);
+        $customer->password = bcrypt($this->newPassword);
+        $customer->save();
+
+        $auditService->logCustom($customer, 'password_reset', "Password customer {$customer->name} direset oleh admin");
+
+        $this->showResetPasswordConfirm = false;
+        $this->newPassword = '';
+
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "Password {$customer->name} berhasil direset.");
+    }
 
     public function selectCustomer(int $id): void
     {
@@ -96,6 +134,7 @@ class CustomerIndex extends Component
         $this->editKtpNumber = $customer->ktp_number ?? '';
         $this->editAddress = $customer->address ?? '';
         $this->editLineId = $customer->line_id ?? '';
+        $this->editCustomerCode = $customer->customer_code ?? '';
         $this->editStatus = $customer->status;
         $this->editCustomRateAir = $customer->custom_rate_air !== null ? (string) $customer->custom_rate_air : '';
         $this->editCustomRateSea = $customer->custom_rate_sea !== null ? (string) $customer->custom_rate_sea : '';
@@ -118,6 +157,7 @@ class CustomerIndex extends Component
             'editKtpNumber' => 'nullable|string|max:30',
             'editAddress' => 'nullable|string|max:500',
             'editLineId' => 'nullable|string|max:50',
+            'editCustomerCode' => 'nullable|string|max:10|unique:users,customer_code,' . $customer->id,
             'editStatus' => 'required|in:pending,active,inactive',
             'editCustomRateAir' => 'nullable|numeric|min:0',
             'editCustomRateSea' => 'nullable|numeric|min:0',
@@ -143,6 +183,7 @@ class CustomerIndex extends Component
             'ktp_number' => $this->editKtpNumber ?: null,
             'address' => $this->editAddress ?: null,
             'line_id' => $this->editLineId ?: null,
+            'customer_code' => $this->editCustomerCode ?: null,
             'status' => $this->editStatus,
             'custom_rate_air' => $this->editCustomRateAir !== '' ? (float) $this->editCustomRateAir : null,
             'custom_rate_sea' => $this->editCustomRateSea !== '' ? (float) $this->editCustomRateSea : null,
@@ -182,11 +223,18 @@ class CustomerIndex extends Component
         $activeBoxes = $customer->boxes()->whereIn('status', ['OPEN', 'SENT_TO_CARGO', 'OTW_INA', 'UP_INVOICE'])->count();
         $activeInvoices = $customer->invoices()->whereIn('status', ['waiting_payment', 'waiting_verification'])->count();
 
-        if ($activeBoxes > 0 || $activeInvoices > 0) {
+        // Sprint 5B: Juga cek barang yang masih di China (box belum sampai INA)
+        $itemsInChina = $customer->items()
+            ->whereHas('box', function ($q) {
+                $q->whereNotIn('status', ['ARRIVED_INA', 'REDLINE', 'STEVEDORING', 'CHECKED_BY_WH', 'INVOICE', 'DONE']);
+            })
+            ->count();
+
+        if ($activeBoxes > 0 || $activeInvoices > 0 || $itemsInChina > 0) {
             $this->dispatch('toast',
                 type: 'error',
                 title: 'Tidak Bisa Dihapus',
-                message: "Customer memiliki {$activeBoxes} box aktif dan {$activeInvoices} invoice aktif. Selesaikan dulu sebelum menghapus.",
+                message: "Customer memiliki {$activeBoxes} box aktif, {$activeInvoices} invoice aktif, dan {$itemsInChina} barang masih di China. Selesaikan dulu sebelum menghapus.",
             );
             $this->showDeleteConfirm = false;
             return;

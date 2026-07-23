@@ -19,6 +19,7 @@ class WhChinaData extends Model
         'volume',
         'ukuran_box',
         'huruf_box',
+        'china_batch_name',
         'biaya_jasa',
         'biaya_tax',
         'foto_barang',

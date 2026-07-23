@@ -69,6 +69,77 @@
             </div>
         </div>
 
+        {{-- Sprint 5B: Laporan Keuangan per Kategori --}}
+        <div class="bg-white rounded-[12px] border border-gray-100 p-5">
+            <h3 class="text-body font-semibold text-gray-800 mb-4">Laporan per Kategori</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {{-- Pengeluaran China --}}
+                <div class="p-4 rounded-[8px] bg-red-50 border border-red-100">
+                    <p class="text-caption text-red-600 font-medium uppercase tracking-wide">Pengeluaran China</p>
+                    <p class="text-[18px] font-bold text-red-700 mt-1">Rp {{ number_format($totalFeesRupiah, 0, ',', '.') }}</p>
+                    <p class="text-[11px] text-red-400 mt-0.5">{{ number_format($totalFeesYuan, 2) }} Yuan @ {{ number_format($kursYuan, 0) }}</p>
+                </div>
+                {{-- Biaya Box --}}
+                <div class="p-4 rounded-[8px] bg-orange-50 border border-orange-100">
+                    <p class="text-caption text-orange-600 font-medium uppercase tracking-wide">Biaya Box</p>
+                    <p class="text-[18px] font-bold text-orange-700 mt-1">Rp {{ number_format($shippingMaterialTotalYuan * $kursYuan, 0, ',', '.') }}</p>
+                    <p class="text-[11px] text-orange-400 mt-0.5">{{ number_format($shippingMaterialTotalYuan, 2) }} Yuan</p>
+                </div>
+                {{-- Biaya Operasional --}}
+                <div class="p-4 rounded-[8px] bg-yellow-50 border border-yellow-100">
+                    <p class="text-caption text-yellow-600 font-medium uppercase tracking-wide">Biaya Operasional</p>
+                    <p class="text-[18px] font-bold text-yellow-700 mt-1">Rp {{ number_format($operasionalTotal, 0, ',', '.') }}</p>
+                </div>
+                {{-- Pemasukan --}}
+                <div class="p-4 rounded-[8px] bg-emerald-50 border border-emerald-100">
+                    <p class="text-caption text-emerald-600 font-medium uppercase tracking-wide">Pemasukan</p>
+                    <p class="text-[18px] font-bold text-emerald-700 mt-1">Rp {{ number_format($totalRevenue + $pemasukanLainTotal, 0, ',', '.') }}</p>
+                    <p class="text-[11px] text-emerald-400 mt-0.5">Invoice + Lain: {{ number_format($pemasukanLainTotal, 0, ',', '.') }}</p>
+                </div>
+                {{-- Biaya Refund --}}
+                <div class="p-4 rounded-[8px] bg-purple-50 border border-purple-100">
+                    <p class="text-caption text-purple-600 font-medium uppercase tracking-wide">Biaya Refund</p>
+                    <p class="text-[18px] font-bold text-purple-700 mt-1">Rp {{ number_format($refundTotal, 0, ',', '.') }}</p>
+                </div>
+            </div>
+
+            {{-- Recent Finance Transactions --}}
+            @if($recentTransactions && !$recentTransactions->isEmpty())
+            <div class="mt-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="text-[13px] font-semibold text-gray-700">Transaksi Terbaru</h4>
+                    <button wire:click="openTrxModal" class="text-[12px] font-medium px-3 py-1.5 rounded-[6px] bg-accent text-white hover:bg-accent-dark">
+                        + Tambah Transaksi
+                    </button>
+                </div>
+                <div class="space-y-2">
+                    @foreach($recentTransactions as $trx)
+                    <div class="flex items-center justify-between p-3 rounded-[8px] border border-gray-100 hover:bg-gray-50">
+                        <div>
+                            <p class="text-body font-medium text-gray-800">{{ $trx->description }}</p>
+                            <p class="text-caption text-gray-500">{{ ucfirst($trx->category) }} · {{ $trx->transaction_date->format('d M Y') }}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-body font-semibold {{ $trx->category === 'pemasukan_lain' ? 'text-emerald-600' : 'text-red-600' }}">
+                                {{ $trx->category === 'pemasukan_lain' ? '+' : '-' }} Rp {{ number_format($trx->amount, 0, ',', '.') }}
+                            </span>
+                            <button wire:click="editTrx({{ $trx->id }})" class="text-[11px] text-blue-600 hover:underline">Edit</button>
+                            <button wire:click="deleteTrx({{ $trx->id }})" wire:confirm="Hapus transaksi ini?" class="text-[11px] text-red-600 hover:underline">Hapus</button>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @else
+            <div class="mt-6 text-center py-4">
+                <p class="text-caption text-gray-400 mb-3">Belum ada transaksi</p>
+                <button wire:click="openTrxModal" class="text-[12px] font-medium px-3 py-1.5 rounded-[6px] bg-accent text-white hover:bg-accent-dark">
+                    + Tambah Transaksi
+                </button>
+            </div>
+            @endif
+        </div>
+
         {{-- Filters --}}
         <div class="bg-white rounded-[12px] border border-gray-100 p-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
@@ -385,5 +456,54 @@
                 </div>
             </div>
         @endif
+    @endif
+
+    {{-- Sprint 5B: Finance Transaction Modal --}}
+    @if($showTrxModal)
+        <div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div class="fixed inset-0 bg-gray-900/50" wire:click="closeTrxModal"></div>
+            <div class="relative bg-white rounded-[12px] shadow-xl max-w-md w-full p-6 z-10">
+                <h3 class="text-[16px] font-semibold text-gray-900 mb-4">{{ $editTrxId ? 'Edit' : 'Tambah' }} Transaksi</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[13px] font-medium text-gray-700 mb-1.5">Kategori <span class="text-red-500">*</span></label>
+                        <select wire:model="trxCategory" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-[8px] focus:border-accent">
+                            <option value="operasional">Biaya Operasional</option>
+                            <option value="refund">Biaya Refund</option>
+                            <option value="pemasukan_lain">Pemasukan Lain</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-medium text-gray-700 mb-1.5">Deskripsi <span class="text-red-500">*</span></label>
+                        <input type="text" wire:model="trxDescription" placeholder="Misal: Sewa warehouse Juli"
+                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-[8px] focus:border-accent">
+                        @error('trxDescription') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[13px] font-medium text-gray-700 mb-1.5">Jumlah (Rp) <span class="text-red-500">*</span></label>
+                            <input type="number" wire:model="trxAmount" placeholder="0" step="0.01"
+                                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-[8px] focus:border-accent">
+                            @error('trxAmount') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-medium text-gray-700 mb-1.5">Tanggal <span class="text-red-500">*</span></label>
+                            <input type="date" wire:model="trxDate"
+                                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-[8px] focus:border-accent">
+                            @error('trxDate') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-medium text-gray-700 mb-1.5">Catatan</label>
+                        <textarea wire:model="trxNotes" rows="2" placeholder="Opsional"
+                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-[8px] focus:border-accent"></textarea>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 justify-end mt-6">
+                    <button wire:click="closeTrxModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50">Batal</button>
+                    <button wire:click="saveTrx" class="px-4 py-2 text-sm font-medium text-white bg-accent rounded-[8px] hover:bg-accent-dark">Simpan</button>
+                </div>
+            </div>
+        </div>
     @endif
 </div>

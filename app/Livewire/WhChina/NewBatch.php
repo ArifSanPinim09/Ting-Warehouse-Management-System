@@ -64,9 +64,21 @@ class NewBatch extends Component
             'status' => Box::STATUS_OPEN,
         ]);
 
-        $this->reset(['batchName', 'hurufBox', 'openDate', 'closeDate']);
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: 'Batch baru berhasil dibuat.');
         $this->showModal = false;
-        $this->dispatch('toast', type: 'success', title: 'Batch Created', message: 'New batch created successfully.');
+    }
+
+    /**
+     * Sprint 5B: DONE button — lock batch dari input, masih bisa edit.
+     */
+    public function toggleLock(int $boxId): void
+    {
+        $box = Box::findOrFail($boxId);
+        $box->is_locked = !$box->is_locked;
+        $box->save();
+
+        $status = $box->is_locked ? 'DI-LOCK' : 'DI-UNLOCK';
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: "Batch {$box->batch_name} sudah {$status}.");
     }
 
     public function render()

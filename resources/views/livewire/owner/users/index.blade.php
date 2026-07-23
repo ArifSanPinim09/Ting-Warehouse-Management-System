@@ -283,6 +283,12 @@
                                         <span class="text-body font-mono text-gray-700">{{ $selectedUser->ktp_number }}</span>
                                     </div>
                                 @endif
+                                @if($selectedUser->customer_code)
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-caption text-gray-500">Customer Code</span>
+                                        <span class="text-body font-mono text-gray-700">{{ $selectedUser->customer_code }}</span>
+                                    </div>
+                                @endif
                                 @if($selectedUser->address)
                                     <div>
                                         <span class="text-caption text-gray-500">Alamat</span>

@@ -109,6 +109,13 @@ class UnmatchedResi extends Component
             return;
         }
 
+        // Sprint 5B: Admin China DONE — locked box tidak bisa di-claim
+        if ($box->is_locked) {
+            $this->addError('boxId', 'Batch sudah di-DONE oleh Admin China. Tidak bisa klaim barang.');
+            $this->submitting = false;
+            return;
+        }
+
         // Upload proof photo (nullable since REV-03.2)
         $proofPath = $this->proofCo ? $this->proofCo->store('proof-co', 'public') : null;
 

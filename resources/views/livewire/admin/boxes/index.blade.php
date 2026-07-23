@@ -175,9 +175,15 @@
                         {{-- Detail Header --}}
                         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                             <h3 class="text-body font-semibold text-gray-900">Detail Box</h3>
-                            <button wire:click="closeDetail" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                {{-- Sprint 5B: Import per Box --}}
+                                <a href="{{ route('admin.export.import-box', $selectedBox->id) }}" target="_blank" class="text-[12px] font-medium px-3 py-1.5 rounded-[6px] bg-white border border-gray-200 text-gray-700 hover:bg-gray-50">
+                                    📦 Import PDF
+                                </a>
+                                <button wire:click="closeDetail" class="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="p-5 space-y-5">
@@ -190,6 +196,10 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-caption text-gray-500">Batch</span>
                                     <span class="text-body text-gray-700">{{ $selectedBox->batch_name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between text-body">
+                                    <span class="text-gray-500">Matched Batch</span>
+                                    <span class="text-body text-gray-700">{{ $selectedBox->matched_batch ?? '-' }}</span>
                                 </div>
                                 @if($selectedBox->huruf_box)
                                 <div class="flex items-center justify-between">
@@ -538,6 +548,22 @@
                                 <label class="block text-caption font-medium text-gray-700 mb-1.5">Batch Name</label>
                                 <input type="text" wire:model="newBatchName" placeholder="Opsional" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                             </div>
+
+                            {{-- Sprint 5A: Matched Data — pilih batch Admin China --}}
+                            <div>
+                                <label class="block text-caption font-medium text-gray-700 mb-1.5">Matched Data (Batch Admin China)</label>
+                                @if($chinaBatches->isNotEmpty())
+                                    <select wire:model="newMatchedBatch" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                        <option value="">— Tidak ada match —</option>
+                                        @foreach($chinaBatches as $batch)
+                                            <option value="{{ $batch }}">{{ $batch }}</option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <input type="text" wire:model="newMatchedBatch" placeholder="Belum ada batch Admin China" class="w-full px-3 py-2.5 text-body bg-gray-50 border border-gray-200 rounded-[8px]">
+                                    <p class="text-[11px] text-gray-400 mt-1">Belum ada batch dari Admin China. Bisa diisi manual.</p>
+                                @endif
+                            </div>
                             <div>
                                 <label class="block text-caption font-medium text-gray-700 mb-1.5">Huruf Box</label>
                                 <input type="text" wire:model="newHurufBox" maxlength="10" placeholder="e.g. H, A" class="w-full px-3 py-2.5 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
@@ -613,6 +639,24 @@
                                 <input type="text" wire:model="editBatchName" maxlength="100" placeholder="e.g. Batch Juli 1"
                                     class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
                                 @error('editBatchName') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        {{-- Sprint 5A: Matched Data — pilih batch Admin China --}}
+                        <div>
+                            <label class="block text-[12px] font-medium text-gray-600 mb-1">Matched Data (Batch Admin China)</label>
+                            @if($chinaBatches->isNotEmpty())
+                                <select wire:model="editMatchedBatch" class="w-full px-3 py-2 text-[13px] bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                                    <option value="">— Tidak ada match —</option>
+                                    @foreach($chinaBatches as $batch)
+                                        <option value="{{ $batch }}">{{ $batch }}</option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <input type="text" wire:model="editMatchedBatch" maxlength="50" placeholder="Belum ada batch Admin China, isi manual jika perlu"
+                                    class="w-full px-3 py-2 text-[13px] bg-gray-50 border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40">
+                            @endif
+                            @error('editMatchedBatch') <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
 

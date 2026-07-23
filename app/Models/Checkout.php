@@ -29,6 +29,8 @@ class Checkout extends Model
         'status',
         'ekspedisi_id',
         'ongkir',
+        'volume_ina',
+        'fee_packing',
         'payment_timeout_at',
     ];
 

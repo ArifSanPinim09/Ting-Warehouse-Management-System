@@ -26,6 +26,10 @@ class ManageComplain extends Component
     public string $search = '';
     #[Url]
     public string $filterStatus = '';
+    #[Url]
+    public string $filterDateFrom = '';
+    #[Url]
+    public string $filterDateTo = '';
 
     // ─── Detail & Actions ───────────────────────────────────────
     public ?int $selectedId = null;
@@ -33,6 +37,8 @@ class ManageComplain extends Component
 
     public function updatingSearch(): void { $this->resetPage(); }
     public function updatingFilterStatus(): void { $this->resetPage(); }
+    public function updatingFilterDateFrom(): void { $this->resetPage(); }
+    public function updatingFilterDateTo(): void { $this->resetPage(); }
 
     public function selectComplain(int $id): void
     {
@@ -100,6 +106,14 @@ class ManageComplain extends Component
 
         if ($this->filterStatus) {
             $query->where('status', $this->filterStatus);
+        }
+
+        // Sprint 5C: Filter tanggal
+        if ($this->filterDateFrom) {
+            $query->whereDate('created_at', '>=', $this->filterDateFrom);
+        }
+        if ($this->filterDateTo) {
+            $query->whereDate('created_at', '<=', $this->filterDateTo);
         }
 
         $complains = $query->latest()->paginate(15);

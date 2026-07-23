@@ -51,6 +51,92 @@ class FinanceIndex extends Component
     public string $editFeeTax = '';
     public bool $showEditTax = false;
 
+    // ─── Sprint 5B: Finance Transaction CRUD ───────────────────
+    public bool $showTrxModal = false;
+    public ?int $editTrxId = null;
+    public string $trxCategory = 'operasional';
+    public string $trxDescription = '';
+    public string $trxAmount = '';
+    public string $trxDate = '';
+    public string $trxNotes = '';
+
+    public function openTrxModal(): void
+    {
+        $this->resetTrxForm();
+        $this->trxDate = now()->format('Y-m-d');
+        $this->showTrxModal = true;
+    }
+
+    public function closeTrxModal(): void
+    {
+        $this->showTrxModal = false;
+        $this->resetTrxForm();
+    }
+
+    public function editTrx(int $id): void
+    {
+        $trx = \App\Models\FinanceTransaction::findOrFail($id);
+        $this->editTrxId = $id;
+        $this->trxCategory = $trx->category;
+        $this->trxDescription = $trx->description;
+        $this->trxAmount = (string) $trx->amount;
+        $this->trxDate = $trx->transaction_date->format('Y-m-d');
+        $this->trxNotes = $trx->notes ?? '';
+        $this->showTrxModal = true;
+    }
+
+    public function saveTrx(): void
+    {
+        $this->validate([
+            'trxCategory' => 'required|in:operasional,refund,pemasukan_lain',
+            'trxDescription' => 'required|string|max:255',
+            'trxAmount' => 'required|numeric|min:0.01',
+            'trxDate' => 'required|date',
+            'trxNotes' => 'nullable|string|max:1000',
+        ], [
+            'trxDescription.required' => 'Deskripsi wajib diisi.',
+            'trxAmount.required' => 'Jumlah wajib diisi.',
+            'trxAmount.numeric' => 'Jumlah harus berupa angka.',
+            'trxDate.required' => 'Tanggal wajib diisi.',
+        ]);
+
+        $data = [
+            'category' => $this->trxCategory,
+            'description' => $this->trxDescription,
+            'amount' => (float) $this->trxAmount,
+            'transaction_date' => $this->trxDate,
+            'input_by' => auth()->id(),
+            'notes' => $this->trxNotes ?: null,
+        ];
+
+        if ($this->editTrxId) {
+            \App\Models\FinanceTransaction::find($this->editTrxId)->update($data);
+            $msg = 'Transaksi berhasil diupdate.';
+        } else {
+            \App\Models\FinanceTransaction::create($data);
+            $msg = 'Transaksi berhasil ditambahkan.';
+        }
+
+        $this->closeTrxModal();
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: $msg);
+    }
+
+    public function deleteTrx(int $id): void
+    {
+        \App\Models\FinanceTransaction::findOrFail($id)->delete();
+        $this->dispatch('toast', type: 'success', title: 'Berhasil', message: 'Transaksi berhasil dihapus.');
+    }
+
+    private function resetTrxForm(): void
+    {
+        $this->editTrxId = null;
+        $this->trxCategory = 'operasional';
+        $this->trxDescription = '';
+        $this->trxAmount = '';
+        $this->trxDate = '';
+        $this->trxNotes = '';
+    }
+
     public function openEditTax(int $invoiceId): void
     {
         $invoice = Invoice::find($invoiceId);
@@ -216,6 +302,22 @@ class FinanceIndex extends Component
         $totalFeesYuan = $shippingMaterialTotal + $goodsWeightTotal;
         $totalFeesRupiah = $totalFeesYuan * $kurs;
 
+        // Sprint 5B: Finance transactions by category
+        $operasionalTotal = \App\Models\FinanceTransaction::where('category', 'operasional')->sum('amount');
+        $refundTotal = \App\Models\FinanceTransaction::where('category', 'refund')->sum('amount');
+        $pemasukanLainTotal = \App\Models\FinanceTransaction::where('category', 'pemasukan_lain')->sum('amount');
+
+        // Total pengeluaran = China fees + Box fees + Operasional + Refund
+        $this->cashOut = $totalFeesRupiah + $operasionalTotal + $refundTotal;
+        // Total pemasukan = Invoice revenue + Pemasukan lain
+        $this->cashIn = $this->totalRevenue + $pemasukanLainTotal;
+        $this->totalProfit = $this->cashIn - $this->cashOut;
+
+        $recentTransactions = \App\Models\FinanceTransaction::with('inputBy')
+            ->latest()
+            ->limit(10)
+            ->get();
+
         $invoices = $query->latest()->paginate($this->perPage);
 
         $customers = User::where('role', 'customer')
@@ -240,6 +342,10 @@ class FinanceIndex extends Component
             'totalFeesYuan' => $totalFeesYuan,
             'totalFeesRupiah' => $totalFeesRupiah,
             'kursYuan' => $kurs,
+            'operasionalTotal' => $operasionalTotal,
+            'refundTotal' => $refundTotal,
+            'pemasukanLainTotal' => $pemasukanLainTotal,
+            'recentTransactions' => $recentTransactions,
         ]);
     }
 }

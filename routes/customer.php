@@ -9,6 +9,7 @@ use App\Livewire\Customer\InvoiceIndex;
 use App\Livewire\Customer\Kalkulator;
 use App\Livewire\Customer\KomplainIndex;
 use App\Livewire\Customer\NoTuanIndex;
+use App\Livewire\Customer\Notulen;
 use App\Livewire\Customer\SetorResi;
 use App\Livewire\Customer\UnmatchedResi;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +58,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Resi Belum Dikenali — customer klaim unmatched WH China data
     Route::get('/unmatched-resi', UnmatchedResi::class)->name('customer.unmatched-resi');
+
+    // Sprint 5A: Notulen — barang yang sudah sampai di INA
+    Route::get('/notulen', Notulen::class)->name('customer.notulen');
 
     // Profile
     Route::view('/profile', 'profile')->name('profile');

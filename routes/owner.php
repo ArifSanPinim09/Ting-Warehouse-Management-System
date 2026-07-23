@@ -7,6 +7,7 @@ use App\Livewire\Owner\Dashboard;
 use App\Livewire\Owner\FinanceIndex;
 use App\Livewire\Owner\KursManagement;
 use App\Livewire\Owner\ManageAdminIndex;
+use App\Livewire\Owner\ResiSearch;
 use App\Livewire\Owner\UsersIndex;
 use Illuminate\Support\Facades\Route;
 
@@ -45,4 +46,7 @@ Route::middleware(['auth', 'verified', 'role:owner'])->prefix('owner')->name('ow
 
     // All Data (PRD §7.4)
     Route::get('/data', AllDataIndex::class)->name('all-data');
+
+    // Sprint 5A: Mesin Pencari Resi
+    Route::get('/resi-search', ResiSearch::class)->name('resi-search');
 });

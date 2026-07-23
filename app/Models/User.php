@@ -34,6 +34,7 @@ class User extends Authenticatable
         'role',
         'status',
         'line_id',
+        'customer_code',
         'password',
         'custom_rate_air',
         'custom_rate_sea',

@@ -26,6 +26,7 @@ new class extends Component
         ['label' => 'Kalkulator', 'route' => 'customer.kalkulator', 'icon' => 'calculator'],
         ['label' => 'No Tuan', 'route' => 'customer.no-tuan', 'icon' => 'archive'],
         ['label' => 'Resi Belum Dikenali', 'route' => 'customer.unmatched-resi', 'icon' => 'search'],
+        ['label' => 'Notulen', 'route' => 'customer.notulen', 'icon' => 'truck'],
     ] : [
         ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'home'],
     ];

@@ -115,6 +115,13 @@ class SetorResi extends Component
             return;
         }
 
+        // Sprint 5B: Admin China DONE button — box locked, tidak bisa input barang baru
+        if ($box->is_locked) {
+            $this->addError('boxId', 'Batch sudah di-DONE oleh Admin China. Tidak bisa menambah barang baru.');
+            $this->submitting = false;
+            return;
+        }
+
         // Check duplicate resi in same box
         $exists = Item::where('box_id', $this->boxId)
             ->where('resi_number', $this->resiNumber)
@@ -174,6 +181,7 @@ class SetorResi extends Component
         // Direct box hanya untuk customer tertentu (customer_id = auth user)
         $userId = auth()->id();
         $boxes = Box::where('status', Box::STATUS_OPEN)
+            ->where('is_locked', false) // Sprint 5B: Hide locked boxes
             ->where(function ($query) use ($userId) {
                 // Box sharing (customer_id NULL) → semua customer bisa lihat
                 $query->whereNull('customer_id')

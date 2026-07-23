@@ -4,6 +4,7 @@ namespace App\Livewire\Customer;
 
 use App\Models\Checkout;
 use App\Models\Invoice;
+use App\Services\FeeCalculationService;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -35,6 +36,32 @@ class CheckoutIndex extends Component
     public string $ongkir = '0';
 
     public function updatingFilterStatus(): void { $this->resetPage(); }
+
+    /**
+     * Sprint 5A: Computed — preview VI & Fee Packing untuk invoice terpilih.
+     */
+    public function getPreviewFeeProperty(): ?array
+    {
+        if (!$this->invoiceId) return null;
+
+        $invoice = Invoice::find($this->invoiceId);
+        if (!$invoice) return null;
+
+        $volumeIna = round($invoice->volume * 1.5, 2);
+        $feeService = app(FeeCalculationService::class);
+        $packingBasis = max($invoice->weight, $volumeIna);
+        $feePacking = $feeService->calculateFeePacking($packingBasis);
+
+        return [
+            'weight' => $invoice->weight,
+            'volume' => $invoice->volume,
+            'volume_ina' => $volumeIna,
+            'packing_basis' => $packingBasis,
+            'fee_packing' => $feePacking,
+            'ongkir' => (float) ($this->ongkir ?: 0),
+            'grand_total' => $invoice->grand_total + $feePacking + (float) ($this->ongkir ?: 0),
+        ];
+    }
 
     public function openForm(): void
     {
@@ -102,6 +129,16 @@ class CheckoutIndex extends Component
             return;
         }
 
+        // Sprint 5A: Hitung VI (Volume INA) dan Fee Packing
+        // VI = (P×L×T)/4000 — konversi dari volume (/6000) ke VI (/4000)
+        // Rumus: VI = volume × (6000/4000) = volume × 1.5
+        $volumeIna = round($invoice->volume * 1.5, 2);
+
+        // Fee Packing = max(berat, VI) × fee_packing tiered
+        $feeService = app(\App\Services\FeeCalculationService::class);
+        $packingBasis = max($invoice->weight, $volumeIna);
+        $feePacking = $feeService->calculateFeePacking($packingBasis);
+
         Checkout::create([
             'invoice_id' => $this->invoiceId,
             'customer_id' => auth()->id(),
@@ -115,6 +152,9 @@ class CheckoutIndex extends Component
             // Sprint 3: Ekspedisi + ongkir
             'ekspedisi_id' => $this->ekspedisiId,
             'ongkir' => $this->ongkir ?: 0,
+            // Sprint 5A: VI + Fee Packing
+            'volume_ina' => $volumeIna,
+            'fee_packing' => $feePacking,
         ]);
 
         $this->closeForm();

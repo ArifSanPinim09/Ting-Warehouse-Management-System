@@ -46,6 +46,7 @@ class ManageBox extends Component
     public string $editType = '';
     public string $editMethod = '';
     public string $editBatchName = '';
+    public string $editMatchedBatch = '';
     public ?int $editCustomerId = null;
     public string $editNotes = '';
 
@@ -59,6 +60,7 @@ class ManageBox extends Component
     public string $newMethod = 'air';
     public string $newTrackingNumber = '';
     public string $newBatchName = '';
+    public string $newMatchedBatch = '';
     public string $newHurufBox = '';
     public ?int $newCustomerId = null;
     public string $newNotes = '';
@@ -119,6 +121,7 @@ class ManageBox extends Component
         $this->editType = $box->type;
         $this->editMethod = $box->method;
         $this->editBatchName = $box->batch_name ?? '';
+        $this->editMatchedBatch = $box->matched_batch ?? '';
         $this->editCustomerId = $box->customer_id;
         $this->editNotes = $box->notes ?? '';
         $this->editIsRedline = (bool) $box->is_redline;
@@ -137,6 +140,7 @@ class ManageBox extends Component
         $this->editType = '';
         $this->editMethod = '';
         $this->editBatchName = '';
+        $this->editMatchedBatch = '';
         $this->editCustomerId = null;
         $this->editNotes = '';
         $this->editIsRedline = false;
@@ -222,6 +226,7 @@ class ManageBox extends Component
             'editType' => 'required|in:sharing,direct,handcarry',
             'editMethod' => 'required|in:air,sea',
             'editBatchName' => 'nullable|string|max:100',
+            'editMatchedBatch' => 'nullable|string|max:50',
             'editCustomerId' => 'nullable|exists:users,id',
             'editNotes' => 'nullable|string|max:1000',
         ], [
@@ -255,6 +260,7 @@ class ManageBox extends Component
         $box->type = $this->editType;
         $box->method = $this->editMethod;
         $box->batch_name = $this->editBatchName ?: null;
+        $box->matched_batch = $this->editMatchedBatch ?: null;
         $box->customer_id = $this->editCustomerId;
         $box->notes = $this->editNotes ?: null;
         $box->is_redline = $this->editIsRedline;
@@ -283,6 +289,7 @@ class ManageBox extends Component
         $this->editType = '';
         $this->editMethod = '';
         $this->editBatchName = '';
+        $this->editMatchedBatch = '';
         $this->editCustomerId = null;
         $this->editNotes = '';
 
@@ -462,6 +469,7 @@ class ManageBox extends Component
             'newMethod' => 'required|in:air,sea',
             'newTrackingNumber' => 'nullable|string|max:100',
             'newBatchName' => 'nullable|string|max:100',
+            'newMatchedBatch' => 'nullable|string|max:50',
             'newHurufBox' => 'nullable|string|max:10',
             'newCustomerId' => 'nullable|exists:users,id',
             'newNotes' => 'nullable|string|max:1000',
@@ -472,6 +480,7 @@ class ManageBox extends Component
             'method' => $this->newMethod,
             'tracking_number' => $this->newTrackingNumber ?: null,
             'batch_name' => $this->newBatchName ?: null,
+            'matched_batch' => $this->newMatchedBatch ?: null,
             'huruf_box' => $this->newHurufBox ?: null,
             'customer_id' => $this->newCustomerId,
             'notes' => $this->newNotes ?: null,
@@ -493,6 +502,7 @@ class ManageBox extends Component
         $this->newMethod = 'air';
         $this->newTrackingNumber = '';
         $this->newBatchName = '';
+        $this->newMatchedBatch = '';
         $this->newHurufBox = '';
         $this->newCustomerId = null;
         $this->newNotes = '';
@@ -554,10 +564,19 @@ class ManageBox extends Component
 
         $boxes = $query->latest()->paginate(15);
 
+        // Sprint 5A: Daftar batch Admin China yang available untuk Matched Data
+        $chinaBatches = \App\Models\WhChinaData::whereNotNull('china_batch_name')
+            ->where('china_batch_name', '!=', '')
+            ->distinct()
+            ->pluck('china_batch_name')
+            ->sort()
+            ->values();
+
         return view('livewire.admin.boxes.index', [
             'boxes' => $boxes,
             'selectedBox' => $this->selected_box,
             'customers' => $this->customers,
+            'chinaBatches' => $chinaBatches,
         ]);
     }
 }

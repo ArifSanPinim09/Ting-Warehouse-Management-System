@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ExportController;
 use App\Livewire\Admin\CreateNoTuanItem;
 use App\Livewire\Admin\CustomerIndex;
 use App\Livewire\Admin\Dashboard;
@@ -11,6 +12,8 @@ use App\Livewire\Admin\ManageBox;
 use App\Livewire\Admin\ManageCheckout;
 use App\Livewire\Admin\ManageComplain;
 use App\Livewire\Admin\RecapIndex;
+use App\Livewire\Admin\ItemStatusManager;
+use App\Livewire\Admin\ResiSearch;
 use App\Livewire\Admin\SettingsIndex;
 use App\Livewire\Admin\VerificationIndex;
 use Illuminate\Support\Facades\Route;
@@ -65,4 +68,15 @@ Route::middleware(['auth', 'verified', 'role:admin,owner'])->prefix('admin')->na
 
     // Input Barang No Tuan (Revisi §2.1 — admin input barang tanpa resi)
     Route::get('/no-tuan/create', CreateNoTuanItem::class)->name('no-tuan.create');
+
+    // Sprint 5A: Mesin Pencari Resi
+    Route::get('/resi-search', ResiSearch::class)->name('resi-search');
+
+    // Sprint 5C: Item Status Manager
+    Route::get('/item-status', ItemStatusManager::class)->name('item-status');
+
+    // Sprint 5B: Export — Thermal Label, Faktur, Import per Box
+    Route::get('/checkout/{checkout}/thermal-label', [ExportController::class, 'thermalLabel'])->name('export.thermal-label');
+    Route::get('/checkout/{checkout}/faktur', [ExportController::class, 'invoiceFaktur'])->name('export.faktur');
+    Route::get('/box/{boxId}/import-pdf', [ExportController::class, 'importPerBox'])->name('export.import-box');
 });

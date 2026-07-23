@@ -30,6 +30,9 @@
                     <option value="processing">Processing</option>
                     <option value="resolved">Resolved</option>
                 </select>
+                {{-- Sprint 5C: Filter tanggal --}}
+                <input type="date" wire:model.live="filterDateFrom" class="py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600" placeholder="Dari">
+                <input type="date" wire:model.live="filterDateTo" class="py-2.5 px-3 text-body bg-white border border-gray-200 rounded-[8px] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors text-gray-600" placeholder="Sampai">
             </div>
         </div>
 

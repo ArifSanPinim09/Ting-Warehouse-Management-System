@@ -217,6 +217,15 @@
                                         <span class="text-caption text-emerald-600">Tracking Number</span>
                                         <span class="text-body font-mono font-semibold text-emerald-800">{{ $selectedCheckout->tracking_number }}</span>
                                     </div>
+                                    {{-- Sprint 5B: Download buttons --}}
+                                    <div class="flex gap-2 pt-2 border-t border-emerald-100">
+                                        <a href="{{ route('admin.export.thermal-label', $selectedCheckout->id) }}" target="_blank" class="text-[12px] font-medium px-3 py-1.5 rounded-[6px] bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+                                            🖨 Thermal Label
+                                        </a>
+                                        <a href="{{ route('admin.export.faktur', $selectedCheckout->id) }}" target="_blank" class="text-[12px] font-medium px-3 py-1.5 rounded-[6px] bg-white border border-gray-200 text-gray-700 hover:bg-gray-50">
+                                            📄 Faktur
+                                        </a>
+                                    </div>
                                 </div>
                             @endif
 

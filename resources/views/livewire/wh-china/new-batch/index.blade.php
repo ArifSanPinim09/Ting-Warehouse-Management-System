@@ -55,6 +55,7 @@
                                 <th class="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Open Date</th>
                                 <th class="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Close Date</th>
+                                <th class="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
@@ -92,6 +93,14 @@
                                     </td>
                                     <td class="px-5 py-3 text-[13px] text-gray-700">
                                         {{ $batch->close_date ? \Carbon\Carbon::parse($batch->close_date)->format('d M Y') : '—' }}
+                                    </td>
+                                    <td class="px-5 py-3">
+                                        @if($batch->is_locked)
+                                            <span class="text-[12px] font-medium px-2 py-0.5 rounded-full bg-red-100 text-red-700">LOCKED</span>
+                                            <button wire:click="toggleLock({{ $batch->id }})" wire:confirm="Unlock batch ini?" class="ml-2 text-[12px] text-blue-600 hover:underline">Unlock</button>
+                                        @else
+                                            <button wire:click="toggleLock({{ $batch->id }})" wire:confirm="DONE: Lock batch dari input baru? Data yang sudah ada masih bisa di-edit." class="text-[12px] font-medium px-3 py-1 rounded-[6px] bg-green-600 text-white hover:bg-green-700 transition-colors">DONE</button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

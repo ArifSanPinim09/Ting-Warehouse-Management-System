@@ -29,6 +29,7 @@ class RegisterRequest extends FormRequest
             'phone' => ['required', 'numeric', 'digits_between:10,15'],
             'ktp_number' => ['required', 'numeric', 'digits:16', 'unique:users,ktp_number'],
             'address' => ['required', 'string', 'min:10', 'max:500'],
+            'customer_code' => ['nullable', 'string', 'max:10', 'unique:users,customer_code'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }

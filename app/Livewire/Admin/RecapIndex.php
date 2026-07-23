@@ -71,6 +71,7 @@ class RecapIndex extends Component
     public string $volume = '';
     public string $ukuranBox = '';
     public string $hurufBox = '';
+    public string $chinaBatchName = '';
     public string $biayaJasa = '';
     public string $biayaTax = '';
     public $fotoBarang = null;
@@ -276,6 +277,7 @@ class RecapIndex extends Component
                 'volume' => $calculatedVolume ?? $whData->volume,
                 'ukuran_box' => $this->ukuranBox,
                 'huruf_box' => $this->hurufBox ?: null,
+                'china_batch_name' => $this->chinaBatchName ?: null,
                 'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
                 'biaya_tax' => $this->biayaTax !== '' ? (float) $this->biayaTax : $whData->biaya_tax,
                 'foto_barang' => $fotoPath ?? $whData->foto_barang,
@@ -296,6 +298,7 @@ class RecapIndex extends Component
                 'volume' => $calculatedVolume,
                 'ukuran_box' => $this->ukuranBox,
                 'huruf_box' => $this->hurufBox ?: null,
+                'china_batch_name' => $this->chinaBatchName ?: null,
                 'biaya_jasa' => $this->biayaJasa !== '' ? (float) $this->biayaJasa : null,
                 'biaya_tax' => $this->biayaTax !== '' ? (float) $this->biayaTax : null,
                 'foto_barang' => $fotoPath,
@@ -332,6 +335,7 @@ class RecapIndex extends Component
         $this->volume = $whData->volume !== null ? (string) $whData->volume : '';
         $this->ukuranBox = $whData->ukuran_box;
         $this->hurufBox = $whData->huruf_box ?? '';
+        $this->chinaBatchName = $whData->china_batch_name ?? '';
         $this->biayaJasa = $whData->biaya_jasa !== null ? (string) $whData->biaya_jasa : '';
         $this->tanggalSetor = $whData->tanggal_setor ? $whData->tanggal_setor->format('Y-m-d') : '';
         $this->showWhModal = true;
@@ -385,6 +389,7 @@ class RecapIndex extends Component
         $this->volume = '';
         $this->ukuranBox = '';
         $this->hurufBox = '';
+        $this->chinaBatchName = '';
         $this->biayaJasa = '';
         $this->fotoBarang = null;
         $this->fotoArrivedChina = null;

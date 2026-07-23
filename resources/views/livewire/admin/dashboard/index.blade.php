@@ -335,5 +335,33 @@
                 @endif
             </div>
         </div>
+
+        {{-- Sprint 5B: Customers Nimbun Kelamaan --}}
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <div class="flex items-center gap-2 mb-4">
+                <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <h3 class="text-body font-semibold text-gray-800">Customer Nimbun Kelamaan</h3>
+            </div>
+            @if($longStorageCustomers && !$longStorageCustomers->isEmpty())
+                <div class="space-y-2">
+                    @foreach($longStorageCustomers as $customer)
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                                    <span class="text-xs font-medium text-orange-600">{{ strtoupper(substr($customer->name, 0, 1)) }}</span>
+                                </div>
+                                <div>
+                                    <p class="text-body font-medium text-gray-800">{{ $customer->name }}</p>
+                                    <p class="text-caption text-gray-500">{{ $customer->items_count }} barang di box OPEN >14 hari</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.customers') }}" class="text-caption text-accent hover:underline">Lihat</a>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-caption text-gray-400 py-4 text-center">Tidak ada customer yang nimbun kelamaan</p>
+            @endif
+        </div>
     </div>
 </div>

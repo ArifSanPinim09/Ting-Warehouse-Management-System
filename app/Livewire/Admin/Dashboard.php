@@ -35,6 +35,7 @@ class Dashboard extends Component
     public $recentActivities;
     public $deadlinePayments;
     public $deadlineStorages;
+    public $longStorageCustomers;
 
     public function mount(): void
     {
@@ -90,18 +91,37 @@ class Dashboard extends Component
 
     public function loadDeadlines(): void
     {
-        // Invoices waiting payment (deadline tracking)
+        // Invoices waiting payment (deadline tracking) — nimbun kelamaan + belum bayar
         $this->deadlinePayments = Invoice::with(['customer', 'box'])
             ->where('status', Invoice::STATUS_WAITING_PAYMENT)
-            ->latest()
-            ->limit(5)
+            ->where('payment_deadline', '<', now())
+            ->orderBy('payment_deadline')
+            ->limit(10)
             ->get();
 
         // Boxes that have been at warehouse for too long (storage deadline)
         $this->deadlineStorages = Box::with('customer')
             ->whereIn('status', [Box::STATUS_OPEN, Box::STATUS_OTW_INA])
             ->latest()
-            ->limit(5)
+            ->limit(10)
+            ->get();
+
+        // Sprint 5B: Customers nimbun kelamaan — items di box OPEN > 14 hari
+        $this->longStorageCustomers = \App\Models\User::where('role', 'customer')
+            ->where('status', 'active')
+            ->whereHas('items.box', function ($q) {
+                $q->where('status', Box::STATUS_OPEN)
+                  ->where('updated_at', '<', now()->subDays(14));
+            })
+            ->withCount(['items' => function ($q) {
+                $q->whereHas('box', function ($bq) {
+                    $bq->where('status', Box::STATUS_OPEN)
+                      ->where('updated_at', '<', now()->subDays(14));
+                });
+            }])
+            ->having('items_count', '>', 0)
+            ->orderByDesc('items_count')
+            ->limit(10)
             ->get();
     }
 

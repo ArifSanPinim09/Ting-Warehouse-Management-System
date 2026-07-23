@@ -23,8 +23,10 @@ class Box extends Model
         'cargo_tracking_number',
         'cargo_photo',
         'batch_name',
+        'matched_batch',
         'huruf_box',
         'status',
+        'is_locked',
         'method',
         'customer_id',
         'notes',
@@ -41,15 +43,32 @@ class Box extends Model
     ];
 
     /**
-     * Get box display name: batch_name + huruf_box.
-     * Contoh: "126-H"
+     * Get box display code — format sesuai jawaban client 24 Juli 2026.
+     *
+     * Sharing (dengan matched_batch): {matched_batch}-{METHOD}-{batch_name}
+     *   Contoh: 20072607-26-AIR-140
+     *   matched_batch dari Admin China, batch_name+huruf_box dari Admin INA
+     *
+     * Sharing (tanpa matched_batch): {batch_name}-{METHOD}-{huruf_box}
+     *   Contoh: 07071708-26-AIR-140
+     *
+     * Direct: {customer_code}-{METHOD}-{huruf_box}
+     *   Contoh: LIX-SEA-B-1
      */
     public function getBoxCodeAttribute(): string
     {
-        $parts = array_filter([
-            $this->batch_name,
-            $this->huruf_box,
-        ]);
+        $method = $this->method ? strtoupper($this->method) : '';
+
+        if ($this->type === 'direct' && $this->customer) {
+            $prefix = $this->customer->customer_code ?? ('C' . $this->customer_id);
+            $parts = array_filter([$prefix, $method, $this->huruf_box]);
+        } elseif ($this->matched_batch) {
+            // Matched: batch Admin China + METHOD + batch_name Admin INA
+            $parts = array_filter([$this->matched_batch, $method, $this->batch_name]);
+        } else {
+            $parts = array_filter([$this->batch_name, $method, $this->huruf_box]);
+        }
+
         return $parts ? implode('-', $parts) : ('Box #' . $this->id);
     }
 
@@ -79,6 +98,7 @@ class Box extends Model
             'open_date' => 'datetime',
             'close_date' => 'datetime',
             'last_setor_date' => 'datetime',
+            'is_locked' => 'boolean',
         ];
     }
 

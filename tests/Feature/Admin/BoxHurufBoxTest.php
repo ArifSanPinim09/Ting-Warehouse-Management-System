@@ -47,7 +47,7 @@ class BoxHurufBoxTest extends TestCase
             'status' => 'OPEN',
         ]);
 
-        $this->assertEquals('126-H', $box->box_code);
+        $this->assertEquals('126-AIR-H', $box->box_code);
     }
 
     /** @test */
@@ -60,7 +60,7 @@ class BoxHurufBoxTest extends TestCase
             'status' => 'OPEN',
         ]);
 
-        $this->assertEquals('126', $box->box_code);
+        $this->assertEquals('126-AIR', $box->box_code);
     }
 
     /** @test */
@@ -72,7 +72,8 @@ class BoxHurufBoxTest extends TestCase
             'status' => 'OPEN',
         ]);
 
-        $this->assertEquals('Box #' . $box->id, $box->box_code);
+        // No batch_name, no huruf_box — only method exists
+        $this->assertEquals('AIR', $box->box_code);
     }
 
     /** @test */
@@ -101,7 +102,7 @@ class BoxHurufBoxTest extends TestCase
             'status' => 'OPEN',
         ]);
 
-        $this->assertEquals('126-H', $box->display_name);
+        $this->assertEquals('126-AIR-H', $box->display_name);
     }
 
     /** @test */
@@ -161,7 +162,7 @@ class BoxHurufBoxTest extends TestCase
         Livewire::test(ManageBox::class)
             ->set('search', 'X')
             ->assertDontSee('Tidak ada box')
-            ->assertSee('126-X');
+            ->assertSee('126-AIR-X');
     }
 
     /** @test */

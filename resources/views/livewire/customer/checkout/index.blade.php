@@ -205,6 +205,49 @@
                             </div>
                         </div>
 
+                        {{-- Sprint 5A: Preview VI + Fee Packing + Grand Total --}}
+                        @if($this->previewFee)
+                        <div class="bg-gray-50 rounded-[8px] p-4 space-y-2 border border-gray-100">
+                            <p class="text-[13px] font-semibold text-gray-700 mb-2">Ringkasan Biaya</p>
+                            <div class="flex justify-between text-[13px]">
+                                <span class="text-gray-500">Berat</span>
+                                <span class="font-medium text-gray-800">{{ number_format($this->previewFee['weight'], 2) }} kg</span>
+                            </div>
+                            <div class="flex justify-between text-[13px]">
+                                <span class="text-gray-500">Volume (P×L×T)/6000</span>
+                                <span class="font-medium text-gray-800">{{ number_format($this->previewFee['volume'], 2) }}</span>
+                            </div>
+                            <div class="flex justify-between text-[13px]">
+                                <span class="text-gray-500">VI (P×L×T)/4000</span>
+                                <span class="font-medium text-gray-800">{{ number_format($this->previewFee['volume_ina'], 2) }}</span>
+                            </div>
+                            <div class="flex justify-between text-[13px]">
+                                <span class="text-gray-500">Dasar Packing (max berat, VI)</span>
+                                <span class="font-medium text-gray-800">{{ number_format($this->previewFee['packing_basis'], 2) }}</span>
+                            </div>
+                            <div class="border-t border-gray-200 pt-2 mt-2 space-y-1">
+                                <div class="flex justify-between text-[13px]">
+                                    <span class="text-gray-500">Invoice</span>
+                                    <span class="font-medium text-gray-800">Rp {{ number_format($this->previewFee['grand_total'] - $this->previewFee['fee_packing'] - $this->previewFee['ongkir'], 0, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between text-[13px]">
+                                    <span class="text-gray-500">Fee Packing</span>
+                                    <span class="font-medium text-gray-800">Rp {{ number_format($this->previewFee['fee_packing'], 0, ',', '.') }}</span>
+                                </div>
+                                @if($this->previewFee['ongkir'] > 0)
+                                <div class="flex justify-between text-[13px]">
+                                    <span class="text-gray-500">Ongkir Ekspedisi</span>
+                                    <span class="font-medium text-gray-800">Rp {{ number_format($this->previewFee['ongkir'], 0, ',', '.') }}</span>
+                                </div>
+                                @endif
+                                <div class="flex justify-between text-[14px] font-bold pt-1 border-t border-gray-200">
+                                    <span class="text-gray-700">Grand Total</span>
+                                    <span class="text-primary">Rp {{ number_format($this->previewFee['grand_total'], 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
                         <label class="flex items-start gap-3 cursor-pointer">
                             <input type="checkbox" wire:model="confirmation" class="mt-0.5 rounded border-gray-300 text-accent focus:ring-accent/20" />
                             <span class="text-body text-gray-600">Saya mengkonfirmasi data di atas sudah benar dan ingin mengajukan checkout.</span>

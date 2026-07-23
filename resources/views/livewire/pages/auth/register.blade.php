@@ -19,6 +19,7 @@ new #[Layout('layouts.guest')] class extends Component
     public string $phone = '';
     public string $ktp_number = '';
     public string $address = '';
+    public ?string $customer_code = null;
     public string $password = '';
     public string $password_confirmation = '';
     public bool $tncAccepted = false; // Sprint 3: TnC checkbox

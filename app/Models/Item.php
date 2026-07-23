@@ -65,6 +65,13 @@ class Item extends Model
     const STATUS_DIJUAL = 'dijual'; // Revisi §2.9: Barang ditandai untuk dijual
     const STATUS_LELANG = 'lelang'; // Revisi §2.9: Barang ditandai untuk dilelang
 
+    // Sprint 5C: Status tambahan item
+    const STATUS_OTW = 'otw';                       // On The Way — dalam perjalanan
+    const STATUS_SEND_BACK = 'send_back_to_seller'; // Kirim balik ke seller China
+    const STATUS_SEND_DIFF = 'send_to_diff_addr';   // Kirim ke alamat berbeda
+    const STATUS_NEVER_ARRIVED = 'never_arrived';   // Barang tidak pernah sampai
+    const STATUS_WRONG_ADDRESS = 'wrong_address';   // Salah alamat
+
     /**
      * Get all valid statuses.
      *
@@ -81,7 +88,35 @@ class Item extends Model
             self::STATUS_HOLD,
             self::STATUS_DIJUAL,
             self::STATUS_LELANG,
+            self::STATUS_OTW,
+            self::STATUS_SEND_BACK,
+            self::STATUS_SEND_DIFF,
+            self::STATUS_NEVER_ARRIVED,
+            self::STATUS_WRONG_ADDRESS,
         ];
+    }
+
+    /**
+     * Sprint 5C: Get human-readable label for status.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return match($this->status) {
+            self::STATUS_ACTIVE => 'Active',
+            self::STATUS_NO_TUAN => 'No Tuan',
+            self::STATUS_CLAIMED => 'Claimed',
+            self::STATUS_KLAIM_WH => 'Unknown',
+            self::STATUS_SHIPPED => 'Shipped',
+            self::STATUS_HOLD => 'Hold',
+            self::STATUS_DIJUAL => 'Dijual',
+            self::STATUS_LELANG => 'Lelang',
+            self::STATUS_OTW => 'OTW',
+            self::STATUS_SEND_BACK => 'Send Back to Seller',
+            self::STATUS_SEND_DIFF => 'Send to Different Address',
+            self::STATUS_NEVER_ARRIVED => 'Never Arrived',
+            self::STATUS_WRONG_ADDRESS => 'Wrong Address',
+            default => ucfirst($this->status ?? 'unknown'),
+        };
     }
 
     /**
