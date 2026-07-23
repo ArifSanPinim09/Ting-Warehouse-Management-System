@@ -35,7 +35,7 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function register(): void
     {
-        // PRD §20.5: Rate limiting for registration
+        // PRD §20.5: Rate limiting for registration (3x per hour per IP)
         $this->ensureIsNotRateLimited();
 
         // Hit rate limiter BEFORE processing (counts all attempts, successful or not)
